@@ -14,9 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
-enum class UserRole {
+enum class AuthState {
+    UNAUTHENTICATED,
+    TEACHER_ADMIN,
     STUDENT,
-    ADMIN_TEACHER,
     WEB_VIEW
 }
 
@@ -24,8 +25,11 @@ class TeacherManagementViewModel(
     private val repository: TeacherRepository = TeacherRepository.getInstance()
 ) : ViewModel() {
 
-    private val _currentRole = MutableStateFlow(UserRole.ADMIN_TEACHER)
-    val currentRole: StateFlow<UserRole> = _currentRole.asStateFlow()
+    private val _authState = MutableStateFlow(AuthState.UNAUTHENTICATED)
+    val authState: StateFlow<AuthState> = _authState.asStateFlow()
+
+    private val _loggedInUserEmail = MutableStateFlow("")
+    val loggedInUserEmail: StateFlow<String> = _loggedInUserEmail.asStateFlow()
 
     private val _selectedTeacherId = MutableStateFlow("t1")
     val selectedTeacherId: StateFlow<String> = _selectedTeacherId.asStateFlow()
@@ -63,8 +67,24 @@ class TeacherManagementViewModel(
         teacherList.find { it.id == teacherId } ?: teacherList.firstOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    fun selectRole(role: UserRole) {
-        _currentRole.value = role
+    fun loginAsTeacher(email: String, teacherId: String = "t1") {
+        _loggedInUserEmail.value = email.ifBlank { "teacher@university.edu" }
+        _selectedTeacherId.value = teacherId
+        _authState.value = AuthState.TEACHER_ADMIN
+    }
+
+    fun loginAsStudent(email: String) {
+        _loggedInUserEmail.value = email.ifBlank { "student@university.edu" }
+        _authState.value = AuthState.STUDENT
+    }
+
+    fun openWebView() {
+        _authState.value = AuthState.WEB_VIEW
+    }
+
+    fun logout() {
+        _authState.value = AuthState.UNAUTHENTICATED
+        _loggedInUserEmail.value = ""
     }
 
     fun selectTeacher(teacherId: String) {
@@ -100,7 +120,7 @@ class TeacherManagementViewModel(
             teacherId = teacherId,
             teacherName = teacherName,
             studentName = studentName,
-            studentEmail = studentEmail,
+            studentEmail = studentEmail.ifBlank { _loggedInUserEmail.value },
             date = date,
             timeSlot = timeSlot,
             purpose = purpose

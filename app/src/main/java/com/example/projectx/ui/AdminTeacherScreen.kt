@@ -41,6 +41,19 @@ fun AdminTeacherScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text("👨‍🏫 Teacher Admin Portal") },
+                actions = {
+                    TextButton(onClick = { viewModel.logout() }) {
+                        Text("Log Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            )
+        },
         snackbarHost = {
             if (showSavedSnackbar) {
                 Snackbar(

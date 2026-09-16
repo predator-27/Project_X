@@ -51,26 +51,26 @@ body {
 .role-switcher {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
     background: rgba(255, 255, 255, 0.1);
-    padding: 0.25rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 8px;
 }
 
-.role-btn {
+.session-label {
+    font-size: 0.8rem;
+    color: #e2e8f0;
+}
+
+.logout-btn {
+    background: #dc2626;
+    color: white;
     border: none;
-    background: transparent;
-    color: #cbd5e1;
-    padding: 0.5rem 1rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-}
-
-.role-btn.active {
-    background: var(--primary-color);
-    color: white;
+    font-size: 0.8rem;
 }
 
 .container {
@@ -85,6 +85,53 @@ body {
 
 .view-section.active {
     display: block;
+}
+
+/* Login Card Styling */
+.login-card {
+    max-width: 440px;
+    margin: 2rem auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.login-card h2 {
+    font-size: 1.5rem;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.login-card .subtitle {
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.role-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 1.25rem;
+}
+
+.role-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 0.75rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+}
+
+.role-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
 }
 
 .portal-nav {
@@ -135,7 +182,7 @@ body {
 
 .filter-bar input, .filter-bar select {
     padding: 0.65rem 1rem;
-    border: 1fr solid var(--border-color);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 0.9rem;
     outline: none;

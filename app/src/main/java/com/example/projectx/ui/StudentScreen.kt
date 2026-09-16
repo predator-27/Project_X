@@ -35,6 +35,19 @@ fun StudentScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text("👨‍🎓 Student Desk Portal") },
+                actions = {
+                    TextButton(onClick = { viewModel.logout() }) {
+                        Text("Log Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            )
+        },
         snackbarHost = {
             if (showSuccessSnackbar) {
                 Snackbar(

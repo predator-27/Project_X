@@ -84,25 +84,71 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAppointments(initialAppointments);
     }
 
-    renderTeachers();
-    renderAppointments();
+    populateWebTeacherSelect();
     populateAdminTeacherSelect();
 });
 
-// Role Switcher
-function switchRole(role) {
-    document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+function populateWebTeacherSelect() {
+    const teachers = getTeachers();
+    const select = document.getElementById('web-teacher-select');
+    select.innerHTML = '';
+    teachers.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = `${t.name} (${t.department})`;
+        select.appendChild(opt);
+    });
+}
 
-    if (role === 'student') {
-        document.getElementById('btn-role-student').classList.add('active');
-        document.getElementById('view-student').classList.add('active');
-        renderTeachers();
+function switchLoginTab(role) {
+    document.getElementById('tab-btn-teacher').classList.remove('active');
+    document.getElementById('tab-btn-student').classList.remove('active');
+    document.getElementById('form-login-teacher').style.display = 'none';
+    document.getElementById('form-login-student').style.display = 'none';
+
+    if (role === 'teacher') {
+        document.getElementById('tab-btn-teacher').classList.add('active');
+        document.getElementById('form-login-teacher').style.display = 'block';
     } else {
-        document.getElementById('btn-role-admin').classList.add('active');
-        document.getElementById('view-admin').classList.add('active');
-        loadAdminTeacher();
+        document.getElementById('tab-btn-student').classList.add('active');
+        document.getElementById('form-login-student').style.display = 'block';
     }
+}
+
+function handleTeacherLogin(event) {
+    event.preventDefault();
+    const teacherId = document.getElementById('web-teacher-select').value;
+    const teachers = getTeachers();
+    const teacher = teachers.find(t => t.id === teacherId) || teachers[0];
+
+    document.getElementById('view-login').classList.remove('active');
+    document.getElementById('view-admin').classList.add('active');
+
+    document.getElementById('user-session-bar').style.display = 'flex';
+    document.getElementById('session-user-badge').textContent = `👨‍🏫 ${teacher.name}`;
+
+    document.getElementById('teacher-select').value = teacher.id;
+    loadAdminTeacher();
+}
+
+function handleStudentLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('web-student-email').value;
+
+    document.getElementById('view-login').classList.remove('active');
+    document.getElementById('view-student').classList.add('active');
+
+    document.getElementById('user-session-bar').style.display = 'flex';
+    document.getElementById('session-user-badge').textContent = `👨‍🎓 ${email}`;
+
+    renderTeachers();
+    renderAppointments();
+}
+
+function webLogout() {
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById('view-login').classList.add('active');
+    document.getElementById('user-session-bar').style.display = 'none';
 }
 
 // Student View Navigation

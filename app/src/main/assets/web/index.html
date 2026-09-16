@@ -12,15 +12,63 @@
             <h1>🏫 EduDesk & Mentor Portal</h1>
             <p>Teacher Desk Presence, Schedules & Appointment Management</p>
         </div>
-        <div class="role-switcher">
-            <button id="btn-role-student" class="role-btn active" onclick="switchRole('student')">👨‍🎓 Student View</button>
-            <button id="btn-role-admin" class="role-btn" onclick="switchRole('admin')">👨‍🏫 Teacher Admin View</button>
+        <div id="user-session-bar" class="role-switcher" style="display: none;">
+            <span id="session-user-badge" class="session-label">Logged In</span>
+            <button class="role-btn logout-btn" onclick="webLogout()">🔒 Log Out</button>
         </div>
     </header>
 
     <main class="container">
+        <!-- LOGIN VIEW -->
+        <section id="view-login" class="view-section active">
+            <div class="login-card">
+                <h2>Portal Sign In</h2>
+                <p class="subtitle">Choose your portal type to log in</p>
+
+                <div class="role-tabs">
+                    <button id="tab-btn-teacher" class="role-tab active" onclick="switchLoginTab('teacher')">👨‍🏫 Teacher / Admin</button>
+                    <button id="tab-btn-student" class="role-tab" onclick="switchLoginTab('student')">👨‍🎓 Student / User</button>
+                </div>
+
+                <!-- Teacher Login Form -->
+                <form id="form-login-teacher" onsubmit="handleTeacherLogin(event)">
+                    <div class="form-group">
+                        <label for="web-teacher-select">Select Teacher Account:</label>
+                        <select id="web-teacher-select"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="web-teacher-email">Work Email:</label>
+                        <input type="email" id="web-teacher-email" required value="s.jenkins@university.edu">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="web-teacher-pass">Password:</label>
+                        <input type="password" id="web-teacher-pass" required value="password123">
+                    </div>
+
+                    <button type="submit" class="primary-btn full-width">Sign In as Teacher</button>
+                </form>
+
+                <!-- Student Login Form -->
+                <form id="form-login-student" style="display: none;" onsubmit="handleStudentLogin(event)">
+                    <div class="form-group">
+                        <label for="web-student-email">Student Email:</label>
+                        <input type="email" id="web-student-email" required value="alex.r@student.edu">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="web-student-pass">Password:</label>
+                        <input type="password" id="web-student-pass" required value="password123">
+                    </div>
+
+                    <button type="submit" class="primary-btn full-width">Sign In as Student</button>
+                </form>
+            </div>
+        </section>
+
         <!-- STUDENT VIEW -->
-        <section id="view-student" class="view-section active">
+        <section id="view-student" class="view-section">
             <div class="portal-nav">
                 <button class="nav-tab active" onclick="switchStudentTab('directory')">🔍 Teacher Directory</button>
                 <button class="nav-tab" onclick="switchStudentTab('appointments')">📅 My Appointments <span id="app-count-badge" class="badge">0</span></button>
