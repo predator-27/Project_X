@@ -7,14 +7,21 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.projectx.model.Institution
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -39,6 +47,8 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var selectedTeacherId by remember { mutableStateOf("t1") }
+
+    var showRegisterDialog by remember { mutableStateOf(false) }
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -174,12 +184,24 @@ fun LoginScreen(
                         verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         if (role == 0) {
-                            Text(
-                                text = "Teacher Admin Sign In",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Teacher Admin Sign In",
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+
+                                TextButton(onClick = { showRegisterDialog = true }) {
+                                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("New Teacher?", fontSize = 12.sp)
+                                }
+                            }
 
                             var expanded by remember { mutableStateOf(false) }
                             val activeTeacher = teachers.find { it.id == selectedTeacherId } ?: teachers.firstOrNull()
@@ -192,7 +214,7 @@ fun LoginScreen(
                                     value = activeTeacher?.let { "${it.name} (${it.department})" } ?: "",
                                     onValueChange = {},
                                     readOnly = true,
-                                    label = { Text("Teacher Account") },
+                                    label = { Text("Select Teacher Account") },
                                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                                     shape = RoundedCornerShape(12.dp),
@@ -343,5 +365,188 @@ fun LoginScreen(
                 }
             }
         }
+
+        // Register New Teacher Dialog
+        if (showRegisterDialog) {
+            RegisterTeacherDialog(
+                onDismiss = { showRegisterDialog = false },
+                onRegister = { name, title, dept, email, desk, timings, instName, instDomain ->
+                    viewModel.registerAndLoginTeacher(
+                        name = name,
+                        title = title,
+                        department = dept,
+                        email = email,
+                        deskNumber = desk,
+                        timings = timings,
+                        institution = instName,
+                        institutionDomain = instDomain
+                    )
+                    showRegisterDialog = false
+                }
+            )
+        }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RegisterTeacherDialog(
+    onDismiss: () -> Unit,
+    onRegister: (name: String, title: String, dept: String, email: String, desk: String, timings: String, instName: String, instDomain: String) -> Unit
+) {
+    var regName by remember { mutableStateOf("") }
+    var regTitle by remember { mutableStateOf("Professor") }
+    var regDept by remember { mutableStateOf("Computer Science") }
+    var regDesk by remember { mutableStateOf("Desk #101, Block A") }
+    var regTimings by remember { mutableStateOf("Mon-Fri: 09:00 AM - 01:00 PM") }
+
+    val institutions = remember { Institution.DEFAULT_LIST }
+    var selectedInstitution by remember { mutableStateOf(institutions.first()) }
+    var regEmailPrefix by remember { mutableStateOf("prof.new") }
+
+    val fullEmail = "$regEmailPrefix@${selectedInstitution.domain}"
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Register New Teacher Account", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedTextField(
+                    value = regName,
+                    onValueChange = { regName = it },
+                    label = { Text("Full Name") },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = regTitle,
+                        onValueChange = { regTitle = it },
+                        label = { Text("Title") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    OutlinedTextField(
+                        value = regDept,
+                        onValueChange = { regDept = it },
+                        label = { Text("Department") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // Institution Selection
+                var expandedInst by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedInst,
+                    onExpandedChange = { expandedInst = !expandedInst }
+                ) {
+                    OutlinedTextField(
+                        value = "${selectedInstitution.name} (@${selectedInstitution.domain})",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Institution / College") },
+                        leadingIcon = { Icon(Icons.Default.Business, contentDescription = null) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInst) },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedInst,
+                        onDismissRequest = { expandedInst = false }
+                    ) {
+                        institutions.forEach { inst ->
+                            DropdownMenuItem(
+                                text = { Text("${inst.name} (@${inst.domain})") },
+                                onClick = {
+                                    selectedInstitution = inst
+                                    expandedInst = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = regEmailPrefix,
+                    onValueChange = { regEmailPrefix = it },
+                    label = { Text("Email Username") },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                    trailingIcon = { Text("@${selectedInstitution.domain} ", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Text(
+                    text = "Valid Institutional Email: $fullEmail",
+                    fontSize = 11.sp,
+                    color = Color(0xFF2E7D32),
+                    fontWeight = FontWeight.Medium
+                )
+
+                OutlinedTextField(
+                    value = regDesk,
+                    onValueChange = { regDesk = it },
+                    label = { Text("Desk / Stall Location") },
+                    leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = regTimings,
+                    onValueChange = { regTimings = it },
+                    label = { Text("Office Hours / Timings") },
+                    leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (regName.isNotBlank() && regEmailPrefix.isNotBlank()) {
+                        onRegister(
+                            regName,
+                            regTitle,
+                            regDept,
+                            fullEmail,
+                            regDesk,
+                            regTimings,
+                            selectedInstitution.name,
+                            selectedInstitution.domain
+                        )
+                    }
+                },
+                enabled = regName.isNotBlank() && regEmailPrefix.isNotBlank(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Register & Enter")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

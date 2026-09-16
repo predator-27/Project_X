@@ -37,6 +37,61 @@ class TeacherRepository private constructor() {
         }
     }
 
+    fun updateTeacherFullProfile(
+        teacherId: String,
+        name: String,
+        title: String,
+        department: String,
+        email: String,
+        deskNumber: String,
+        timings: String,
+        institution: String,
+        institutionDomain: String
+    ) {
+        _teachers.value = _teachers.value.map { teacher ->
+            if (teacher.id == teacherId) {
+                teacher.copy(
+                    name = name,
+                    title = title,
+                    department = department,
+                    email = email,
+                    deskNumber = deskNumber,
+                    timings = timings,
+                    institution = institution,
+                    institutionDomain = institutionDomain
+                )
+            } else {
+                teacher
+            }
+        }
+    }
+
+    fun registerNewTeacher(
+        name: String,
+        title: String,
+        department: String,
+        email: String,
+        deskNumber: String,
+        timings: String,
+        institution: String,
+        institutionDomain: String
+    ): Teacher {
+        val newTeacher = Teacher(
+            id = "t_" + UUID.randomUUID().toString().take(6),
+            name = name,
+            title = title,
+            department = department,
+            email = email,
+            deskNumber = deskNumber.ifBlank { "Desk #101" },
+            timings = timings.ifBlank { "Mon-Fri: 10:00 AM - 02:00 PM" },
+            institution = institution,
+            institutionDomain = institutionDomain,
+            status = TeacherStatus.AT_DESK
+        )
+        _teachers.value = _teachers.value + newTeacher
+        return newTeacher
+    }
+
     fun bookAppointment(
         teacherId: String,
         teacherName: String,
@@ -90,6 +145,8 @@ class TeacherRepository private constructor() {
                 deskNumber = "Desk #304, Block B",
                 timings = "Mon-Fri: 10:00 AM - 01:00 PM",
                 email = "s.jenkins@university.edu",
+                institution = "Global Tech University",
+                institutionDomain = "university.edu",
                 status = TeacherStatus.AT_DESK,
                 bio = "Specializes in Artificial Intelligence and Machine Learning mentorship."
             ),
@@ -101,6 +158,8 @@ class TeacherRepository private constructor() {
                 deskNumber = "Stall #102, Innovation Lab",
                 timings = "Mon-Thu: 02:00 PM - 05:00 PM",
                 email = "d.miller@university.edu",
+                institution = "Global Tech University",
+                institutionDomain = "university.edu",
                 status = TeacherStatus.BUSY,
                 bio = "Data Analytics advisor and research mentor."
             ),
@@ -112,6 +171,8 @@ class TeacherRepository private constructor() {
                 deskNumber = "Desk #412, Tech Tower",
                 timings = "Tue-Fri: 11:00 AM - 03:00 PM",
                 email = "e.carter@university.edu",
+                institution = "Global Tech University",
+                institutionDomain = "university.edu",
                 status = TeacherStatus.IN_CLASS,
                 bio = "Software Architecture and Distributed Systems lead."
             ),
@@ -123,6 +184,8 @@ class TeacherRepository private constructor() {
                 deskNumber = "Desk #208, Block C",
                 timings = "Mon-Wed: 09:30 AM - 12:30 PM",
                 email = "r.chen@university.edu",
+                institution = "Global Tech University",
+                institutionDomain = "university.edu",
                 status = TeacherStatus.AWAY,
                 bio = "Network Security and Cryptography mentor."
             )

@@ -10,12 +10,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectx.model.Appointment
 import com.example.projectx.model.AppointmentStatus
+import com.example.projectx.model.Institution
 import com.example.projectx.model.Teacher
 import com.example.projectx.model.TeacherStatus
 
@@ -39,8 +43,18 @@ fun AdminTeacherScreen(
     val activeTeacher by viewModel.activeTeacher.collectAsState()
     val appointments by viewModel.appointments.collectAsState()
 
+    var name by remember(activeTeacher) { mutableStateOf(activeTeacher?.name ?: "") }
+    var title by remember(activeTeacher) { mutableStateOf(activeTeacher?.title ?: "") }
+    var department by remember(activeTeacher) { mutableStateOf(activeTeacher?.department ?: "") }
+    var email by remember(activeTeacher) { mutableStateOf(activeTeacher?.email ?: "") }
     var editableDesk by remember(activeTeacher) { mutableStateOf(activeTeacher?.deskNumber ?: "") }
     var editableTimings by remember(activeTeacher) { mutableStateOf(activeTeacher?.timings ?: "") }
+
+    val institutions = remember { Institution.DEFAULT_LIST }
+    var selectedInstitution by remember(activeTeacher) {
+        mutableStateOf(institutions.find { it.name == activeTeacher?.institution } ?: institutions.first())
+    }
+
     var showSavedSnackbar by remember { mutableStateOf(false) }
 
     val teacherAppointments = remember(appointments, activeTeacher) {
@@ -76,7 +90,7 @@ fun AdminTeacherScreen(
                     },
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text("Desk location & timings updated successfully!")
+                    Text("Teacher profile & institution details updated!")
                 }
             }
         }
@@ -91,13 +105,13 @@ fun AdminTeacherScreen(
             // Header
             item {
                 Text(
-                    text = "Welcome, ${activeTeacher?.name ?: "Teacher"}",
+                    text = "Welcome, $name",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Manage your real-time desk presence, office hours, and student requests",
+                    text = "Customize your teacher profile, institution, desk location, and office hours",
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -166,7 +180,7 @@ fun AdminTeacherScreen(
                     }
                 }
 
-                // Desk & Schedule Editor Card
+                // Teacher Profile & Institution Customization Card
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -179,11 +193,122 @@ fun AdminTeacherScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
-                                text = "Desk & Schedule Information",
+                                text = "Teacher Profile & Institution Settings",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
+                            // Name Input
+                            OutlinedTextField(
+                                value = name,
+                                onValueChange = { name = it },
+                                label = { Text("Full Name") },
+                                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            // Title & Department Row
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                OutlinedTextField(
+                                    value = title,
+                                    onValueChange = { title = it },
+                                    label = { Text("Title / Designation") },
+                                    leadingIcon = { Icon(Icons.Default.Work, contentDescription = null) },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f)
+                                )
+
+                                OutlinedTextField(
+                                    value = department,
+                                    onValueChange = { department = it },
+                                    label = { Text("Department") },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+
+                            // Institution Dropdown
+                            var expandedInst by remember { mutableStateOf(false) }
+
+                            ExposedDropdownMenuBox(
+                                expanded = expandedInst,
+                                onExpandedChange = { expandedInst = !expandedInst }
+                            ) {
+                                OutlinedTextField(
+                                    value = "${selectedInstitution.name} (@${selectedInstitution.domain})",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("College / Institution") },
+                                    leadingIcon = { Icon(Icons.Default.Business, contentDescription = null) },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInst) },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .menuAnchor()
+                                        .fillMaxWidth()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = expandedInst,
+                                    onDismissRequest = { expandedInst = false }
+                                ) {
+                                    institutions.forEach { inst ->
+                                        DropdownMenuItem(
+                                            text = { Text("${inst.name} (@${inst.domain})") },
+                                            onClick = {
+                                                selectedInstitution = inst
+                                                // Auto-update email domain suffix if email contains @
+                                                if (email.contains("@")) {
+                                                    val prefix = email.substringBefore("@")
+                                                    email = "$prefix@${inst.domain}"
+                                                }
+                                                expandedInst = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Work Email with Validation Badge
+                            val isEmailValid = email.endsWith("@${selectedInstitution.domain}")
+                            OutlinedTextField(
+                                value = email,
+                                onValueChange = { email = it },
+                                label = { Text("Institutional Work Email") },
+                                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                                trailingIcon = {
+                                    if (isEmailValid) {
+                                        Icon(Icons.Default.CheckCircle, contentDescription = "Valid Domain", tint = Color(0xFF2E7D32))
+                                    }
+                                },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            if (!isEmailValid) {
+                                Text(
+                                    text = "💡 Email should match institutional domain: @${selectedInstitution.domain}",
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            } else {
+                                Text(
+                                    text = "✅ Valid Institutional Domain: @${selectedInstitution.domain}",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFF2E7D32),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+
+                            Divider()
+
+                            // Desk & Timings
                             OutlinedTextField(
                                 value = editableDesk,
                                 onValueChange = { editableDesk = it },
@@ -208,7 +333,17 @@ fun AdminTeacherScreen(
 
                             Button(
                                 onClick = {
-                                    viewModel.updateDeskAndTimings(teacher.id, editableDesk, editableTimings)
+                                    viewModel.updateFullProfile(
+                                        teacherId = teacher.id,
+                                        name = name.ifBlank { teacher.name },
+                                        title = title.ifBlank { teacher.title },
+                                        department = department.ifBlank { teacher.department },
+                                        email = email.ifBlank { teacher.email },
+                                        deskNumber = editableDesk.ifBlank { teacher.deskNumber },
+                                        timings = editableTimings.ifBlank { teacher.timings },
+                                        institution = selectedInstitution.name,
+                                        institutionDomain = selectedInstitution.domain
+                                    )
                                     showSavedSnackbar = true
                                 },
                                 modifier = Modifier.align(Alignment.End),
@@ -216,7 +351,7 @@ fun AdminTeacherScreen(
                             ) {
                                 Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Save Info")
+                                Text("Save Profile & Settings")
                             }
                         }
                     }

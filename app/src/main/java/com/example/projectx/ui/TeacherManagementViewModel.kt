@@ -52,7 +52,8 @@ class TeacherManagementViewModel(
             val matchesQuery = query.isEmpty() ||
                     teacher.name.contains(query, ignoreCase = true) ||
                     teacher.department.contains(query, ignoreCase = true) ||
-                    teacher.deskNumber.contains(query, ignoreCase = true)
+                    teacher.deskNumber.contains(query, ignoreCase = true) ||
+                    teacher.institution.contains(query, ignoreCase = true)
 
             val matchesDept = department == "All" || teacher.department.equals(department, ignoreCase = true)
 
@@ -105,6 +106,53 @@ class TeacherManagementViewModel(
 
     fun updateDeskAndTimings(teacherId: String, desk: String, timings: String) {
         repository.updateTeacherDeskAndTimings(teacherId, desk, timings)
+    }
+
+    fun updateFullProfile(
+        teacherId: String,
+        name: String,
+        title: String,
+        department: String,
+        email: String,
+        deskNumber: String,
+        timings: String,
+        institution: String,
+        institutionDomain: String
+    ) {
+        repository.updateTeacherFullProfile(
+            teacherId = teacherId,
+            name = name,
+            title = title,
+            department = department,
+            email = email,
+            deskNumber = deskNumber,
+            timings = timings,
+            institution = institution,
+            institutionDomain = institutionDomain
+        )
+    }
+
+    fun registerAndLoginTeacher(
+        name: String,
+        title: String,
+        department: String,
+        email: String,
+        deskNumber: String,
+        timings: String,
+        institution: String,
+        institutionDomain: String
+    ) {
+        val newTeacher = repository.registerNewTeacher(
+            name = name,
+            title = title,
+            department = department,
+            email = email,
+            deskNumber = deskNumber,
+            timings = timings,
+            institution = institution,
+            institutionDomain = institutionDomain
+        )
+        loginAsTeacher(email = newTeacher.email, teacherId = newTeacher.id)
     }
 
     fun bookAppointment(
