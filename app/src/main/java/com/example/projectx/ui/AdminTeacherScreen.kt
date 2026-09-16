@@ -108,18 +108,11 @@ fun AdminTeacherScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Column {
-                                    Text(
-                                        text = teacher.name,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(
-                                        text = "${teacher.title} - ${teacher.department}",
-                                        fontSize = 13.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
+                                Text(
+                                    text = "Real-time Presence Status",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                                 StatusBadge(status = teacher.status)
                             }
 
