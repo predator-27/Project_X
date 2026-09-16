@@ -1,14 +1,27 @@
 package com.example.projectx.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,10 +50,14 @@ fun StudentScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("👨‍🎓 Student Desk Portal") },
+                title = { Text("👨‍🎓 Student Desk Portal", fontWeight = FontWeight.Bold) },
                 actions = {
-                    TextButton(onClick = { viewModel.logout() }) {
-                        Text("Log Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = { viewModel.logout() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "Log Out",
+                            tint = MaterialTheme.colorScheme.error
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -70,38 +87,43 @@ fun StudentScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Header
-            Text(
-                text = "Student Desk & Mentor Portal",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            // Tabs
-            TabRow(selectedTabIndex = selectedTab) {
+            // Tab Row
+            TabRow(
+                selectedTabIndex = selectedTab,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Teacher Directory") }
+                    text = { Text("🔍 Teacher Directory", fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("My Appointments (${appointments.size})") }
+                    text = { Text("📅 My Appointments (${appointments.size})", fontWeight = FontWeight.Bold) }
                 )
             }
 
             if (selectedTab == 0) {
-                // Search & Filter
+                // Search Bar
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { viewModel.setSearchQuery(it) },
                     placeholder = { Text("Search by teacher, desk #, or subject...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.setSearchQuery("") }) {
+                                Icon(Icons.Default.Clear, contentDescription = "Clear")
+                            }
+                        }
+                    },
                     singleLine = true,
+                    shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Department Filter Chips
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -109,12 +131,13 @@ fun StudentScreen(
                         FilterChip(
                             selected = dept == selectedDept,
                             onClick = { viewModel.setDepartmentFilter(dept) },
-                            label = { Text(dept) }
+                            label = { Text(dept) },
+                            shape = RoundedCornerShape(12.dp)
                         )
                     }
                 }
 
-                // Teachers List
+                // Teachers Directory List
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()
@@ -127,7 +150,7 @@ fun StudentScreen(
                     }
                 }
             } else {
-                // Appointments Tab
+                // My Appointments List
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()
@@ -138,7 +161,8 @@ fun StudentScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                )
+                                ),
+                                shape = RoundedCornerShape(12.dp)
                             ) {
                                 Box(
                                     modifier = Modifier
@@ -176,7 +200,7 @@ fun StudentScreen(
                     )
                     bookingTeacher = null
                     showSuccessSnackbar = true
-                    selectedTab = 1 // Switch to appointments tab
+                    selectedTab = 1
                 }
             )
         }
@@ -190,29 +214,54 @@ fun TeacherCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = teacher.name,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "${teacher.title} • ${teacher.department}",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // Initials Avatar Circle
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier.size(42.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = teacher.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString(""),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+
+                    Column {
+                        Text(
+                            text = teacher.name,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "${teacher.title} • ${teacher.department}",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
+
                 StatusBadge(status = teacher.status)
             }
 
@@ -222,12 +271,19 @@ fun TeacherCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "📍 Desk Location:",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold
+                Icon(
+                    Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "Desk:",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = teacher.deskNumber,
                     fontSize = 13.sp,
@@ -240,12 +296,19 @@ fun TeacherCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "🕒 Timings:",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold
+                Icon(
+                    Icons.Default.Schedule,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "Office Hours:",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = teacher.timings,
                     fontSize = 13.sp,
@@ -264,8 +327,10 @@ fun TeacherCard(
             Button(
                 onClick = onBookClick,
                 modifier = Modifier.align(Alignment.End),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(10.dp)
             ) {
+                Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text("Book Appointment")
             }
         }
@@ -277,7 +342,8 @@ fun StudentAppointmentCard(appointment: Appointment) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(14.dp)
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -317,31 +383,34 @@ fun BookAppointmentDialog(
     onDismiss: () -> Unit,
     onConfirm: (name: String, email: String, date: String, timeSlot: String, purpose: String) -> Unit
 ) {
-    var studentName by remember { mutableStateOf("") }
-    var studentEmail by remember { mutableStateOf("") }
+    var studentName by remember { mutableStateOf("Alex Rivera") }
+    var studentEmail by remember { mutableStateOf("alex.r@student.edu") }
     var selectedDate by remember { mutableStateOf("2026-09-20") }
     var selectedSlot by remember { mutableStateOf("11:00 AM - 11:30 AM") }
     var purpose by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Book Appointment with ${teacher.name}") },
+        title = { Text("Book Appointment with ${teacher.name}", fontWeight = FontWeight.Bold) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Desk: ${teacher.deskNumber}",
+                    text = "📍 Location: ${teacher.deskNumber}",
                     fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
                 )
 
                 OutlinedTextField(
                     value = studentName,
                     onValueChange = { studentName = it },
                     label = { Text("Your Full Name") },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -349,7 +418,9 @@ fun BookAppointmentDialog(
                     value = studentEmail,
                     onValueChange = { studentEmail = it },
                     label = { Text("Your Email") },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -357,7 +428,9 @@ fun BookAppointmentDialog(
                     value = selectedDate,
                     onValueChange = { selectedDate = it },
                     label = { Text("Date (YYYY-MM-DD)") },
+                    leadingIcon = { Icon(Icons.Default.CalendarMonth, contentDescription = null) },
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -365,7 +438,9 @@ fun BookAppointmentDialog(
                     value = selectedSlot,
                     onValueChange = { selectedSlot = it },
                     label = { Text("Preferred Time Slot") },
+                    leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -373,6 +448,8 @@ fun BookAppointmentDialog(
                     value = purpose,
                     onValueChange = { purpose = it },
                     label = { Text("Purpose / Discussion Topic") },
+                    placeholder = { Text("e.g. Guidance on Internship or AI Project") },
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -384,7 +461,8 @@ fun BookAppointmentDialog(
                         onConfirm(studentName, studentEmail, selectedDate, selectedSlot, purpose)
                     }
                 },
-                enabled = studentName.isNotBlank() && purpose.isNotBlank()
+                enabled = studentName.isNotBlank() && purpose.isNotBlank(),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text("Confirm Request")
             }

@@ -1,12 +1,21 @@
 package com.example.projectx.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,10 +51,14 @@ fun AdminTeacherScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("👨‍🏫 Teacher Admin Portal") },
+                title = { Text("👨‍🏫 Teacher Admin Dashboard", fontWeight = FontWeight.Bold) },
                 actions = {
-                    TextButton(onClick = { viewModel.logout() }) {
-                        Text("Log Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = { viewModel.logout() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "Log Out",
+                            tint = MaterialTheme.colorScheme.error
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -78,14 +91,14 @@ fun AdminTeacherScreen(
             // Header
             item {
                 Text(
-                    text = "Teacher Management Dashboard",
+                    text = "Welcome, ${activeTeacher?.name ?: "Teacher"}",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Manage your desk presence, schedule, and student appointments",
-                    fontSize = 14.sp,
+                    text = "Manage your real-time desk presence, office hours, and student requests",
+                    fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -95,13 +108,15 @@ fun AdminTeacherScreen(
                 item {
                     Card(
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                        shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -118,32 +133,31 @@ fun AdminTeacherScreen(
 
                             Divider()
 
-                            Text(
-                                text = "Set Real-time Presence Status:",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 TeacherStatus.values().forEach { status ->
                                     val isSelected = teacher.status == status
+                                    val animatedBg by animateColorAsState(
+                                        targetValue = if (isSelected) getStatusColor(status) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                        label = "bgAnimation"
+                                    )
+
                                     Button(
                                         onClick = { viewModel.updateStatus(teacher.id, status) },
                                         modifier = Modifier.weight(1f),
-                                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+                                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 10.dp),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (isSelected) getStatusColor(status) else MaterialTheme.colorScheme.surface,
+                                            containerColor = animatedBg,
                                             contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
                                         ),
-                                        shape = RoundedCornerShape(8.dp)
+                                        shape = RoundedCornerShape(10.dp)
                                     ) {
                                         Text(
                                             text = status.label.split(" ").first(),
                                             fontSize = 11.sp,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                         )
                                     }
                                 }
@@ -152,14 +166,13 @@ fun AdminTeacherScreen(
                     }
                 }
 
-                // Desk & Schedule Editor
+                // Desk & Schedule Editor Card
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
@@ -174,9 +187,11 @@ fun AdminTeacherScreen(
                             OutlinedTextField(
                                 value = editableDesk,
                                 onValueChange = { editableDesk = it },
-                                label = { Text("Desk / Stall Number") },
+                                label = { Text("Desk / Stall Location") },
+                                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
                                 placeholder = { Text("e.g. Desk #304, Block B") },
                                 singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth()
                             )
 
@@ -184,8 +199,10 @@ fun AdminTeacherScreen(
                                 value = editableTimings,
                                 onValueChange = { editableTimings = it },
                                 label = { Text("Available Timings / Office Hours") },
+                                leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
                                 placeholder = { Text("e.g. Mon-Fri: 10:00 AM - 01:00 PM") },
                                 singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth()
                             )
 
@@ -194,8 +211,11 @@ fun AdminTeacherScreen(
                                     viewModel.updateDeskAndTimings(teacher.id, editableDesk, editableTimings)
                                     showSavedSnackbar = true
                                 },
-                                modifier = Modifier.align(Alignment.End)
+                                modifier = Modifier.align(Alignment.End),
+                                shape = RoundedCornerShape(10.dp)
                             ) {
+                                Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Text("Save Info")
                             }
                         }
@@ -217,7 +237,8 @@ fun AdminTeacherScreen(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                            )
+                            ),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -251,11 +272,12 @@ fun AppointmentRequestCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(14.dp)
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -297,23 +319,31 @@ fun AppointmentRequestCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            if (appointment.status == AppointmentStatus.PENDING) {
+            AnimatedVisibility(visible = appointment.status == AppointmentStatus.PENDING) {
                 Row(
                     horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 6.dp)
                 ) {
                     OutlinedButton(
                         onClick = { onUpdateStatus(AppointmentStatus.CANCELLED) },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                        shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
+                        Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text("Decline")
                     }
 
                     Button(
                         onClick = { onUpdateStatus(AppointmentStatus.CONFIRMED) },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text("Accept")
                     }
                 }
@@ -329,7 +359,7 @@ fun StatusBadge(status: TeacherStatus) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
