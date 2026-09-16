@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Desk & Appointment Management Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <h1>🏫 EduDesk & Mentor Portal</h1>
+            <p>Teacher Desk Presence, Schedules & Appointment Management</p>
+        </div>
+        <div class="role-switcher">
+            <button id="btn-role-student" class="role-btn active" onclick="switchRole('student')">👨‍🎓 Student View</button>
+            <button id="btn-role-admin" class="role-btn" onclick="switchRole('admin')">👨‍🏫 Teacher Admin View</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- STUDENT VIEW -->
+        <section id="view-student" class="view-section active">
+            <div class="portal-nav">
+                <button class="nav-tab active" onclick="switchStudentTab('directory')">🔍 Teacher Directory</button>
+                <button class="nav-tab" onclick="switchStudentTab('appointments')">📅 My Appointments <span id="app-count-badge" class="badge">0</span></button>
+            </div>
+
+            <div id="tab-directory" class="tab-content active">
+                <div class="filter-bar">
+                    <input type="text" id="search-input" placeholder="Search teacher, desk #, or department..." oninput="renderTeachers()">
+                    <select id="dept-filter" onchange="renderTeachers()">
+                        <option value="All">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Software Engineering">Software Engineering</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                    </select>
+                </div>
+
+                <div id="teachers-grid" class="cards-grid">
+                    <!-- Teacher Cards will be rendered dynamically -->
+                </div>
+            </div>
+
+            <div id="tab-appointments" class="tab-content">
+                <h2>My Booked Appointments</h2>
+                <div id="appointments-list" class="cards-list">
+                    <!-- Appointments rendered dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN TEACHER VIEW -->
+        <section id="view-admin" class="view-section">
+            <div class="admin-header">
+                <h2>Teacher Management Dashboard</h2>
+                <div class="teacher-selector-wrapper">
+                    <label for="teacher-select">Active Profile: </label>
+                    <select id="teacher-select" onchange="loadAdminTeacher()"></select>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <!-- Status & Location Card -->
+                <div class="card admin-status-card">
+                    <h3>📍 Real-time Presence & Desk Info</h3>
+                    <div class="current-status-box">
+                        Current Status: <span id="current-status-badge" class="status-badge">At Desk</span>
+                    </div>
+
+                    <div class="status-actions">
+                        <p class="section-label">Update Status:</p>
+                        <div class="btn-group">
+                            <button class="status-btn at-desk" onclick="updateAdminStatus('AT_DESK')">At Desk</button>
+                            <button class="status-btn busy" onclick="updateAdminStatus('BUSY')">Busy</button>
+                            <button class="status-btn in-class" onclick="updateAdminStatus('IN_CLASS')">In Class</button>
+                            <button class="status-btn away" onclick="updateAdminStatus('AWAY')">Away</button>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <label for="admin-desk-input">Desk / Stall Location:</label>
+                        <input type="text" id="admin-desk-input" placeholder="e.g. Desk #304, Block B">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admin-timings-input">Available Timings / Office Hours:</label>
+                        <input type="text" id="admin-timings-input" placeholder="e.g. Mon-Fri: 10:00 AM - 01:00 PM">
+                    </div>
+
+                    <button class="primary-btn" onclick="saveAdminInfo()">Save Desk Info</button>
+                </div>
+
+                <!-- Appointment Requests -->
+                <div class="card admin-requests-card">
+                    <h3>📬 Student Appointment Requests</h3>
+                    <div id="admin-requests-list" class="requests-list">
+                        <!-- Admin requests list -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Appointment Modal Dialog -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal-teacher-name">Book Appointment</h2>
+            <p id="modal-teacher-desk" class="modal-subtitle"></p>
+
+            <form id="booking-form" onsubmit="handleBookingSubmit(event)">
+                <input type="hidden" id="modal-teacher-id">
+
+                <div class="form-group">
+                    <label for="student-name">Your Full Name:</label>
+                    <input type="text" id="student-name" required placeholder="e.g. Alex Rivera">
+                </div>
+
+                <div class="form-group">
+                    <label for="student-email">Email Address:</label>
+                    <input type="email" id="student-email" required placeholder="alex@university.edu">
+                </div>
+
+                <div class="form-group">
+                    <label for="booking-date">Date:</label>
+                    <input type="date" id="booking-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="booking-slot">Preferred Time Slot:</label>
+                    <select id="booking-slot" required>
+                        <option value="10:00 AM - 10:30 AM">10:00 AM - 10:30 AM</option>
+                        <option value="11:00 AM - 11:30 AM">11:00 AM - 11:30 AM</option>
+                        <option value="02:00 PM - 02:30 PM">02:00 PM - 02:30 PM</option>
+                        <option value="03:30 PM - 04:00 PM">03:30 PM - 04:00 PM</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="booking-purpose">Discussion Purpose / Notes:</label>
+                    <textarea id="booking-purpose" required placeholder="Detail what you'd like to discuss..."></textarea>
+                </div>
+
+                <button type="submit" class="primary-btn full-width">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
