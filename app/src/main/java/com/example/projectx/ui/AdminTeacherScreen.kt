@@ -145,13 +145,13 @@ fun AdminTeacherScreen(
                                 StatusBadge(status = teacher.status)
                             }
 
-                            Divider()
+                            HorizontalDivider()
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                TeacherStatus.values().forEach { status ->
+                                TeacherStatus.entries.forEach { status ->
                                     val isSelected = teacher.status == status
                                     val animatedBg by animateColorAsState(
                                         targetValue = if (isSelected) getStatusColor(status) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -306,7 +306,7 @@ fun AdminTeacherScreen(
                                 )
                             }
 
-                            Divider()
+                            HorizontalDivider()
 
                             // Desk & Timings
                             OutlinedTextField(
@@ -435,7 +435,7 @@ fun AppointmentRequestCard(
                 AppointmentStatusBadge(status = appointment.status)
             }
 
-            Divider()
+            HorizontalDivider()
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

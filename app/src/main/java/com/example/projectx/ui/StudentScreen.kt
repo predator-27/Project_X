@@ -1,6 +1,5 @@
 package com.example.projectx.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -265,7 +264,7 @@ fun TeacherCard(
                 StatusBadge(status = teacher.status)
             }
 
-            Divider()
+            HorizontalDivider()
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
