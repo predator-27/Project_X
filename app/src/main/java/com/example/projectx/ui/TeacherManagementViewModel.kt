@@ -1,5 +1,6 @@
 package com.example.projectx.ui
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectx.data.TeacherRepository
@@ -7,12 +8,15 @@ import com.example.projectx.model.Appointment
 import com.example.projectx.model.AppointmentStatus
 import com.example.projectx.model.Teacher
 import com.example.projectx.model.TeacherStatus
+import com.example.projectx.update.UpdateInfo
+import com.example.projectx.update.UpdateManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 enum class AuthState {
     UNAUTHENTICATED,
@@ -22,7 +26,8 @@ enum class AuthState {
 }
 
 class TeacherManagementViewModel(
-    private val repository: TeacherRepository = TeacherRepository.getInstance()
+    private val repository: TeacherRepository = TeacherRepository.getInstance(),
+    private val updateManager: UpdateManager = UpdateManager.getInstance()
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow(AuthState.UNAUTHENTICATED)
@@ -40,8 +45,37 @@ class TeacherManagementViewModel(
     private val _selectedDepartment = MutableStateFlow("All")
     val selectedDepartment: StateFlow<String> = _selectedDepartment.asStateFlow()
 
+    private val _showUpdateBanner = MutableStateFlow(true)
+    val showUpdateBanner: StateFlow<Boolean> = _showUpdateBanner.asStateFlow()
+
+    val updateInfo: StateFlow<UpdateInfo?> = updateManager.updateInfo
+    val isDownloadingUpdate: StateFlow<Boolean> = updateManager.isDownloading
+    val downloadProgress: StateFlow<Float> = updateManager.downloadProgress
+    val downloadError: StateFlow<String?> = updateManager.downloadError
+
     val teachers: StateFlow<List<Teacher>> = repository.teachers
     val appointments: StateFlow<List<Appointment>> = repository.appointments
+
+    init {
+        checkForAppUpdates()
+    }
+
+    fun checkForAppUpdates() {
+        viewModelScope.launch {
+            updateManager.checkForUpdates()
+        }
+    }
+
+    fun downloadAndInstallAppUpdate(context: Context) {
+        val info = updateInfo.value ?: return
+        viewModelScope.launch {
+            updateManager.downloadAndInstallUpdate(context, info.downloadUrl)
+        }
+    }
+
+    fun dismissUpdateNotification() {
+        _showUpdateBanner.value = false
+    }
 
     val filteredTeachers: StateFlow<List<Teacher>> = combine(
         teachers,

@@ -87,7 +87,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     populateWebTeacherSelect();
+    checkWebUpdate();
 });
+
+function checkWebUpdate() {
+    setTimeout(() => {
+        const banner = document.getElementById('web-update-banner');
+        if (banner) banner.style.display = 'block';
+    }, 1500);
+}
+
+function triggerWebUpdate() {
+    window.location.href = "https://raw.githubusercontent.com/predator-27/Project_X/main/releases/app-debug.apk";
+}
+
+function closeWebUpdate() {
+    const banner = document.getElementById('web-update-banner');
+    if (banner) banner.style.display = 'none';
+}
 
 function populateWebTeacherSelect() {
     const teachers = getTeachers();

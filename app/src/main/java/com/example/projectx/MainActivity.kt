@@ -11,12 +11,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.projectx.ui.AdminTeacherScreen
 import com.example.projectx.ui.AuthState
 import com.example.projectx.ui.LoginScreen
 import com.example.projectx.ui.StudentScreen
 import com.example.projectx.ui.TeacherManagementViewModel
+import com.example.projectx.ui.UpdateNotificationOverlay
 import com.example.projectx.ui.WebViewScreen
 import com.example.projectx.ui.theme.ProjectXTheme
 
@@ -50,5 +52,11 @@ fun MainAppContent(viewModel: TeacherManagementViewModel) {
             AuthState.STUDENT -> StudentScreen(viewModel = viewModel)
             AuthState.WEB_VIEW -> WebViewScreen(viewModel = viewModel)
         }
+
+        // Floating In-App Update Notification Banner Overlay
+        UpdateNotificationOverlay(
+            viewModel = viewModel,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
