@@ -56,6 +56,8 @@ const initialAppointments = [
     }
 ];
 
+let activeTeacherId = "t1";
+
 // Load or Initialize Local Storage
 function getTeachers() {
     const data = localStorage.getItem('edudesk_teachers');
@@ -85,12 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     populateWebTeacherSelect();
-    populateAdminTeacherSelect();
 });
 
 function populateWebTeacherSelect() {
     const teachers = getTeachers();
     const select = document.getElementById('web-teacher-select');
+    if (!select) return;
     select.innerHTML = '';
     teachers.forEach(t => {
         const opt = document.createElement('option');
@@ -121,13 +123,14 @@ function handleTeacherLogin(event) {
     const teachers = getTeachers();
     const teacher = teachers.find(t => t.id === teacherId) || teachers[0];
 
+    activeTeacherId = teacher.id;
+
     document.getElementById('view-login').classList.remove('active');
     document.getElementById('view-admin').classList.add('active');
 
     document.getElementById('user-session-bar').style.display = 'flex';
     document.getElementById('session-user-badge').textContent = `👨‍🏫 ${teacher.name}`;
 
-    document.getElementById('teacher-select').value = teacher.id;
     loadAdminTeacher();
 }
 
@@ -283,23 +286,9 @@ function handleBookingSubmit(event) {
 }
 
 // Admin Teacher View
-function populateAdminTeacherSelect() {
-    const teachers = getTeachers();
-    const select = document.getElementById('teacher-select');
-    select.innerHTML = '';
-    teachers.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = t.name;
-        select.appendChild(opt);
-    });
-}
-
 function loadAdminTeacher() {
-    const select = document.getElementById('teacher-select');
-    const teacherId = select.value || 't1';
     const teachers = getTeachers();
-    const teacher = teachers.find(t => t.id === teacherId);
+    const teacher = teachers.find(t => t.id === activeTeacherId) || teachers[0];
 
     if (!teacher) return;
 
@@ -314,11 +303,8 @@ function loadAdminTeacher() {
 }
 
 function updateAdminStatus(newStatus) {
-    const select = document.getElementById('teacher-select');
-    const teacherId = select.value;
     const teachers = getTeachers();
-
-    const idx = teachers.findIndex(t => t.id === teacherId);
+    const idx = teachers.findIndex(t => t.id === activeTeacherId);
     if (idx !== -1) {
         teachers[idx].status = newStatus;
         saveTeachers(teachers);
@@ -327,11 +313,8 @@ function updateAdminStatus(newStatus) {
 }
 
 function saveAdminInfo() {
-    const select = document.getElementById('teacher-select');
-    const teacherId = select.value;
     const teachers = getTeachers();
-
-    const idx = teachers.findIndex(t => t.id === teacherId);
+    const idx = teachers.findIndex(t => t.id === activeTeacherId);
     if (idx !== -1) {
         teachers[idx].deskNumber = document.getElementById('admin-desk-input').value;
         teachers[idx].timings = document.getElementById('admin-timings-input').value;

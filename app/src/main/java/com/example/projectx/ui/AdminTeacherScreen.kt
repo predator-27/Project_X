@@ -27,7 +27,6 @@ fun AdminTeacherScreen(
     viewModel: TeacherManagementViewModel,
     modifier: Modifier = Modifier
 ) {
-    val teachers by viewModel.teachers.collectAsState()
     val activeTeacher by viewModel.activeTeacher.collectAsState()
     val appointments by viewModel.appointments.collectAsState()
 
@@ -89,30 +88,6 @@ fun AdminTeacherScreen(
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-
-            // Teacher Profile Selector
-            item {
-                Text(
-                    text = "Select Active Profile:",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(teachers) { teacher ->
-                        FilterChip(
-                            selected = teacher.id == activeTeacher?.id,
-                            onClick = { viewModel.selectTeacher(teacher.id) },
-                            label = { Text(teacher.name) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
-                            )
-                        )
-                    }
-                }
             }
 
             // Status Control Card
