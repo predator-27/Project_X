@@ -34,7 +34,9 @@ fun UpdateNotificationOverlay(
     val context = LocalContext.current
 
     val info = updateInfo
-    val isVisible = showBanner && info != null && info.isUpdateAvailable
+    val isDismissedForThisVersion = info != null &&
+        viewModel.isVersionDismissed(context, info.latestVersion)
+    val isVisible = showBanner && info != null && info.isUpdateAvailable && !isDismissedForThisVersion
 
     AnimatedVisibility(
         visible = isVisible,
@@ -79,7 +81,7 @@ fun UpdateNotificationOverlay(
                         }
 
                         IconButton(
-                            onClick = { viewModel.dismissUpdateNotification() },
+                            onClick = { viewModel.dismissUpdateNotification(context) },
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(

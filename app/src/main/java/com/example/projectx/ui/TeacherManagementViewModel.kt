@@ -56,13 +56,9 @@ class TeacherManagementViewModel(
     val teachers: StateFlow<List<Teacher>> = repository.teachers
     val appointments: StateFlow<List<Appointment>> = repository.appointments
 
-    init {
-        checkForAppUpdates()
-    }
-
-    fun checkForAppUpdates() {
+    fun checkForAppUpdates(context: Context) {
         viewModelScope.launch {
-            updateManager.checkForUpdates()
+            updateManager.checkForUpdates(context)
         }
     }
 
@@ -73,8 +69,15 @@ class TeacherManagementViewModel(
         }
     }
 
-    fun dismissUpdateNotification() {
+    fun dismissUpdateNotification(context: Context) {
+        updateInfo.value?.latestVersion?.let { version ->
+            updateManager.markVersionDismissed(context, version)
+        }
         _showUpdateBanner.value = false
+    }
+
+    fun isVersionDismissed(context: Context, version: String): Boolean {
+        return updateManager.getDismissedVersion(context) == version
     }
 
     val filteredTeachers: StateFlow<List<Teacher>> = combine(

@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.example.projectx.ui.AdminTeacherScreen
 import com.example.projectx.ui.AuthState
 import com.example.projectx.ui.LoginScreen
@@ -44,6 +46,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainAppContent(viewModel: TeacherManagementViewModel) {
     val authState by viewModel.authState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.checkForAppUpdates(context)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         when (authState) {
