@@ -29,9 +29,7 @@ class BakingViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val bitmap = withContext(Dispatchers.IO) {
-                    BitmapFactory.decodeResource(resources, imageRes)
-                }
+                val bitmap = BitmapFactory.decodeResource(resources, imageRes)
                 val response = generativeModel.generateContent(
                     content {
                         image(bitmap)
