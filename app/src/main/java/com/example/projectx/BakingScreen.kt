@@ -1,6 +1,5 @@
 package com.example.projectx
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -22,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -79,21 +79,16 @@ fun BakingScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 itemsIndexed(images) { index, image ->
-                    var imageModifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp)
+                    val isSelected = index == selectedImage.intValue
+                    val borderColor = MaterialTheme.colorScheme.primary
+                    val imageModifier = Modifier
+                        .padding(horizontal = 8.dp)
                         .requiredSize(200.dp)
-                        .clickable {
-                            selectedImage.intValue = index
-                        }
-                    if (index == selectedImage.intValue) {
-                        imageModifier =
-                            imageModifier.border(
-                                BorderStroke(
-                                    4.dp,
-                                    MaterialTheme.colorScheme.primary
-                                )
-                            )
-                    }
+                        .clickable { selectedImage.intValue = index }
+                        .then(
+                            if (isSelected) Modifier.border(BorderStroke(4.dp, borderColor))
+                            else Modifier
+                        )
                     Image(
                         painter = painterResource(image),
                         contentDescription = stringResource(imageDescriptions[index]),
@@ -117,11 +112,11 @@ fun BakingScreen(
 
                 Button(
                     onClick = {
-                        val bitmap = BitmapFactory.decodeResource(
+                        bakingViewModel.sendPrompt(
                             resources,
-                            images[selectedImage.intValue]
+                            images[selectedImage.intValue],
+                            prompt
                         )
-                        bakingViewModel.sendPrompt(bitmap, prompt)
                     },
                     enabled = prompt.isNotEmpty(),
                     modifier = Modifier
@@ -131,16 +126,21 @@ fun BakingScreen(
                 }
             }
 
+            LaunchedEffect(uiState) {
+                when (val state = uiState) {
+                    is UiState.Success -> result = state.outputText
+                    is UiState.Error -> result = state.errorMessage
+                    else -> Unit
+                }
+            }
+
             if (uiState is UiState.Loading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
-                var textColor = MaterialTheme.colorScheme.onSurface
-                if (uiState is UiState.Error) {
-                    textColor = MaterialTheme.colorScheme.error
-                    result = (uiState as UiState.Error).errorMessage
-                } else if (uiState is UiState.Success) {
-                    textColor = MaterialTheme.colorScheme.onSurface
-                    result = (uiState as UiState.Success).outputText
+                val textColor = if (uiState is UiState.Error) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurface
                 }
                 val scrollState = rememberScrollState()
                 Text(

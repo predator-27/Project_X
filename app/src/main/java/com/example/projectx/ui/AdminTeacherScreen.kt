@@ -386,7 +386,7 @@ fun AdminTeacherScreen(
                         }
                     }
                 } else {
-                    items(teacherAppointments) { appointment ->
+                    items(teacherAppointments, key = { it.id }) { appointment ->
                         AppointmentRequestCard(
                             appointment = appointment,
                             onUpdateStatus = { newStatus ->

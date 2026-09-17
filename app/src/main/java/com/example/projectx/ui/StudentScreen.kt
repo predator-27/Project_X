@@ -126,7 +126,7 @@ fun StudentScreen(
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(departments) { dept ->
+                    items(departments, key = { it }) { dept ->
                         FilterChip(
                             selected = dept == selectedDept,
                             onClick = { viewModel.setDepartmentFilter(dept) },
@@ -141,7 +141,7 @@ fun StudentScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(teachers) { teacher ->
+                    items(teachers, key = { it.id }) { teacher ->
                         TeacherCard(
                             teacher = teacher,
                             onBookClick = { bookingTeacher = teacher }
@@ -174,7 +174,7 @@ fun StudentScreen(
                             }
                         }
                     } else {
-                        items(appointments) { appointment ->
+                        items(appointments, key = { it.id }) { appointment ->
                             StudentAppointmentCard(appointment = appointment)
                         }
                     }
@@ -232,6 +232,9 @@ fun TeacherCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     // Initials Avatar Circle
+                    val initials = remember(teacher.name) {
+                        teacher.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString("")
+                    }
                     Surface(
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primaryContainer,
@@ -239,7 +242,7 @@ fun TeacherCard(
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                text = teacher.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString(""),
+                                text = initials,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer

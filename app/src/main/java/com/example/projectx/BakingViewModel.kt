@@ -1,6 +1,8 @@
 package com.example.projectx
 
-import android.graphics.Bitmap
+import android.content.res.Resources
+import android.graphics.BitmapFactory
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
@@ -22,11 +24,14 @@ class BakingViewModel : ViewModel() {
         modelName = "gemini-flash-latest",
     )
 
-    fun sendPrompt(bitmap: Bitmap, prompt: String) {
+    fun sendPrompt(resources: Resources, @DrawableRes imageRes: Int, prompt: String) {
         _uiState.value = UiState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val bitmap = withContext(Dispatchers.IO) {
+                    BitmapFactory.decodeResource(resources, imageRes)
+                }
                 val response = generativeModel.generateContent(
                     content {
                         image(bitmap)

@@ -97,6 +97,9 @@ fun UpdateNotificationOverlay(
                     )
 
                     if (isDownloading) {
+                        val progressPercent by remember {
+                            derivedStateOf { (progress * 100).toInt() }
+                        }
                         Column(
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                             modifier = Modifier.fillMaxWidth()
@@ -106,7 +109,7 @@ fun UpdateNotificationOverlay(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text("Downloading APK from GitHub...", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                Text("${(progress * 100).toInt()}%", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("$progressPercent%", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
                             LinearProgressIndicator(
                                 progress = { progress },

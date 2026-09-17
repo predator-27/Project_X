@@ -13,7 +13,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -23,6 +26,24 @@ fun WebViewScreen(
     viewModel: TeacherManagementViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val webView = remember {
+        WebView(context).apply {
+            webViewClient = WebViewClient()
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            loadUrl("file:///android_asset/web/index.html")
+        }
+    }
+
+    DisposableEffect(webView) {
+        onDispose {
+            webView.stopLoading()
+            webView.removeAllViews()
+            webView.destroy()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -42,14 +63,7 @@ fun WebViewScreen(
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
-                factory = { context ->
-                    WebView(context).apply {
-                        webViewClient = WebViewClient()
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        loadUrl("file:///android_asset/web/index.html")
-                    }
-                }
+                factory = { webView }
             )
         }
     }
