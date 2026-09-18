@@ -85,16 +85,21 @@ class TeacherManagementViewModel(
         _searchQuery,
         _selectedDepartment
     ) { teacherList, query, department ->
-        teacherList.filter { teacher ->
-            val matchesQuery = query.isEmpty() ||
-                    teacher.name.contains(query, ignoreCase = true) ||
-                    teacher.department.contains(query, ignoreCase = true) ||
-                    teacher.deskNumber.contains(query, ignoreCase = true) ||
-                    teacher.institution.contains(query, ignoreCase = true)
+        val trimmedQuery = query.trim()
+        if (trimmedQuery.isEmpty() && department == "All") {
+            teacherList
+        } else {
+            teacherList.filter { teacher ->
+                val matchesQuery = trimmedQuery.isEmpty() ||
+                        teacher.name.contains(trimmedQuery, ignoreCase = true) ||
+                        teacher.department.contains(trimmedQuery, ignoreCase = true) ||
+                        teacher.deskNumber.contains(trimmedQuery, ignoreCase = true) ||
+                        teacher.institution.contains(trimmedQuery, ignoreCase = true)
 
-            val matchesDept = department == "All" || teacher.department.equals(department, ignoreCase = true)
+                val matchesDept = department == "All" || teacher.department.equals(department, ignoreCase = true)
 
-            matchesQuery && matchesDept
+                matchesQuery && matchesDept
+            }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 

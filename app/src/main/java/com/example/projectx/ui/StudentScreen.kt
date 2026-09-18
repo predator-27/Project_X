@@ -43,7 +43,7 @@ fun StudentScreen(
     var bookingTeacher by remember { mutableStateOf<Teacher?>(null) }
     var showSuccessSnackbar by remember { mutableStateOf(false) }
 
-    val departments = listOf("All", "Computer Science", "Data Science", "Software Engineering", "Cybersecurity")
+    val departments = remember { listOf("All", "Computer Science", "Data Science", "Software Engineering", "Cybersecurity") }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
