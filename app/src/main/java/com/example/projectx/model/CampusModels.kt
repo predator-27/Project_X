@@ -1,5 +1,8 @@
 package com.example.projectx.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class AttendanceSubject(
     val courseCode: String,
     val courseName: String,
@@ -12,7 +15,6 @@ data class AttendanceSubject(
     val classesNeededFor75: Int
         get() {
             if (percentage >= 75f) return 0
-            // (attended + x) / (total + x) >= 0.75  =>  x >= 3 * total - 4 * attended
             val needed = (3 * totalClasses - 4 * attendedClasses)
             return if (needed < 0) 0 else needed
         }
@@ -20,12 +22,12 @@ data class AttendanceSubject(
     val classesBunkable: Int
         get() {
             if (percentage < 75f) return 0
-            // attended / (total + x) >= 0.75 => x <= (4 * attended - 3 * total) / 3
             val bunkable = (4 * attendedClasses - 3 * totalClasses) / 3
             return if (bunkable < 0) 0 else bunkable
         }
 }
 
+@Immutable
 data class TimetableSlot(
     val id: String,
     val courseName: String,
@@ -35,9 +37,10 @@ data class TimetableSlot(
     val durationMins: Int,
     val facultyName: String,
     val roomCode: String,
-    val type: String // Lecture, Lab, Tutorial
+    val type: String
 )
 
+@Immutable
 data class CampusMessage(
     val id: String,
     val senderName: String,
@@ -49,10 +52,10 @@ data class CampusMessage(
 
 object SampleCampusData {
     val sampleAttendance = listOf(
-        AttendanceSubject("CS201", "Data Structures & Algorithms", 28, 32), // 87.5%
-        AttendanceSubject("CS202", "Database Management Systems", 18, 28), // 64.2% (ALERT)
-        AttendanceSubject("CS203", "Web Technologies & Frameworks", 22, 30), // 78.5%
-        AttendanceSubject("MA201", "Discrete Mathematics", 21, 30)          // 70.0% (WARNING)
+        AttendanceSubject("CS201", "Data Structures & Algorithms", 28, 32),
+        AttendanceSubject("CS202", "Database Management Systems", 18, 28),
+        AttendanceSubject("CS203", "Web Technologies & Frameworks", 22, 30),
+        AttendanceSubject("MA201", "Discrete Mathematics", 21, 30)
     )
 
     val sampleTimetable = listOf(

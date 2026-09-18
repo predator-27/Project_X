@@ -1,5 +1,6 @@
 package com.example.projectx.ui
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+@Immutable
 data class ChatMessage(
     val id: String = UUID.randomUUID().toString(),
     val sender: MessageSender,

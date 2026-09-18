@@ -85,9 +85,9 @@ fun AttendanceScreen(
                 // Overall Summary Stats
                 item {
                     SectionFormCard(sectionTitle = "Overall Attendance Summary") {
-                        val totalAttended = subjects.sumOf { it.attendedClasses }
-                        val totalClasses = subjects.sumOf { it.totalClasses }
-                        val overallPercentage = (totalAttended.toFloat() / totalClasses) * 100f
+                        val totalAttended = remember(subjects) { subjects.sumOf { it.attendedClasses } }
+                        val totalClasses = remember(subjects) { subjects.sumOf { it.totalClasses } }
+                        val overallPercentage = remember(subjects) { (totalAttended.toFloat() / totalClasses) * 100f }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),

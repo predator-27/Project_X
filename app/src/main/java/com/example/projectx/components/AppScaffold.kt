@@ -1,12 +1,11 @@
 package com.example.projectx.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,9 +23,11 @@ fun AppScaffold(
     lastSyncedText: String = "Updated 2h ago",
     content: @Composable ColumnScope.() -> Unit
 ) {
+    var showThemeDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = PageBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -35,12 +36,12 @@ fun AppScaffold(
                             text = title,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = HeadingNavy
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             text = lastSyncedText,
                             fontSize = 11.sp,
-                            color = MutedText
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },
@@ -49,7 +50,7 @@ fun AppScaffold(
                         Icon(
                             imageVector = Icons.Default.Menu,
                             contentDescription = "Menu",
-                            tint = HeadingNavy
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
@@ -57,28 +58,28 @@ fun AppScaffold(
                     if (isOffline) {
                         Surface(
                             shape = PillShape,
-                            color = MutedText.copy(alpha = 0.2f),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
                             modifier = Modifier.padding(end = 8.dp)
                         ) {
                             Text(
                                 text = "Offline",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = MutedText,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                             )
                         }
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { showThemeDialog = true }) {
                         Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = HeadingNavy
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = "Select Theme",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = PageBackground
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -92,6 +93,12 @@ fun AppScaffold(
         ) {
             StudentHeaderCard()
             content()
+        }
+
+        if (showThemeDialog) {
+            ThemeSelectorDialog(
+                onDismiss = { showThemeDialog = false }
+            )
         }
     }
 }
