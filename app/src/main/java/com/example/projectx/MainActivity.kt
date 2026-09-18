@@ -15,8 +15,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectx.components.SideNavDrawerContent
@@ -38,6 +40,7 @@ enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {
 class MainActivity : ComponentActivity() {
 
     private val viewModel: TeacherManagementViewModel by viewModels()
+    private val aiViewModel: CampusAiViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CampusAppShell(viewModel = viewModel)
+                    CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
                 }
             }
         }
@@ -55,7 +58,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CampusAppShell(viewModel: TeacherManagementViewModel) {
+fun CampusAppShell(
+    viewModel: TeacherManagementViewModel,
+    aiViewModel: CampusAiViewModel
+) {
     val authState by viewModel.authState.collectAsState()
     val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -63,6 +69,7 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
 
     var activeDrawerModule by remember { mutableStateOf("home") }
     var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
+    var showAiAssistantSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.checkForAppUpdates(context)
@@ -99,6 +106,15 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
         }
     ) {
         Scaffold(
+            floatingActionButton = {
+                ExtendedFloatingActionButton(
+                    text = { Text("✨ Ask AI Tutor", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White) },
+                    icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "AI Tutor", tint = Color.White) },
+                    onClick = { showAiAssistantSheet = true },
+                    containerColor = PrimaryIndigo,
+                    shape = RoundedCornerShape(999.dp)
+                )
+            },
             bottomBar = {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -149,6 +165,10 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
                                 AttendanceScreen(
                                     onMenuClick = { coroutineScope.launch { drawerState.open() } }
                                 )
+                            } else if (activeDrawerModule == "community") {
+                                SocialCommunityScreen(
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                                )
                             } else {
                                 HomeScreen(
                                     onMenuClick = { coroutineScope.launch { drawerState.open() } },
@@ -168,6 +188,9 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
                                             "messages" -> {
                                                 selectedBottomTab = BottomTab.MESSAGES
                                                 activeDrawerModule = "messages"
+                                            }
+                                            "community" -> {
+                                                activeDrawerModule = "community"
                                             }
                                         }
                                     }
@@ -213,6 +236,14 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
                     viewModel = viewModel,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
+
+                // Gemini AI Assistant Bottom Sheet
+                if (showAiAssistantSheet) {
+                    CampusAiAssistantSheet(
+                        aiViewModel = aiViewModel,
+                        onDismiss = { showAiAssistantSheet = false }
+                    )
+                }
             }
         }
     }
