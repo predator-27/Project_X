@@ -6,23 +6,31 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import com.example.projectx.ui.AdminTeacherScreen
-import com.example.projectx.ui.AuthState
-import com.example.projectx.ui.LoginScreen
-import com.example.projectx.ui.StudentScreen
-import com.example.projectx.ui.TeacherManagementViewModel
-import com.example.projectx.ui.UpdateNotificationOverlay
-import com.example.projectx.ui.WebViewScreen
-import com.example.projectx.ui.theme.ProjectXTheme
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.projectx.components.SideNavDrawerContent
+import com.example.projectx.theme.CampusTheme
+import com.example.projectx.theme.HeadingNavy
+import com.example.projectx.theme.PrimaryBlue
+import com.example.projectx.ui.*
+import kotlinx.coroutines.launch
+
+enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {
+    HOME("home", "Home", Icons.Default.Home),
+    TIMETABLE("timetable", "Timetable", Icons.Default.Schedule),
+    MAP("campus_map", "Campus Map", Icons.Default.Map),
+    MESSAGES("messages", "Messages", Icons.Default.Email),
+    PROFILE("profile", "Profile", Icons.Default.Person)
+}
 
 class MainActivity : ComponentActivity() {
 
@@ -31,12 +39,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ProjectXTheme {
+            CampusTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainAppContent(viewModel = viewModel)
+                    CampusAppShell(viewModel = viewModel)
                 }
             }
         }
@@ -44,26 +52,92 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainAppContent(viewModel: TeacherManagementViewModel) {
+fun CampusAppShell(viewModel: TeacherManagementViewModel) {
     val authState by viewModel.authState.collectAsState()
     val context = LocalContext.current
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+
+    var activeDrawerModule by remember { mutableStateOf("gallery") }
+    var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
 
     LaunchedEffect(Unit) {
         viewModel.checkForAppUpdates(context)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        when (authState) {
-            AuthState.UNAUTHENTICATED -> LoginScreen(viewModel = viewModel)
-            AuthState.TEACHER_ADMIN -> AdminTeacherScreen(viewModel = viewModel)
-            AuthState.STUDENT -> StudentScreen(viewModel = viewModel)
-            AuthState.WEB_VIEW -> WebViewScreen(viewModel = viewModel)
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                SideNavDrawerContent(
+                    activeItemId = activeDrawerModule,
+                    onItemClick = { moduleId ->
+                        activeDrawerModule = moduleId
+                        coroutineScope.launch { drawerState.close() }
+                    },
+                    onLogoutClick = {
+                        viewModel.logout()
+                        coroutineScope.launch { drawerState.close() }
+                    }
+                )
+            }
         }
+    ) {
+        Scaffold(
+            bottomBar = {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 6.dp
+                ) {
+                    BottomTab.entries.forEach { tab ->
+                        val isSelected = selectedBottomTab == tab
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = { selectedBottomTab = tab },
+                            icon = {
+                                Icon(
+                                    imageVector = tab.icon,
+                                    contentDescription = tab.label,
+                                    tint = if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = tab.label,
+                                    fontSize = 11.sp,
+                                    color = if (isSelected) HeadingNavy else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                // Show Component Gallery as default showcase for Step 1
+                when (authState) {
+                    AuthState.UNAUTHENTICATED -> {
+                        ComponentGalleryScreen(
+                            onMenuClick = {
+                                coroutineScope.launch { drawerState.open() }
+                            }
+                        )
+                    }
+                    AuthState.TEACHER_ADMIN -> AdminTeacherScreen(viewModel = viewModel)
+                    AuthState.STUDENT -> StudentScreen(viewModel = viewModel)
+                    AuthState.WEB_VIEW -> WebViewScreen(viewModel = viewModel)
+                }
 
-        // Floating In-App Update Notification Banner Overlay
-        UpdateNotificationOverlay(
-            viewModel = viewModel,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
+                // In-App Update Banner Overlay
+                UpdateNotificationOverlay(
+                    viewModel = viewModel,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
+        }
     }
 }
