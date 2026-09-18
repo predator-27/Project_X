@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
@@ -16,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -23,32 +25,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectx.theme.*
 
+data class NavDrawerCategory(
+    val categoryTitle: String,
+    val items: List<NavDrawerItem>
+)
+
 data class NavDrawerItem(
     val id: String,
     val label: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val badgeText: String? = null,
+    val badgeTone: StatusTone = StatusTone.NEUTRAL
 )
 
-val MYCAMU_DRAWER_ITEMS = listOf(
-    NavDrawerItem("institution", "My Institution", Icons.Default.AccountBalance),
-    NavDrawerItem("messages", "Messages", Icons.Default.Email),
-    NavDrawerItem("attendance", "Attendance", Icons.Default.CheckCircle),
-    NavDrawerItem("exams", "Exam schedules", Icons.AutoMirrored.Filled.EventNote),
-    NavDrawerItem("reports", "Reports", Icons.AutoMirrored.Filled.Assignment),
-    NavDrawerItem("progress", "Progress Report", Icons.AutoMirrored.Filled.TrendingUp),
-    NavDrawerItem("holidays", "Holidays", Icons.Default.CalendarMonth),
-    NavDrawerItem("cafeteria", "Cafeteria", Icons.Default.Restaurant),
-    NavDrawerItem("timetable", "Timetable", Icons.Default.Schedule),
-    NavDrawerItem("leave", "Leave", Icons.Default.FlightTakeoff),
-    NavDrawerItem("services", "Services", Icons.Default.Build),
-    NavDrawerItem("enrollment", "Enrollment (> Pre enlistment)", Icons.Default.HowToReg),
-    NavDrawerItem("activity", "Activity", Icons.Default.SportsBasketball),
-    NavDrawerItem("clearance", "Clearance", Icons.Default.Verified),
-    NavDrawerItem("announcement", "Announcement", Icons.Default.Campaign),
-    NavDrawerItem("feedback", "Feedback", Icons.Default.Feedback),
-    NavDrawerItem("gallery", "Gallery", Icons.Default.Collections),
-    NavDrawerItem("result", "Final result", Icons.Default.Grade),
-    NavDrawerItem("room_partner", "Room partner selection", Icons.Default.MeetingRoom)
+val CATEGORIZED_DRAWER_ITEMS = listOf(
+    NavDrawerCategory(
+        categoryTitle = "ACADEMICS",
+        items = listOf(
+            NavDrawerItem("home", "Dashboard", Icons.Default.Dashboard),
+            NavDrawerItem("timetable", "Timetable", Icons.Default.Schedule),
+            NavDrawerItem("attendance", "Attendance", Icons.Default.CheckCircle, badgeText = "64%", badgeTone = StatusTone.DANGER),
+            NavDrawerItem("exams", "Exam Schedules", Icons.AutoMirrored.Filled.EventNote),
+            NavDrawerItem("reports", "Reports & Hall Ticket", Icons.AutoMirrored.Filled.Assignment),
+            NavDrawerItem("progress", "Progress Report", Icons.AutoMirrored.Filled.TrendingUp),
+            NavDrawerItem("result", "Final Result", Icons.Default.Grade)
+        )
+    ),
+    NavDrawerCategory(
+        categoryTitle = "CAMPUS LIFE & SERVICES",
+        items = listOf(
+            NavDrawerItem("messages", "Messages", Icons.Default.Email, badgeText = "1 New", badgeTone = StatusTone.SUCCESS),
+            NavDrawerItem("campus_map", "Campus Map & Navigation", Icons.Default.Map),
+            NavDrawerItem("cafeteria", "Cafeteria & QR Menu", Icons.Default.Restaurant),
+            NavDrawerItem("holidays", "Holidays & Events", Icons.Default.CalendarMonth),
+            NavDrawerItem("services", "Service Requests", Icons.Default.Build),
+            NavDrawerItem("leave", "Apply Leave", Icons.Default.FlightTakeoff),
+            NavDrawerItem("gallery", "Component Gallery", Icons.Default.Collections)
+        )
+    ),
+    NavDrawerCategory(
+        categoryTitle = "ADMINISTRATION",
+        items = listOf(
+            NavDrawerItem("institution", "My Institution", Icons.Default.AccountBalance),
+            NavDrawerItem("enrollment", "Enrollment (> Pre enlistment)", Icons.Default.HowToReg),
+            NavDrawerItem("clearance", "Clearance", Icons.Default.Verified),
+            NavDrawerItem("announcement", "Announcements", Icons.Default.Campaign),
+            NavDrawerItem("room_partner", "Room Partner Selection", Icons.Default.MeetingRoom)
+        )
+    )
 )
 
 @Composable
@@ -60,57 +84,51 @@ fun SideNavDrawerContent(
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
-    val filteredItems = remember(searchQuery) {
-        if (searchQuery.isBlank()) MYCAMU_DRAWER_ITEMS
-        else MYCAMU_DRAWER_ITEMS.filter { it.label.contains(searchQuery, ignoreCase = true) }
-    }
-
     Column(
         modifier = modifier
-            .fillMaxHeight()
-            .width(300.dp)
+            .fillMaxSize()
             .background(NavySidebar)
-            .padding(16.dp)
+            .padding(18.dp)
     ) {
         // Logo Card Header
-        Card(
-            shape = CardShape,
-            colors = CardDefaults.cardColors(containerColor = NavySidebarActive),
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = NavySidebarActive,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp)
+                .padding(bottom = 14.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = PrimaryBlue,
-                    modifier = Modifier.size(36.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    color = PrimaryIndigo,
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.School,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 }
                 Column {
                     Text(
                         text = "Campus Portal",
-                        fontSize = 16.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = HeadingNavy
                     )
                     Text(
                         text = "Bennett University",
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         color = MutedText
                     )
                 }
@@ -121,14 +139,14 @@ fun SideNavDrawerContent(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search modules...", fontSize = 12.sp, color = MutedText) },
+            placeholder = { Text("Search modules...", fontSize = 13.sp, color = MutedText) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MutedText) },
             singleLine = true,
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = SurfaceCard,
                 unfocusedContainerColor = SurfaceCard,
-                focusedBorderColor = PrimaryBlue,
+                focusedBorderColor = PrimaryIndigo,
                 unfocusedBorderColor = SurfaceBorder
             ),
             modifier = Modifier
@@ -136,44 +154,73 @@ fun SideNavDrawerContent(
                 .padding(bottom = 12.dp)
         )
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.15f), thickness = 1.dp)
+        HorizontalDivider(color = Color.White.copy(alpha = 0.12f), thickness = 1.dp)
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // Module Items List
+        // Module Categories List
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.weight(1f)
         ) {
-            items(filteredItems, key = { it.id }) { item ->
-                val isActive = item.id == activeItemId
+            CATEGORIZED_DRAWER_ITEMS.forEach { category ->
+                val matchingItems = if (searchQuery.isBlank()) category.items
+                else category.items.filter { it.label.contains(searchQuery, ignoreCase = true) }
 
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isActive) NavySidebarActive else Color.Transparent,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onItemClick(item.id) }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.label,
-                            tint = if (isActive) HeadingNavy else NavySidebarText,
-                            modifier = Modifier.size(18.dp)
-                        )
+                if (matchingItems.isNotEmpty()) {
+                    item {
                         Text(
-                            text = item.label,
-                            fontSize = 13.sp,
-                            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
-                            color = if (isActive) HeadingNavy else NavySidebarText
+                            text = category.categoryTitle,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryIndigoLight,
+                            letterSpacing = 0.8.sp,
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
                         )
+                    }
+
+                    items(matchingItems, key = { it.id }) { item ->
+                        val isActive = item.id == activeItemId
+
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isActive) NavySidebarActive else Color.Transparent,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { onItemClick(item.id) }
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                        tint = if (isActive) PrimaryIndigo else NavySidebarText,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Text(
+                                        text = item.label,
+                                        fontSize = 13.sp,
+                                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isActive) HeadingNavy else NavySidebarText
+                                    )
+                                }
+
+                                item.badgeText?.let { badge ->
+                                    StatusPill(text = badge, tone = item.badgeTone)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -181,15 +228,16 @@ fun SideNavDrawerContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.15f), thickness = 1.dp)
+        HorizontalDivider(color = Color.White.copy(alpha = 0.12f), thickness = 1.dp)
 
         // Logout Button
         Surface(
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(12.dp),
             color = Color.Transparent,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .clickable { onLogoutClick() }
         ) {
             Row(
@@ -202,14 +250,14 @@ fun SideNavDrawerContent(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = "Logout",
-                    tint = DangerRed,
+                    tint = AccentCoral,
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
                     text = "Sign Out",
-                    fontSize = 13.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = DangerRed
+                    color = AccentCoral
                 )
             }
         }

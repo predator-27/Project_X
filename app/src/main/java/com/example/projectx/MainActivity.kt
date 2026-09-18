@@ -7,6 +7,8 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -20,7 +22,8 @@ import androidx.compose.ui.unit.sp
 import com.example.projectx.components.SideNavDrawerContent
 import com.example.projectx.theme.CampusTheme
 import com.example.projectx.theme.HeadingNavy
-import com.example.projectx.theme.PrimaryBlue
+import com.example.projectx.theme.NavySidebar
+import com.example.projectx.theme.PrimaryIndigo
 import com.example.projectx.ui.*
 import kotlinx.coroutines.launch
 
@@ -58,7 +61,7 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
-    var activeDrawerModule by remember { mutableStateOf("gallery") }
+    var activeDrawerModule by remember { mutableStateOf("home") }
     var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
 
     LaunchedEffect(Unit) {
@@ -68,11 +71,23 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerContainerColor = NavySidebar,
+                drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
+                modifier = Modifier.width(320.dp)
+            ) {
                 SideNavDrawerContent(
                     activeItemId = activeDrawerModule,
                     onItemClick = { moduleId ->
                         activeDrawerModule = moduleId
+                        when (moduleId) {
+                            "home" -> selectedBottomTab = BottomTab.HOME
+                            "timetable" -> selectedBottomTab = BottomTab.TIMETABLE
+                            "messages" -> selectedBottomTab = BottomTab.MESSAGES
+                            "attendance" -> selectedBottomTab = BottomTab.HOME
+                            "campus_map" -> selectedBottomTab = BottomTab.MAP
+                            "gallery" -> selectedBottomTab = BottomTab.MAP
+                        }
                         coroutineScope.launch { drawerState.close() }
                     },
                     onLogoutClick = {
@@ -93,12 +108,21 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
                         val isSelected = selectedBottomTab == tab
                         NavigationBarItem(
                             selected = isSelected,
-                            onClick = { selectedBottomTab = tab },
+                            onClick = {
+                                selectedBottomTab = tab
+                                when (tab) {
+                                    BottomTab.HOME -> activeDrawerModule = "home"
+                                    BottomTab.TIMETABLE -> activeDrawerModule = "timetable"
+                                    BottomTab.MESSAGES -> activeDrawerModule = "messages"
+                                    BottomTab.MAP -> activeDrawerModule = "campus_map"
+                                    BottomTab.PROFILE -> activeDrawerModule = "profile"
+                                }
+                            },
                             icon = {
                                 Icon(
                                     imageVector = tab.icon,
                                     contentDescription = tab.label,
-                                    tint = if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = if (isSelected) PrimaryIndigo else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             label = {
@@ -118,18 +142,70 @@ fun CampusAppShell(viewModel: TeacherManagementViewModel) {
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                // Show Component Gallery as default showcase for Step 1
-                when (authState) {
-                    AuthState.UNAUTHENTICATED -> {
-                        ComponentGalleryScreen(
-                            onMenuClick = {
-                                coroutineScope.launch { drawerState.open() }
+                if (authState == AuthState.UNAUTHENTICATED) {
+                    when (selectedBottomTab) {
+                        BottomTab.HOME -> {
+                            if (activeDrawerModule == "attendance") {
+                                AttendanceScreen(
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                                )
+                            } else {
+                                HomeScreen(
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                    onNavigateToTab = { tabId ->
+                                        when (tabId) {
+                                            "timetable" -> {
+                                                selectedBottomTab = BottomTab.TIMETABLE
+                                                activeDrawerModule = "timetable"
+                                            }
+                                            "attendance" -> {
+                                                activeDrawerModule = "attendance"
+                                            }
+                                            "campus_map" -> {
+                                                selectedBottomTab = BottomTab.MAP
+                                                activeDrawerModule = "campus_map"
+                                            }
+                                            "messages" -> {
+                                                selectedBottomTab = BottomTab.MESSAGES
+                                                activeDrawerModule = "messages"
+                                            }
+                                        }
+                                    }
+                                )
                             }
-                        )
+                        }
+                        BottomTab.TIMETABLE -> {
+                            TimetableScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                onNavigateToRoom = {
+                                    selectedBottomTab = BottomTab.MAP
+                                    activeDrawerModule = "campus_map"
+                                }
+                            )
+                        }
+                        BottomTab.MAP -> {
+                            ComponentGalleryScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        }
+                        BottomTab.MESSAGES -> {
+                            MessagesScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        }
+                        BottomTab.PROFILE -> {
+                            ProfileScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        }
                     }
-                    AuthState.TEACHER_ADMIN -> AdminTeacherScreen(viewModel = viewModel)
-                    AuthState.STUDENT -> StudentScreen(viewModel = viewModel)
-                    AuthState.WEB_VIEW -> WebViewScreen(viewModel = viewModel)
+                } else {
+                    when (authState) {
+                        AuthState.TEACHER_ADMIN -> AdminTeacherScreen(viewModel = viewModel)
+                        AuthState.STUDENT -> StudentScreen(viewModel = viewModel)
+                        AuthState.WEB_VIEW -> WebViewScreen(viewModel = viewModel)
+                        else -> {}
+                    }
                 }
 
                 // In-App Update Banner Overlay
