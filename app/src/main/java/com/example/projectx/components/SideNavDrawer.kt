@@ -121,7 +121,7 @@ fun SideNavDrawerContent(
                 }
                 Column {
                     Text(
-                        text = "Campus Portal",
+                        text = "Project-X Portal",
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = HeadingNavy
