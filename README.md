@@ -9,8 +9,8 @@ An Android application built with Modern Android Development practices, Jetpack 
 - **In-App Auto-Update System**: In-app updates with GitHub Release synchronization.
 
 ## Contributors 👥
-- **Akhil Tyagi** ([@predator-27](https://github.com/predator-27)) - Lead Developer & Maintainer
-- **@atriputr** ([@atriputr](https://github.com/atriputr)) - Contributor
+- **Krishang Jain** ([@predator-27](https://github.com/predator-27)) - Lead Developer & Maintainer
+- **Akhil Tyagi** ([@atriputr](https://github.com/atriputr)) - Contributor
 
 For a full list of contributors, see [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
