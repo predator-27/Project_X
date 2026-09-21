@@ -64,16 +64,48 @@ fun CampusAppShell(
 ) {
     val authState by viewModel.authState.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.loadSavedAuth(context)
+        viewModel.checkForAppUpdates(context)
+    }
+
+    when (authState) {
+        AuthState.UNAUTHENTICATED -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                LoginScreen(viewModel = viewModel)
+
+                // In-App Update Banner Overlay
+                UpdateNotificationOverlay(
+                    viewModel = viewModel,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
+        }
+        AuthState.STUDENT -> {
+            StudentCampusShell(viewModel = viewModel, aiViewModel = aiViewModel)
+        }
+        AuthState.TEACHER_ADMIN -> {
+            AdminTeacherScreen(viewModel = viewModel)
+        }
+        AuthState.WEB_VIEW -> {
+            WebViewScreen(viewModel = viewModel)
+        }
+    }
+}
+
+@Composable
+fun StudentCampusShell(
+    viewModel: TeacherManagementViewModel,
+    aiViewModel: CampusAiViewModel
+) {
+    val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
     var activeDrawerModule by remember { mutableStateOf("home") }
     var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
     var showAiAssistantSheet by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        viewModel.checkForAppUpdates(context)
-    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -92,13 +124,15 @@ fun CampusAppShell(
                             "timetable" -> selectedBottomTab = BottomTab.TIMETABLE
                             "messages" -> selectedBottomTab = BottomTab.MESSAGES
                             "attendance" -> selectedBottomTab = BottomTab.HOME
+                            "community" -> selectedBottomTab = BottomTab.HOME
+                            "teachers" -> selectedBottomTab = BottomTab.HOME
                             "campus_map" -> selectedBottomTab = BottomTab.MAP
                             "gallery" -> selectedBottomTab = BottomTab.MAP
                         }
                         coroutineScope.launch { drawerState.close() }
                     },
                     onLogoutClick = {
-                        viewModel.logout()
+                        viewModel.logout(context)
                         coroutineScope.launch { drawerState.close() }
                     }
                 )
@@ -158,76 +192,71 @@ fun CampusAppShell(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                if (authState == AuthState.UNAUTHENTICATED) {
-                    when (selectedBottomTab) {
-                        BottomTab.HOME -> {
-                            if (activeDrawerModule == "attendance") {
-                                AttendanceScreen(
-                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                                )
-                            } else if (activeDrawerModule == "community") {
-                                SocialCommunityScreen(
-                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                                )
-                            } else {
-                                HomeScreen(
-                                    onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                                    onNavigateToTab = { tabId ->
-                                        when (tabId) {
-                                            "timetable" -> {
-                                                selectedBottomTab = BottomTab.TIMETABLE
-                                                activeDrawerModule = "timetable"
-                                            }
-                                            "attendance" -> {
-                                                activeDrawerModule = "attendance"
-                                            }
-                                            "campus_map" -> {
-                                                selectedBottomTab = BottomTab.MAP
-                                                activeDrawerModule = "campus_map"
-                                            }
-                                            "messages" -> {
-                                                selectedBottomTab = BottomTab.MESSAGES
-                                                activeDrawerModule = "messages"
-                                            }
-                                            "community" -> {
-                                                activeDrawerModule = "community"
-                                            }
+                when (selectedBottomTab) {
+                    BottomTab.HOME -> {
+                        if (activeDrawerModule == "attendance") {
+                            AttendanceScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "community") {
+                            SocialCommunityScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "teachers") {
+                            StudentScreen(
+                                viewModel = viewModel
+                            )
+                        } else {
+                            HomeScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                onNavigateToTab = { tabId ->
+                                    when (tabId) {
+                                        "timetable" -> {
+                                            selectedBottomTab = BottomTab.TIMETABLE
+                                            activeDrawerModule = "timetable"
+                                        }
+                                        "attendance" -> {
+                                            activeDrawerModule = "attendance"
+                                        }
+                                        "campus_map" -> {
+                                            selectedBottomTab = BottomTab.MAP
+                                            activeDrawerModule = "campus_map"
+                                        }
+                                        "messages" -> {
+                                            selectedBottomTab = BottomTab.MESSAGES
+                                            activeDrawerModule = "messages"
+                                        }
+                                        "community" -> {
+                                            activeDrawerModule = "community"
                                         }
                                     }
-                                )
-                            }
-                        }
-                        BottomTab.TIMETABLE -> {
-                            TimetableScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                                onNavigateToRoom = {
-                                    selectedBottomTab = BottomTab.MAP
-                                    activeDrawerModule = "campus_map"
                                 }
                             )
                         }
-                        BottomTab.MAP -> {
-                            ComponentGalleryScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                            )
-                        }
-                        BottomTab.MESSAGES -> {
-                            MessagesScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                            )
-                        }
-                        BottomTab.PROFILE -> {
-                            ProfileScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                            )
-                        }
                     }
-                } else {
-                    when (authState) {
-                        AuthState.TEACHER_ADMIN -> AdminTeacherScreen(viewModel = viewModel)
-                        AuthState.STUDENT -> StudentScreen(viewModel = viewModel)
-                        AuthState.WEB_VIEW -> WebViewScreen(viewModel = viewModel)
-                        else -> {}
+                    BottomTab.TIMETABLE -> {
+                        TimetableScreen(
+                            onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                            onNavigateToRoom = {
+                                selectedBottomTab = BottomTab.MAP
+                                activeDrawerModule = "campus_map"
+                            }
+                        )
+                    }
+                    BottomTab.MAP -> {
+                        ComponentGalleryScreen(
+                            onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                        )
+                    }
+                    BottomTab.MESSAGES -> {
+                        MessagesScreen(
+                            onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                        )
+                    }
+                    BottomTab.PROFILE -> {
+                        ProfileScreen(
+                            onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                        )
                     }
                 }
 

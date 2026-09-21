@@ -28,12 +28,15 @@ import androidx.compose.ui.unit.sp
 import com.example.projectx.model.Appointment
 import com.example.projectx.model.Teacher
 
+import androidx.compose.ui.platform.LocalContext
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentScreen(
     viewModel: TeacherManagementViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val teachers by viewModel.filteredTeachers.collectAsState()
     val appointments by viewModel.appointments.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -51,7 +54,7 @@ fun StudentScreen(
             TopAppBar(
                 title = { Text("👨‍🎓 Student Desk Portal", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { viewModel.logout() }) {
+                    IconButton(onClick = { viewModel.logout(context) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                             contentDescription = "Log Out",

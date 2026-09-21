@@ -34,12 +34,15 @@ import com.example.projectx.model.Institution
 import com.example.projectx.model.Teacher
 import com.example.projectx.model.TeacherStatus
 
+import androidx.compose.ui.platform.LocalContext
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminTeacherScreen(
     viewModel: TeacherManagementViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val activeTeacher by viewModel.activeTeacher.collectAsState()
     val appointments by viewModel.appointments.collectAsState()
 
@@ -67,7 +70,7 @@ fun AdminTeacherScreen(
             TopAppBar(
                 title = { Text("👨‍🏫 Teacher Admin Dashboard", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { viewModel.logout() }) {
+                    IconButton(onClick = { viewModel.logout(context) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                             contentDescription = "Log Out",

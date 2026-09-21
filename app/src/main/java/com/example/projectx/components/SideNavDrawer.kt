@@ -45,6 +45,7 @@ val CATEGORIZED_DRAWER_ITEMS = listOf(
             NavDrawerItem("home", "Dashboard", Icons.Default.Dashboard),
             NavDrawerItem("timetable", "Timetable", Icons.Default.Schedule),
             NavDrawerItem("attendance", "Attendance", Icons.Default.CheckCircle, badgeText = "64%", badgeTone = StatusTone.DANGER),
+            NavDrawerItem("teachers", "Teacher Directory & Booking", Icons.Default.PersonSearch, badgeText = "Booking", badgeTone = StatusTone.SUCCESS),
             NavDrawerItem("exams", "Exam Schedules", Icons.AutoMirrored.Filled.EventNote),
             NavDrawerItem("reports", "Reports & Hall Ticket", Icons.AutoMirrored.Filled.Assignment),
             NavDrawerItem("progress", "Progress Report", Icons.AutoMirrored.Filled.TrendingUp),
@@ -55,6 +56,7 @@ val CATEGORIZED_DRAWER_ITEMS = listOf(
         categoryTitle = "CAMPUS LIFE & SERVICES",
         items = listOf(
             NavDrawerItem("messages", "Messages", Icons.Default.Email, badgeText = "1 New", badgeTone = StatusTone.SUCCESS),
+            NavDrawerItem("community", "Social Community", Icons.Default.Groups, badgeText = "Peer", badgeTone = StatusTone.SUCCESS),
             NavDrawerItem("campus_map", "Campus Map & Navigation", Icons.Default.Map),
             NavDrawerItem("cafeteria", "Cafeteria & QR Menu", Icons.Default.Restaurant),
             NavDrawerItem("holidays", "Holidays & Events", Icons.Default.CalendarMonth),

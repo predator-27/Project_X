@@ -34,18 +34,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectx.model.Institution
 
+import androidx.compose.ui.platform.LocalContext
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun LoginScreen(
     viewModel: TeacherManagementViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val teachers by viewModel.teachers.collectAsState()
+    val savedRememberMe by viewModel.rememberMe.collectAsState()
+    val savedEmail by viewModel.loggedInUserEmail.collectAsState()
+    val savedTeacherId by viewModel.selectedTeacherId.collectAsState()
+
     var selectedRoleIndex by remember { mutableStateOf(0) } // 0 = Teacher/Admin, 1 = Student
 
-    var email by remember { mutableStateOf("") }
+    var rememberMe by remember { mutableStateOf(savedRememberMe) }
+    var email by remember(savedEmail) { mutableStateOf(savedEmail) }
     var password by remember { mutableStateOf("") }
-    var selectedTeacherId by remember { mutableStateOf("t1") }
+    var selectedTeacherId by remember(savedTeacherId) { mutableStateOf(if (savedTeacherId.isBlank()) "t1" else savedTeacherId) }
 
     var showRegisterDialog by remember { mutableStateOf(false) }
 
@@ -132,7 +140,7 @@ fun LoginScreen(
                     Button(
                         onClick = {
                             selectedRoleIndex = 0
-                            email = "s.jenkins@university.edu"
+                            if (email.isBlank()) email = "s.jenkins@university.edu"
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
@@ -148,7 +156,7 @@ fun LoginScreen(
                     Button(
                         onClick = {
                             selectedRoleIndex = 1
-                            email = "alex.r@student.edu"
+                            if (email.isBlank()) email = "alex.r@student.edu"
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
@@ -260,11 +268,35 @@ fun LoginScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
 
+                            // Remember Me Checkbox
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Checkbox(
+                                    checked = rememberMe,
+                                    onCheckedChange = { rememberMe = it },
+                                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
+                                )
+                                Text(
+                                    text = "Remember Me (Auto sign in next time)",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+
                             Button(
                                 onClick = {
                                     viewModel.loginAsTeacher(
                                         email = email.ifBlank { activeTeacher?.email ?: "s.jenkins@university.edu" },
-                                        teacherId = selectedTeacherId
+                                        teacherId = selectedTeacherId,
+                                        rememberMe = rememberMe,
+                                        context = context
                                     )
                                 },
                                 modifier = Modifier
@@ -279,7 +311,9 @@ fun LoginScreen(
                                 onClick = {
                                     viewModel.loginAsTeacher(
                                         email = "s.jenkins@university.edu",
-                                        teacherId = "t1"
+                                        teacherId = "t1",
+                                        rememberMe = rememberMe,
+                                        context = context
                                     )
                                 },
                                 modifier = Modifier
@@ -320,10 +354,34 @@ fun LoginScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
 
+                            // Remember Me Checkbox
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Checkbox(
+                                    checked = rememberMe,
+                                    onCheckedChange = { rememberMe = it },
+                                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
+                                )
+                                Text(
+                                    text = "Remember Me (Auto sign in next time)",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+
                             Button(
                                 onClick = {
                                     viewModel.loginAsStudent(
-                                        email = email.ifBlank { "alex.r@student.edu" }
+                                        email = email.ifBlank { "alex.r@student.edu" },
+                                        rememberMe = rememberMe,
+                                        context = context
                                     )
                                 },
                                 modifier = Modifier
@@ -336,7 +394,11 @@ fun LoginScreen(
 
                             OutlinedButton(
                                 onClick = {
-                                    viewModel.loginAsStudent("alex.r@student.edu")
+                                    viewModel.loginAsStudent(
+                                        email = "alex.r@student.edu",
+                                        rememberMe = rememberMe,
+                                        context = context
+                                    )
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -378,7 +440,9 @@ fun LoginScreen(
                         deskNumber = desk,
                         timings = timings,
                         institution = instName,
-                        institutionDomain = instDomain
+                        institutionDomain = instDomain,
+                        rememberMe = rememberMe,
+                        context = context
                     )
                     showRegisterDialog = false
                 }

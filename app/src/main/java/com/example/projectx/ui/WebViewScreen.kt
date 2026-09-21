@@ -49,7 +49,7 @@ fun WebViewScreen(
             TopAppBar(
                 title = { Text("🌐 Web Portal View") },
                 actions = {
-                    TextButton(onClick = { viewModel.logout() }) {
+                    TextButton(onClick = { viewModel.logout(context) }) {
                         Text("Exit Web View", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     }
                 },

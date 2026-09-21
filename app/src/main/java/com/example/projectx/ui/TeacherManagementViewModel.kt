@@ -30,6 +30,14 @@ class TeacherManagementViewModel(
     private val updateManager: UpdateManager = UpdateManager.getInstance()
 ) : ViewModel() {
 
+    companion object {
+        private const val PREFS_NAME = "projectx_auth_prefs"
+        private const val KEY_REMEMBER_ME = "remember_me"
+        private const val KEY_AUTH_STATE = "auth_state"
+        private const val KEY_USER_EMAIL = "user_email"
+        private const val KEY_TEACHER_ID = "teacher_id"
+    }
+
     private val _authState = MutableStateFlow(AuthState.UNAUTHENTICATED)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
@@ -38,6 +46,9 @@ class TeacherManagementViewModel(
 
     private val _selectedTeacherId = MutableStateFlow("t1")
     val selectedTeacherId: StateFlow<String> = _selectedTeacherId.asStateFlow()
+
+    private val _rememberMe = MutableStateFlow(true)
+    val rememberMe: StateFlow<Boolean> = _rememberMe.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -55,6 +66,30 @@ class TeacherManagementViewModel(
 
     val teachers: StateFlow<List<Teacher>> = repository.teachers
     val appointments: StateFlow<List<Appointment>> = repository.appointments
+
+    fun loadSavedAuth(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val isRemembered = prefs.getBoolean(KEY_REMEMBER_ME, false)
+        val savedStateStr = prefs.getString(KEY_AUTH_STATE, AuthState.UNAUTHENTICATED.name) ?: AuthState.UNAUTHENTICATED.name
+        val savedEmail = prefs.getString(KEY_USER_EMAIL, "") ?: ""
+        val savedTeacherId = prefs.getString(KEY_TEACHER_ID, "t1") ?: "t1"
+
+        _rememberMe.value = isRemembered
+        if (savedEmail.isNotBlank()) {
+            _loggedInUserEmail.value = savedEmail
+        }
+        if (savedTeacherId.isNotBlank()) {
+            _selectedTeacherId.value = savedTeacherId
+        }
+
+        if (isRemembered) {
+            when (savedStateStr) {
+                AuthState.TEACHER_ADMIN.name -> _authState.value = AuthState.TEACHER_ADMIN
+                AuthState.STUDENT.name -> _authState.value = AuthState.STUDENT
+                else -> _authState.value = AuthState.UNAUTHENTICATED
+            }
+        }
+    }
 
     fun checkForAppUpdates(context: Context) {
         viewModelScope.launch {
@@ -110,24 +145,64 @@ class TeacherManagementViewModel(
         teacherList.find { it.id == teacherId } ?: teacherList.firstOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    fun loginAsTeacher(email: String, teacherId: String = "t1") {
-        _loggedInUserEmail.value = email.ifBlank { "teacher@university.edu" }
+    fun loginAsTeacher(
+        email: String,
+        teacherId: String = "t1",
+        rememberMe: Boolean = true,
+        context: Context? = null
+    ) {
+        val finalEmail = email.ifBlank { "teacher@university.edu" }
+        _loggedInUserEmail.value = finalEmail
         _selectedTeacherId.value = teacherId
+        _rememberMe.value = rememberMe
         _authState.value = AuthState.TEACHER_ADMIN
+
+        context?.let { ctx ->
+            val prefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().apply {
+                putBoolean(KEY_REMEMBER_ME, rememberMe)
+                putString(KEY_AUTH_STATE, AuthState.TEACHER_ADMIN.name)
+                putString(KEY_USER_EMAIL, finalEmail)
+                putString(KEY_TEACHER_ID, teacherId)
+                apply()
+            }
+        }
     }
 
-    fun loginAsStudent(email: String) {
-        _loggedInUserEmail.value = email.ifBlank { "student@university.edu" }
+    fun loginAsStudent(
+        email: String,
+        rememberMe: Boolean = true,
+        context: Context? = null
+    ) {
+        val finalEmail = email.ifBlank { "student@university.edu" }
+        _loggedInUserEmail.value = finalEmail
+        _rememberMe.value = rememberMe
         _authState.value = AuthState.STUDENT
+
+        context?.let { ctx ->
+            val prefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().apply {
+                putBoolean(KEY_REMEMBER_ME, rememberMe)
+                putString(KEY_AUTH_STATE, AuthState.STUDENT.name)
+                putString(KEY_USER_EMAIL, finalEmail)
+                apply()
+            }
+        }
     }
 
     fun openWebView() {
         _authState.value = AuthState.WEB_VIEW
     }
 
-    fun logout() {
+    fun logout(context: Context? = null) {
         _authState.value = AuthState.UNAUTHENTICATED
-        _loggedInUserEmail.value = ""
+        context?.let { ctx ->
+            val prefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().apply {
+                putString(KEY_AUTH_STATE, AuthState.UNAUTHENTICATED.name)
+                apply()
+            }
+        }
     }
 
     fun selectTeacher(teacherId: String) {
@@ -182,7 +257,9 @@ class TeacherManagementViewModel(
         deskNumber: String,
         timings: String,
         institution: String,
-        institutionDomain: String
+        institutionDomain: String,
+        rememberMe: Boolean = true,
+        context: Context? = null
     ) {
         val newTeacher = repository.registerNewTeacher(
             name = name,
@@ -194,7 +271,12 @@ class TeacherManagementViewModel(
             institution = institution,
             institutionDomain = institutionDomain
         )
-        loginAsTeacher(email = newTeacher.email, teacherId = newTeacher.id)
+        loginAsTeacher(
+            email = newTeacher.email,
+            teacherId = newTeacher.id,
+            rememberMe = rememberMe,
+            context = context
+        )
     }
 
     fun bookAppointment(
