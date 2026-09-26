@@ -13,6 +13,14 @@ enum class CampusThemePreset(
     val sidebarColor: Color,
     val fieldLabelColor: Color
 ) {
+    FROSTED_MIDNIGHT(
+        themeName = "Frosted Midnight",
+        primaryColor    = Color(0xFF60A5FA),   // cornflower
+        pageBackground  = Color(0xFF0B1220),   // deep splash navy
+        surfaceColor    = Color(0xFF131B30),   // 1st glass tier
+        sidebarColor    = Color(0xFF060B18),   // darkest anchor
+        fieldLabelColor = Color(0xFFE0B872)    // warm gold on navy
+    ),
     AURA_INDIGO(
         themeName = "Aura Indigo",
         primaryColor = Color(0xFF4F46E5),
@@ -84,7 +92,8 @@ enum class CampusThemePreset(
 }
 
 object CampusThemeState {
-    private val _currentTheme = MutableStateFlow(CampusThemePreset.AURA_INDIGO)
+    // Default = Frosted Midnight. Splash lands straight into the same navy tone.
+    private val _currentTheme = MutableStateFlow(CampusThemePreset.FROSTED_MIDNIGHT)
     val currentTheme: StateFlow<CampusThemePreset> = _currentTheme.asStateFlow()
 
     fun setTheme(theme: CampusThemePreset) {

@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,7 +28,8 @@ fun AppScaffold(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
+        // Transparent so the AmbientBackground behind this scaffold bleeds through.
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
@@ -78,8 +80,10 @@ fun AppScaffold(
                         )
                     }
                 },
+                // Transparent top bar so the ambient glow is visible behind the title.
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent,
                 )
             )
         }

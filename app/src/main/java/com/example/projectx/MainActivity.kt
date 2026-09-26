@@ -23,11 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.projectx.components.AmbientBackground
 import com.example.projectx.components.SideNavDrawerContent
 import com.example.projectx.theme.CampusTheme
-import com.example.projectx.theme.HeadingNavy
-import com.example.projectx.theme.NavySidebar
-import com.example.projectx.theme.PrimaryIndigo
+import com.example.projectx.theme.CampusTokens
 import com.example.projectx.ui.*
 import com.example.projectx.ui.academics.AcademicViewModel
 import com.example.projectx.ui.academics.CoursesScreen
@@ -51,14 +50,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             CampusTheme {
                 var splashDone by rememberSaveable { mutableStateOf(false) }
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    if (!splashDone) {
-                        SplashScreen(onFinished = { splashDone = true })
-                    } else {
-                        CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
+                if (!splashDone) {
+                    // Splash draws its own background — keep it full-bleed.
+                    SplashScreen(onFinished = { splashDone = true })
+                } else {
+                    // Ambient layer sits behind every screen so the whole app
+                    // shares the splash's navy + soft glow palette.
+                    AmbientBackground(modifier = Modifier.fillMaxSize()) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = androidx.compose.ui.graphics.Color.Transparent,
+                        ) {
+                            CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
+                        }
                     }
                 }
             }
@@ -121,7 +125,7 @@ fun StudentCampusShell(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = NavySidebar,
+                drawerContainerColor = CampusTokens.colors.sidebar,
                 drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
                 modifier = Modifier.width(320.dp)
             ) {
@@ -156,7 +160,7 @@ fun StudentCampusShell(
                     text = { Text("✨ Ask AI Tutor", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White) },
                     icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "AI Tutor", tint = Color.White) },
                     onClick = { showAiAssistantSheet = true },
-                    containerColor = PrimaryIndigo,
+                    containerColor = CampusTokens.colors.primary,
                     shape = RoundedCornerShape(999.dp)
                 )
             },
@@ -183,14 +187,14 @@ fun StudentCampusShell(
                                 Icon(
                                     imageVector = tab.icon,
                                     contentDescription = tab.label,
-                                    tint = if (isSelected) PrimaryIndigo else MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = if (isSelected) CampusTokens.colors.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             label = {
                                 Text(
                                     text = tab.label,
                                     fontSize = 11.sp,
-                                    color = if (isSelected) HeadingNavy else MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = if (isSelected) CampusTokens.colors.heading else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         )
