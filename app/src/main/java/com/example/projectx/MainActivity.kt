@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,11 +50,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CampusTheme {
+                var splashDone by rememberSaveable { mutableStateOf(false) }
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
+                    if (!splashDone) {
+                        SplashScreen(onFinished = { splashDone = true })
+                    } else {
+                        CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
+                    }
                 }
             }
         }
