@@ -1,0 +1,292 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- HELPER FUNCTIONS ---
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Layer 1: Token Domain & Email Verification Gate
+    function isVerifiedBennettUser() {
+      return isAuthenticated()
+        && request.auth.token.email.endsWith('@bennett.edu.in')
+        && request.auth.token.email_verified == true;
+    }
+
+    // Layer 2: Active Account Gate (Used for all protected data reads/writes)
+    function isActiveVerifiedBennettUser() {
+      return isVerifiedBennettUser()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return isActiveVerifiedBennettUser() && getUserRole() == 'SUPER_ADMIN';
+    }
+
+    function isCollegeAdmin() {
+      return isActiveVerifiedBennettUser() && getUserRole() == 'COLLEGE_ADMIN';
+    }
+
+    function isLostFoundStaff() {
+      return isActiveVerifiedBennettUser() && getUserRole() == 'LOST_FOUND_STAFF';
+    }
+
+    function isValidRole(roleStr) {
+      return roleStr == 'STUDENT'
+        || roleStr == 'FACULTY'
+        || roleStr == 'LOST_FOUND_STAFF'
+        || roleStr == 'COLLEGE_ADMIN'
+        || roleStr == 'SUPER_ADMIN';
+    }
+
+    function isValidAppointmentTransition() {
+      let oldStatus = resource.data.status;
+      let newStatus = request.resource.data.status;
+      return (
+        (oldStatus == 'PENDING' && (newStatus == 'CONFIRMED' || newStatus == 'REJECTED' || newStatus == 'CANCELLED')) ||
+        (oldStatus == 'CONFIRMED' && (newStatus == 'COMPLETED' || newStatus == 'CANCELLED'))
+      );
+    }
+
+    // --- 1. PRIVATE USER DOCUMENT (/users/{uid}) ---
+    match /users/{userId} {
+      allow read: if (isOwner(userId) || isSuperAdmin()) && isVerifiedBennettUser();
+
+      // Account creation during registration
+      allow create: if isOwner(userId)
+        && isVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'phoneNumber', 'rollNumber', 'role', 'isActive', 'createdAt', 'updatedAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == 'STUDENT'
+        && request.resource.data.isActive == true;
+
+      // Normal Owner Update: Safe fields ONLY
+      allow update: if isOwner(userId)
+        && isActiveVerifiedBennettUser()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['phoneNumber', 'updatedAt']);
+
+      // Administrative Role & Activation Update: SUPER_ADMIN ONLY (Restricted allowlist + type validation)
+      allow update: if isSuperAdmin()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role', 'isActive', 'updatedAt'])
+        && isValidRole(request.resource.data.role)
+        && request.resource.data.isActive is bool;
+
+      allow delete: if false;
+    }
+
+    // --- 2. PUBLIC PROFILE DOCUMENT (/public_profiles/{uid}) ---
+    match /public_profiles/{userId} {
+      allow read: if isActiveVerifiedBennettUser();
+
+      allow create: if isOwner(userId)
+        && isVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly(['uid', 'displayName', 'profileImageUrl', 'schoolName', 'program', 'department', 'specialization', 'admissionYear', 'currentSemester', 'section', 'bio'])
+        && request.resource.data.uid == request.auth.uid;
+
+      // Public Profile Update: Explicit Allowlist ONLY
+      allow update: if isVerifiedBennettUser()
+        && request.resource.data.uid == resource.data.uid
+        && (
+          (isOwner(userId) && isActiveVerifiedBennettUser()) || isSuperAdmin()
+        )
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName', 'profileImageUrl', 'schoolName', 'program',
+          'department', 'specialization', 'admissionYear', 'currentSemester', 'section', 'bio'
+        ]);
+
+      allow delete: if isSuperAdmin();
+    }
+
+    // --- 3. FACULTY PROFILES (/faculty_profiles/{uid}) ---
+    match /faculty_profiles/{facultyUid} {
+      allow read: if isActiveVerifiedBennettUser();
+
+      allow create: if (isCollegeAdmin() || isSuperAdmin())
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'title', 'department', 'deskNumber', 'institution', 'institutionDomain', 'timings', 'status', 'bio', 'isAvailableForAppointments'])
+        && request.resource.data.uid == facultyUid;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && request.resource.data.uid == resource.data.uid
+        && (
+          (isOwner(facultyUid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['timings', 'status', 'bio'])) ||
+          (isCollegeAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'title', 'department', 'deskNumber', 'institution', 'institutionDomain', 'isAvailableForAppointments'])) ||
+          (isSuperAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'title', 'department', 'deskNumber', 'institution', 'institutionDomain', 'isAvailableForAppointments', 'timings', 'status', 'bio']))
+        );
+
+      allow delete: if isCollegeAdmin() || isSuperAdmin();
+    }
+
+    // --- 4. APPOINTMENTS (/appointments/{appointmentId}) ---
+    match /appointments/{appointmentId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.studentUid == request.auth.uid ||
+        resource.data.facultyUid == request.auth.uid ||
+        isCollegeAdmin() || isSuperAdmin()
+      );
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly(['appointmentId', 'studentUid', 'facultyUid', 'purpose', 'proposedTime', 'status', 'createdAt'])
+        && request.resource.data.studentUid == request.auth.uid
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && request.resource.data.studentUid == resource.data.studentUid
+        && request.resource.data.facultyUid == resource.data.facultyUid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (
+          (resource.data.studentUid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['purpose', 'proposedTime', 'status'])
+            && request.resource.data.status == 'CANCELLED'
+            && isValidAppointmentTransition()) ||
+          ((resource.data.facultyUid == request.auth.uid || isSuperAdmin())
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'facultyNotes', 'approvedTime'])
+            && isValidAppointmentTransition())
+        );
+
+      allow delete: if isSuperAdmin();
+    }
+
+    // --- 5. LOST & FOUND (/lost_found/{itemId}) ---
+    match /lost_found/{itemId} {
+      allow read: if isActiveVerifiedBennettUser();
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly([
+          'itemId', 'title', 'description', 'locationFound', 'imageUrl', 'reporterUid', 'status', 'createdAt'
+        ])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.status == 'REPORTED'
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && request.resource.data.reporterUid == resource.data.reporterUid
+        && (
+          (resource.data.reporterUid == request.auth.uid
+            && resource.data.status == 'REPORTED'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'locationFound', 'imageUrl', 'status'])
+            && (request.resource.data.status == 'REPORTED' || request.resource.data.status == 'CANCELLED')) ||
+
+          (resource.data.status == 'REPORTED'
+            && (!('claimantUid' in resource.data) || resource.data.claimantUid == null || resource.data.claimantUid == '')
+            && request.resource.data.claimantUid == request.auth.uid
+            && request.resource.data.status == 'CLAIM_SUBMITTED'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimantUid', 'claimNotes', 'claimantPhone', 'claimTimestamp', 'status'])) ||
+
+          ((isLostFoundStaff() || isSuperAdmin())
+            && resource.data.status == 'CLAIM_SUBMITTED'
+            && request.resource.data.status == 'REPORTED'
+            && request.resource.data.claimantUid == resource.data.claimantUid
+            && request.resource.data.reviewedByUid == request.auth.uid
+            && request.resource.data.reviewTimestamp == request.time
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'status', 'reviewedByUid', 'reviewTimestamp', 'staffNotes'
+            ])) ||
+
+          ((isLostFoundStaff() || isSuperAdmin())
+            && resource.data.status == 'CLAIM_SUBMITTED'
+            && request.resource.data.status == 'VERIFIED'
+            && request.resource.data.claimantUid == resource.data.claimantUid
+            && request.resource.data.verifiedByUid == request.auth.uid
+            && request.resource.data.verificationTimestamp == request.time
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'status', 'verifiedByUid', 'verificationTimestamp', 'reviewedByUid', 'reviewTimestamp', 'staffNotes'
+            ])) ||
+
+          ((isLostFoundStaff() || isSuperAdmin())
+            && resource.data.status == 'VERIFIED'
+            && request.resource.data.status == 'HANDOVER_COMPLETE'
+            && request.resource.data.reporterUid == resource.data.reporterUid
+            && request.resource.data.claimantUid == resource.data.claimantUid
+            && request.resource.data.verifiedByUid == resource.data.verifiedByUid
+            && request.resource.data.handoverTimestamp == request.time
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'staffNotes', 'handoverTimestamp']))
+        );
+
+      allow delete: if (isLostFoundStaff() || isSuperAdmin()) && isActiveVerifiedBennettUser();
+    }
+
+    // --- 6. TIMETABLES (/timetables/{id}) ---
+    match /timetables/{id} {
+      allow read: if isActiveVerifiedBennettUser();
+
+      allow create: if (isCollegeAdmin() || isSuperAdmin())
+        && request.resource.data.keys().hasOnly(['id', 'courseName', 'courseCode', 'section', 'timeSlot', 'durationMins', 'facultyName', 'roomCode', 'type', 'createdByUid', 'createdAt'])
+        && request.resource.data.createdByUid == request.auth.uid;
+
+      allow update: if (isCollegeAdmin() || isSuperAdmin())
+        && request.resource.data.createdByUid == resource.data.createdByUid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['courseName', 'courseCode', 'section', 'timeSlot', 'durationMins', 'facultyName', 'roomCode', 'type']);
+
+      allow delete: if isCollegeAdmin() || isSuperAdmin();
+    }
+
+    // --- 7. ANNOUNCEMENTS (/announcements/{id}) ---
+    match /announcements/{id} {
+      allow read: if isActiveVerifiedBennettUser();
+
+      allow create: if (isCollegeAdmin() || isSuperAdmin())
+        && request.resource.data.keys().hasOnly(['id', 'title', 'content', 'authorName', 'authorUid', 'targetDepartment', 'priority', 'createdAt'])
+        && request.resource.data.authorUid == request.auth.uid;
+
+      allow update: if (isCollegeAdmin() || isSuperAdmin())
+        && request.resource.data.authorUid == resource.data.authorUid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'content', 'targetDepartment', 'priority']);
+
+      allow delete: if isCollegeAdmin() || isSuperAdmin();
+    }
+
+    // --- 8. COURSES (/courses/{courseId}) ---
+    match /courses/{courseId} {
+      allow read: if isActiveVerifiedBennettUser();
+
+      allow create: if (isCollegeAdmin() || isSuperAdmin())
+        && isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly(['courseCode', 'courseName', 'credits', 'facultyName', 'department', 'schoolName', 'semester', 'section']);
+
+      allow update: if (isCollegeAdmin() || isSuperAdmin())
+        && isActiveVerifiedBennettUser()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['courseCode', 'courseName', 'credits', 'facultyName', 'department', 'schoolName', 'semester', 'section']);
+
+      allow delete: if (isCollegeAdmin() || isSuperAdmin()) && isActiveVerifiedBennettUser();
+    }
+
+    // --- 9. ATTENDANCE (/attendance/{attendanceId}) ---
+    match /attendance/{attendanceId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.studentUid == request.auth.uid ||
+        isCollegeAdmin() ||
+        isSuperAdmin()
+      );
+
+      allow create: if (isCollegeAdmin() || isSuperAdmin())
+        && isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly(['attendanceId', 'studentUid', 'courseCode', 'courseName', 'attendedClasses', 'totalClasses', 'lastUpdatedTimestamp']);
+
+      allow update: if (isCollegeAdmin() || isSuperAdmin())
+        && isActiveVerifiedBennettUser()
+        && request.resource.data.studentUid == resource.data.studentUid
+        && request.resource.data.courseCode == resource.data.courseCode
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendedClasses', 'totalClasses', 'lastUpdatedTimestamp']);
+
+      allow delete: if (isCollegeAdmin() || isSuperAdmin()) && isActiveVerifiedBennettUser();
+    }
+
+    // --- DEFAULT DENY ALL UNMATCHED PATHS ---
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

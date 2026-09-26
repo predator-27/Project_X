@@ -3,13 +3,14 @@ package com.example.projectx.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -18,13 +19,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectx.components.*
 import com.example.projectx.theme.*
+import com.example.projectx.ui.academics.AcademicViewModel
+import com.example.projectx.util.Resource
 
 @Composable
 fun HomeScreen(
+    academicViewModel: AcademicViewModel,
     onMenuClick: () -> Unit,
     onNavigateToTab: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val overallAttendance by academicViewModel.overallAttendancePercentage.collectAsState()
+    val shortageCount by academicViewModel.shortageSubjectCount.collectAsState()
+    val timetableState by academicViewModel.timetableState.collectAsState()
+    val profileState by academicViewModel.publicProfileState.collectAsState()
+
+    val nextClassText = remember(timetableState) {
+        val slots = (timetableState as? Resource.Success)?.data
+        val firstSlot = slots?.firstOrNull()
+        if (firstSlot != null) {
+            "Next Class: ${firstSlot.courseName} @ ${firstSlot.timeSlot.substringBefore(" -")} in Room ${firstSlot.roomCode}"
+        } else {
+            "No upcoming classes scheduled for today."
+        }
+    }
+
     AppScaffold(
         title = "Dashboard",
         onMenuClick = onMenuClick,
@@ -36,15 +55,44 @@ fun HomeScreen(
         ) {
             // Next Class Banner Card
             BannerCard(
-                message = "Next Class: Data Structures @ 09:25 AM in Room 010-N-CC",
+                message = nextClassText,
                 actionLabel = "Map Route",
                 onActionClick = { onNavigateToTab("campus_map") }
             )
 
-            // Shortage Warning Strip
-            InfoStrip(
-                message = "Attendance Shortage: DBMS is at 64.2%. Attend next 3 classes."
-            )
+            // Shortage Warning Strip or Good Standing Info
+            if (shortageCount > 0) {
+                InfoStrip(
+                    message = "Attendance Warning: $shortageCount subject(s) below 75% threshold. Check Attendance portal."
+                )
+            } else {
+                InfoStrip(
+                    message = "Academic Status: Overall Attendance is %.1f%%.".format(overallAttendance)
+                )
+            }
+
+            // Student Academic Overview Summary Card
+            SectionFormCard(sectionTitle = "Student Academic Overview") {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = profileState?.schoolName?.ifBlank { null } ?: "Bennett University",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HeadingNavy
+                    )
+                    val programDeptText = listOfNotNull(
+                        profileState?.program?.ifBlank { null },
+                        profileState?.department?.ifBlank { null },
+                        profileState?.section?.ifBlank { null }
+                    ).joinToString(" • ").ifBlank { "Academic Profile Setup Pending" }
+
+                    Text(
+                        text = programDeptText,
+                        fontSize = 12.sp,
+                        color = MutedText
+                    )
+                }
+            }
 
             Text(
                 text = "Campus Modules & Quick Actions",
@@ -58,14 +106,14 @@ fun HomeScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                     HomeModuleTile(
                         title = "Timetable",
-                        subtitle = "Today: 3 Lectures",
+                        subtitle = "Daily Schedule",
                         icon = Icons.Default.Schedule,
                         onClick = { onNavigateToTab("timetable") },
                         modifier = Modifier.weight(1f)
                     )
                     HomeModuleTile(
                         title = "Attendance",
-                        subtitle = "Overall: 75.1%",
+                        subtitle = "Overall: %.1f%%".format(overallAttendance),
                         icon = Icons.Default.CheckCircle,
                         onClick = { onNavigateToTab("attendance") },
                         modifier = Modifier.weight(1f)
@@ -74,17 +122,17 @@ fun HomeScreen(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                     HomeModuleTile(
+                        title = "Courses & Subjects",
+                        subtitle = "Enrolled Curriculum",
+                        icon = Icons.Default.Book,
+                        onClick = { onNavigateToTab("courses") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    HomeModuleTile(
                         title = "Campus Map",
                         subtitle = "Indoor Navigation",
                         icon = Icons.Default.Map,
                         onClick = { onNavigateToTab("campus_map") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    HomeModuleTile(
-                        title = "Messages",
-                        subtitle = "1 Unread Notice",
-                        icon = Icons.Default.Email,
-                        onClick = { onNavigateToTab("messages") },
                         modifier = Modifier.weight(1f)
                     )
                 }

@@ -45,6 +45,7 @@ val CATEGORIZED_DRAWER_ITEMS = listOf(
             NavDrawerItem("home", "Dashboard", Icons.Default.Dashboard),
             NavDrawerItem("timetable", "Timetable", Icons.Default.Schedule),
             NavDrawerItem("attendance", "Attendance", Icons.Default.CheckCircle, badgeText = "64%", badgeTone = StatusTone.DANGER),
+            NavDrawerItem("courses", "My Courses & Subjects", Icons.Default.Book),
             NavDrawerItem("teachers", "Teacher Directory & Booking", Icons.Default.PersonSearch, badgeText = "Booking", badgeTone = StatusTone.SUCCESS),
             NavDrawerItem("exams", "Exam Schedules", Icons.AutoMirrored.Filled.EventNote),
             NavDrawerItem("reports", "Reports & Hall Ticket", Icons.AutoMirrored.Filled.Assignment),

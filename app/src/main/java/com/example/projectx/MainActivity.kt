@@ -21,12 +21,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectx.components.SideNavDrawerContent
 import com.example.projectx.theme.CampusTheme
 import com.example.projectx.theme.HeadingNavy
 import com.example.projectx.theme.NavySidebar
 import com.example.projectx.theme.PrimaryIndigo
 import com.example.projectx.ui.*
+import com.example.projectx.ui.academics.AcademicViewModel
+import com.example.projectx.ui.academics.CoursesScreen
 import kotlinx.coroutines.launch
 
 enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {
@@ -97,7 +100,8 @@ fun CampusAppShell(
 @Composable
 fun StudentCampusShell(
     viewModel: TeacherManagementViewModel,
-    aiViewModel: CampusAiViewModel
+    aiViewModel: CampusAiViewModel,
+    academicViewModel: AcademicViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -124,6 +128,7 @@ fun StudentCampusShell(
                             "timetable" -> selectedBottomTab = BottomTab.TIMETABLE
                             "messages" -> selectedBottomTab = BottomTab.MESSAGES
                             "attendance" -> selectedBottomTab = BottomTab.HOME
+                            "courses" -> selectedBottomTab = BottomTab.HOME
                             "community" -> selectedBottomTab = BottomTab.HOME
                             "teachers" -> selectedBottomTab = BottomTab.HOME
                             "campus_map" -> selectedBottomTab = BottomTab.MAP
@@ -196,6 +201,12 @@ fun StudentCampusShell(
                     BottomTab.HOME -> {
                         if (activeDrawerModule == "attendance") {
                             AttendanceScreen(
+                                academicViewModel = academicViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "courses") {
+                            CoursesScreen(
+                                academicViewModel = academicViewModel,
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } }
                             )
                         } else if (activeDrawerModule == "community") {
@@ -208,6 +219,7 @@ fun StudentCampusShell(
                             )
                         } else {
                             HomeScreen(
+                                academicViewModel = academicViewModel,
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 onNavigateToTab = { tabId ->
                                     when (tabId) {
@@ -217,6 +229,9 @@ fun StudentCampusShell(
                                         }
                                         "attendance" -> {
                                             activeDrawerModule = "attendance"
+                                        }
+                                        "courses" -> {
+                                            activeDrawerModule = "courses"
                                         }
                                         "campus_map" -> {
                                             selectedBottomTab = BottomTab.MAP
@@ -236,6 +251,7 @@ fun StudentCampusShell(
                     }
                     BottomTab.TIMETABLE -> {
                         TimetableScreen(
+                            academicViewModel = academicViewModel,
                             onMenuClick = { coroutineScope.launch { drawerState.open() } },
                             onNavigateToRoom = {
                                 selectedBottomTab = BottomTab.MAP

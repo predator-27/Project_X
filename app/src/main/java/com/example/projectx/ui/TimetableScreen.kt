@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,19 +20,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectx.components.*
-import com.example.projectx.model.SampleCampusData
 import com.example.projectx.model.TimetableSlot
 import com.example.projectx.theme.*
+import com.example.projectx.ui.academics.AcademicViewModel
+import com.example.projectx.util.Resource
 
 @Composable
 fun TimetableScreen(
+    academicViewModel: AcademicViewModel,
     onMenuClick: () -> Unit,
     onNavigateToRoom: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var currentDateText by remember { mutableStateOf("17-Sep-2026 (Today)") }
-    var selectedSemester by remember { mutableStateOf("2026-2027, Semester - 3, BCA") }
-    val timetableSlots = SampleCampusData.sampleTimetable
+    var currentDateText by remember { mutableStateOf("Today") }
+    var selectedSemester by remember { mutableStateOf("Semester - 3") }
+    val timetableState by academicViewModel.timetableState.collectAsState()
 
     AppScaffold(
         title = "Timetable",
@@ -94,12 +97,47 @@ fun TimetableScreen(
                 }
             }
 
-            // Class Blocks List
-            items(timetableSlots, key = { it.id }) { slot ->
-                TimetableClassCard(
-                    slot = slot,
-                    onNavigateClick = { onNavigateToRoom(slot.roomCode) }
-                )
+            // State Handling
+            when (val state = timetableState) {
+                is Resource.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = PrimaryIndigo)
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    item {
+                        SectionFormCard(sectionTitle = "Error Loading Timetable") {
+                            Text(text = state.message, fontSize = 13.sp, color = AccentCoral)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = { academicViewModel.loadTimetable() },
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                            ) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                }
+                is Resource.Empty -> {
+                    item {
+                        EmptyStateCard(title = "No classes scheduled for today.")
+                    }
+                }
+                is Resource.Success -> {
+                    items(state.data, key = { it.id }) { slot ->
+                        TimetableClassCard(
+                            slot = slot,
+                            onNavigateClick = { onNavigateToRoom(slot.roomCode) }
+                        )
+                    }
+                }
             }
         }
     }

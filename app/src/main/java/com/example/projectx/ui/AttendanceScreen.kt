@@ -17,17 +17,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectx.components.*
 import com.example.projectx.model.AttendanceSubject
-import com.example.projectx.model.SampleCampusData
 import com.example.projectx.theme.*
+import com.example.projectx.ui.academics.AcademicViewModel
+import com.example.projectx.util.Resource
 
 @Composable
 fun AttendanceScreen(
+    academicViewModel: AcademicViewModel,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTab by remember { mutableStateOf(0) } // 0 = Subject-wise, 1 = Log, 2 = Summary
-    var selectedSemester by remember { mutableStateOf("2026-2027, Semester - 3, BCA") }
-    val subjects = SampleCampusData.sampleAttendance
+    var selectedSemester by remember { mutableStateOf("Current Semester") }
+    val attendanceState by academicViewModel.attendanceState.collectAsState()
 
     AppScaffold(
         title = "Attendance",
@@ -59,77 +61,104 @@ fun AttendanceScreen(
                 }
             }
 
-            if (selectedTab == 0) {
-                // Subject-wise Attendance Cards with 75% Calculator
-                items(subjects, key = { it.courseCode }) { subject ->
-                    SubjectAttendanceCard(subject = subject)
-                }
-            } else if (selectedTab == 1) {
-                // Attendance Log
-                item {
-                    SectionFormCard(sectionTitle = "Date-wise Session Log") {
-                        InfoStrip(message = "Detailed attendance session logs synchronized offline.")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        DataTable(
-                            headers = listOf("Date", "Subject", "Slot", "Status"),
-                            rows = listOf(
-                                listOf("17-Sep-2026", "Data Structures", "09:25 AM", "Present"),
-                                listOf("16-Sep-2026", "DBMS", "10:30 AM", "Absent"),
-                                listOf("15-Sep-2026", "Web Tech", "02:00 PM", "Present"),
-                                listOf("14-Sep-2026", "Discrete Math", "11:30 AM", "Present")
-                            )
-                        )
+            when (val state = attendanceState) {
+                is Resource.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = PrimaryIndigo)
+                        }
                     }
                 }
-            } else {
-                // Overall Summary Stats
-                item {
-                    SectionFormCard(sectionTitle = "Overall Attendance Summary") {
-                        val totalAttended = remember(subjects) { subjects.sumOf { it.attendedClasses } }
-                        val totalClasses = remember(subjects) { subjects.sumOf { it.totalClasses } }
-                        val overallPercentage = remember(subjects) { (totalAttended.toFloat() / totalClasses) * 100f }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Overall Attendance",
-                                    fontSize = 13.sp,
-                                    color = MutedText
-                                )
-                                Text(
-                                    text = "%.1f%%".format(overallPercentage),
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (overallPercentage >= 75f) SecondaryEmerald else AccentCoral
-                                )
+                is Resource.Error -> {
+                    item {
+                        SectionFormCard(sectionTitle = "Error Loading Attendance") {
+                            Text(text = state.message, fontSize = 13.sp, color = AccentCoral)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = { academicViewModel.loadAttendance() },
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                            ) {
+                                Text("Retry")
                             }
-                            StatusPill(
-                                text = if (overallPercentage >= 75f) "Good Standing" else "Shortage Warning",
-                                tone = if (overallPercentage >= 75f) StatusTone.SUCCESS else StatusTone.DANGER
-                            )
                         }
+                    }
+                }
+                is Resource.Empty -> {
+                    item {
+                        EmptyStateCard(title = "No attendance records found for this semester.")
+                    }
+                }
+                is Resource.Success -> {
+                    val subjects = state.data
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                    if (selectedTab == 0) {
+                        // Subject-wise Attendance Cards with 75% Calculator
+                        items(subjects, key = { it.courseCode }) { subject ->
+                            SubjectAttendanceCard(subject = subject)
+                        }
+                    } else if (selectedTab == 1) {
+                        // Attendance Session Log
+                        item {
+                            SectionFormCard(sectionTitle = "Date-wise Session Log") {
+                                EmptyStateCard(title = "No attendance session records available.")
+                            }
+                        }
+                    } else {
+                        // Overall Summary Stats
+                        item {
+                            SectionFormCard(sectionTitle = "Overall Attendance Summary") {
+                                val totalAttended = remember(subjects) { subjects.sumOf { it.attendedClasses } }
+                                val totalClasses = remember(subjects) { subjects.sumOf { it.totalClasses } }
+                                val overallPercentage = remember(subjects) { if (totalClasses == 0) 0f else (totalAttended.toFloat() / totalClasses) * 100f }
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Total Classes", fontSize = 11.sp, color = MutedText)
-                                Text("$totalClasses", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
-                            }
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Attended", fontSize = 11.sp, color = MutedText)
-                                Text("$totalAttended", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = SecondaryEmerald)
-                            }
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Missed", fontSize = 11.sp, color = MutedText)
-                                Text("${totalClasses - totalAttended}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AccentCoral)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Overall Attendance",
+                                            fontSize = 13.sp,
+                                            color = MutedText
+                                        )
+                                        Text(
+                                            text = "%.1f%%".format(overallPercentage),
+                                            fontSize = 28.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (overallPercentage >= 75f) SecondaryEmerald else AccentCoral
+                                        )
+                                    }
+                                    StatusPill(
+                                        text = if (overallPercentage >= 75f) "Good Standing" else "Shortage Warning",
+                                        tone = if (overallPercentage >= 75f) StatusTone.SUCCESS else StatusTone.DANGER
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceAround
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Total Classes", fontSize = 11.sp, color = MutedText)
+                                        Text("$totalClasses", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+                                    }
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Attended", fontSize = 11.sp, color = MutedText)
+                                        Text("$totalAttended", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = SecondaryEmerald)
+                                    }
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Missed", fontSize = 11.sp, color = MutedText)
+                                        Text("${totalClasses - totalAttended}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AccentCoral)
+                                    }
+                                }
                             }
                         }
                     }
