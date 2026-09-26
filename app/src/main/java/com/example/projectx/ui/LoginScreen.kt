@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -35,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import com.example.projectx.model.Institution
 
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.example.projectx.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -95,15 +98,14 @@ fun LoginScreen(
                     ) {
                         Surface(
                             shape = CircleShape,
-                            color = Color.White.copy(alpha = 0.2f),
+                            color = Color.White,
                             modifier = Modifier.size(64.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Default.School,
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_app_logo),
                                     contentDescription = "Logo",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(36.dp)
+                                    modifier = Modifier.size(48.dp)
                                 )
                             }
                         }
