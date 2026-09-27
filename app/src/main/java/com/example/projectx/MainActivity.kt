@@ -25,11 +25,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectx.components.AmbientBackground
 import com.example.projectx.components.SideNavDrawerContent
+import com.example.projectx.map.MapScreen
 import com.example.projectx.theme.CampusTheme
 import com.example.projectx.theme.CampusTokens
 import com.example.projectx.ui.*
 import com.example.projectx.ui.academics.AcademicViewModel
 import com.example.projectx.ui.academics.CoursesScreen
+import com.example.projectx.ui.lms.AssignmentDetailScreen
+import com.example.projectx.ui.lms.CourseDetailScreen
 import kotlinx.coroutines.launch
 
 enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {
@@ -49,20 +52,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CampusTheme {
-                var splashDone by rememberSaveable { mutableStateOf(false) }
-                if (!splashDone) {
-                    // Splash draws its own background — keep it full-bleed.
-                    SplashScreen(onFinished = { splashDone = true })
-                } else {
-                    // Ambient layer sits behind every screen so the whole app
-                    // shares the splash's navy + soft glow palette.
-                    AmbientBackground(modifier = Modifier.fillMaxSize()) {
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            color = androidx.compose.ui.graphics.Color.Transparent,
-                        ) {
-                            CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
-                        }
+                AmbientBackground {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = Color.Transparent
+                    ) {
+                        CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
                     }
                 }
             }
@@ -77,32 +72,38 @@ fun CampusAppShell(
 ) {
     val authState by viewModel.authState.collectAsState()
     val context = LocalContext.current
+    var showSplash by rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.loadSavedAuth(context)
         viewModel.checkForAppUpdates(context)
     }
 
-    when (authState) {
-        AuthState.UNAUTHENTICATED -> {
-            Box(modifier = Modifier.fillMaxSize()) {
-                LoginScreen(viewModel = viewModel)
+    if (showSplash) {
+        SplashScreen(
+            onFinished = { showSplash = false }
+        )
+    } else {
+        when (authState) {
+            AuthState.UNAUTHENTICATED -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    LoginScreen(viewModel = viewModel)
 
-                // In-App Update Banner Overlay
-                UpdateNotificationOverlay(
-                    viewModel = viewModel,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                    UpdateNotificationOverlay(
+                        viewModel = viewModel,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
-        }
-        AuthState.STUDENT -> {
-            StudentCampusShell(viewModel = viewModel, aiViewModel = aiViewModel)
-        }
-        AuthState.TEACHER_ADMIN -> {
-            AdminTeacherScreen(viewModel = viewModel)
-        }
-        AuthState.WEB_VIEW -> {
-            WebViewScreen(viewModel = viewModel)
+            AuthState.STUDENT -> {
+                StudentCampusShell(viewModel = viewModel, aiViewModel = aiViewModel)
+            }
+            AuthState.TEACHER_ADMIN -> {
+                AdminTeacherScreen(viewModel = viewModel)
+            }
+            AuthState.WEB_VIEW -> {
+                WebViewScreen(viewModel = viewModel)
+            }
         }
     }
 }
@@ -121,6 +122,11 @@ fun StudentCampusShell(
     var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
     var showAiAssistantSheet by remember { mutableStateOf(false) }
 
+    // LMS Sub-Navigation State
+    var selectedCourseCode by remember { mutableStateOf<String?>(null) }
+    var selectedCourseName by remember { mutableStateOf<String?>(null) }
+    var selectedAssignmentId by remember { mutableStateOf<String?>(null) }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -133,6 +139,11 @@ fun StudentCampusShell(
                     activeItemId = activeDrawerModule,
                     onItemClick = { moduleId ->
                         activeDrawerModule = moduleId
+                        // Reset sub-navigation when switching main modules
+                        selectedCourseCode = null
+                        selectedCourseName = null
+                        selectedAssignmentId = null
+
                         when (moduleId) {
                             "home" -> selectedBottomTab = BottomTab.HOME
                             "timetable" -> selectedBottomTab = BottomTab.TIMETABLE
@@ -175,6 +186,9 @@ fun StudentCampusShell(
                             selected = isSelected,
                             onClick = {
                                 selectedBottomTab = tab
+                                selectedCourseCode = null
+                                selectedCourseName = null
+                                selectedAssignmentId = null
                                 when (tab) {
                                     BottomTab.HOME -> activeDrawerModule = "home"
                                     BottomTab.TIMETABLE -> activeDrawerModule = "timetable"
@@ -215,10 +229,30 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } }
                             )
                         } else if (activeDrawerModule == "courses") {
-                            CoursesScreen(
-                                academicViewModel = academicViewModel,
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                            )
+                            if (selectedAssignmentId != null) {
+                                AssignmentDetailScreen(
+                                    assignmentId = selectedAssignmentId!!,
+                                    onBackClick = { selectedAssignmentId = null },
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                                )
+                            } else if (selectedCourseCode != null) {
+                                CourseDetailScreen(
+                                    courseCode = selectedCourseCode!!,
+                                    courseName = selectedCourseName,
+                                    onBackClick = { selectedCourseCode = null; selectedCourseName = null },
+                                    onAssignmentClick = { assignmentId -> selectedAssignmentId = assignmentId },
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                                )
+                            } else {
+                                CoursesScreen(
+                                    academicViewModel = academicViewModel,
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                    onCourseClick = { course ->
+                                        selectedCourseCode = course.courseCode
+                                        selectedCourseName = course.courseName
+                                    }
+                                )
+                            }
                         } else if (activeDrawerModule == "community") {
                             SocialCommunityScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } }
@@ -242,6 +276,9 @@ fun StudentCampusShell(
                                         }
                                         "courses" -> {
                                             activeDrawerModule = "courses"
+                                            selectedCourseCode = null
+                                            selectedCourseName = null
+                                            selectedAssignmentId = null
                                         }
                                         "campus_map" -> {
                                             selectedBottomTab = BottomTab.MAP
@@ -270,7 +307,7 @@ fun StudentCampusShell(
                         )
                     }
                     BottomTab.MAP -> {
-                        com.example.projectx.map.MapScreen(
+                        MapScreen(
                             onMenuClick = { coroutineScope.launch { drawerState.open() } }
                         )
                     }
@@ -286,13 +323,11 @@ fun StudentCampusShell(
                     }
                 }
 
-                // In-App Update Banner Overlay
                 UpdateNotificationOverlay(
                     viewModel = viewModel,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
 
-                // Gemini AI Assistant Bottom Sheet
                 if (showAiAssistantSheet) {
                     CampusAiAssistantSheet(
                         aiViewModel = aiViewModel,

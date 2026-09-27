@@ -1,6 +1,7 @@
 package com.example.projectx.ui.academics
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +26,7 @@ import com.example.projectx.util.Resource
 fun CoursesScreen(
     academicViewModel: AcademicViewModel,
     onMenuClick: () -> Unit,
+    onCourseClick: (Course) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val coursesState by academicViewModel.coursesState.collectAsState()
@@ -134,7 +136,10 @@ fun CoursesScreen(
                 }
                 is Resource.Success -> {
                     items(state.data, key = { it.courseCode }) { course ->
-                        CourseCard(course = course)
+                        CourseCard(
+                            course = course,
+                            onClick = { onCourseClick(course) }
+                        )
                     }
                 }
             }
@@ -143,9 +148,14 @@ fun CoursesScreen(
 }
 
 @Composable
-fun CourseCard(course: Course) {
+fun CourseCard(
+    course: Course,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = CardShape,
         colors = CardDefaults.cardColors(containerColor = SurfaceCard),
         border = BorderStroke(1.dp, SurfaceBorder),

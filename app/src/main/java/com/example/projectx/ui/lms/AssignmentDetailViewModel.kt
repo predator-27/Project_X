@@ -1,0 +1,55 @@
+package com.example.projectx.ui.lms
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.projectx.data.firestore.AssignmentRepository
+import com.example.projectx.model.lms.Assignment
+import com.example.projectx.util.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class AssignmentDetailViewModel(
+    private val assignmentRepository: AssignmentRepository = AssignmentRepository()
+) : ViewModel() {
+
+    private val _currentAssignmentId = MutableStateFlow("")
+    val currentAssignmentId: StateFlow<String> = _currentAssignmentId.asStateFlow()
+
+    private val _assignmentState = MutableStateFlow<Resource<Assignment>>(Resource.Empty)
+    val assignmentState: StateFlow<Resource<Assignment>> = _assignmentState.asStateFlow()
+
+    fun loadAssignment(assignmentId: String) {
+        val trimmedId = assignmentId.trim()
+        _currentAssignmentId.value = trimmedId
+
+        if (trimmedId.isBlank()) {
+            _assignmentState.value = Resource.Empty
+            return
+        }
+
+        viewModelScope.launch {
+            _assignmentState.value = Resource.Loading
+            assignmentRepository.getAssignment(trimmedId).fold(
+                onSuccess = { assignment ->
+                    _assignmentState.value = if (assignment != null) {
+                        Resource.Success(assignment)
+                    } else {
+                        Resource.Empty
+                    }
+                },
+                onFailure = { error ->
+                    _assignmentState.value = Resource.Error(error.message ?: "Failed to load assignment details.")
+                }
+            )
+        }
+    }
+
+    fun refreshAssignment() {
+        val id = _currentAssignmentId.value
+        if (id.isNotBlank()) {
+            loadAssignment(id)
+        }
+    }
+}
