@@ -1,0 +1,2532 @@
+{
+  "schema": "campus-map/grid@1",
+  "mapId": "N1",
+  "building": "N1",
+  "floor": 1,
+  "cellSizeUnits": 11,
+  "metersPerUnit": 0.019,
+  "cellSizeMeters": 0.209,
+  "rows": 103,
+  "cols": 91,
+  "legend": {
+    "#": "WALL",
+    ".": "PATH",
+    "C": "CUBICLE",
+    "W": "WORKSTATION",
+    "M": "CABIN",
+    "D": "DOOR"
+  },
+  "cells": [
+    "###########################################################################################",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.......CCCCCCC.CCCCCC.CCCCCCC.............................................MMMMMMMMMMMM...#",
+    "#.......CCCCCCC.CCCCCC.CCCCCCC.............................................MMMMMMMMMMMM...#",
+    "#.......CCCCCCC.CCCCCC.CCCCCCC.................................D...........MMMMMMMMMMMM...#",
+    "#.......CCCCCCC.CCCCCC.CCCCCCC.............................................MMMMMMMMMMMM...#",
+    "#.......CCCCCCC.CCCCCC.CCCCCCC.............................................MMMMMMMMMMMM...#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW....CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#....CCCCC..CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW....CCCCC..CCCCCC..CCCCC....#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW....CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC...............................................CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC...............................................CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#....CCCCC..CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW....CCCCC..CCCCCC..CCCCC....#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.......CCCCCC........WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW....CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW....CCCCC..CCCCCC..CCCCC....#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.......CCCCCC........WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW.............................#",
+    "#.......CCCCCC............................................................................#",
+    "#.......CCCCCC............................................................................#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW.......CCCCCC.....CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW.......CCCCCC.....CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW.......CCCCCC.....CCCCCCC...#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW.......CCCCCC.....CCCCCCC...#",
+    "#.......CCCCCC........WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW........CCCCCC.....CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW........CCCCC......CCCCC....#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.......CCCCCC........WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.......CCCCCC........WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW....CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#................................................................CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC...............................................CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW....CCCCC..CCCCCC..CCCCC....#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#....CCCCC..CCCCCC....WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW....CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW....CCCCC..CCCCCC..CCCCC....#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#...CCCCCCC.CCCCCC....WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW....CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC...............................................CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#....CCCCC..CCCCCC...............................................CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW...CCCCCCC.CCCCCC.CCCCCCC...#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW....CCCCC..CCCCCC..CCCCC....#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#...CCCCCCC.CCCCCC....WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW.............................#",
+    "#...CCCCCCC.CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#....CCCCC..CCCCCC....WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW.............................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW.............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW.............................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWWW.WWWWW.WWWWWW.WWWWWW.WWWWWW.WWWWWW............................#",
+    "#.....................WWWWW..WWWWW..WWWWW.WWWWWW.WWWWWW.WWWWW.............................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#...CCCCCCC.CCCCCC.CCCCCCC.................................................MMMMMMMMMMMM...#",
+    "#...CCCCCCC.CCCCCC.CCCCCCC.................................................MMMMMMMMMMMM...#",
+    "#...CCCCCCC.CCCCCC.CCCCCCC.....................................D...........MMMMMMMMMMMM...#",
+    "#...CCCCCCC.CCCCCC.CCCCCCC.................................................MMMMMMMMMMMM...#",
+    "#...CCCCCCC.CCCCCC.CCCCCCC.................................................MMMMMMMMMMMM...#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "#.........................................................................................#",
+    "###########################################################################################"
+  ],
+  "anchors": [
+    {
+      "anchorId": "N1-A01",
+      "label": "Exit",
+      "cell": {
+        "x": 63,
+        "y": 6
+      },
+      "headingDeg": 180,
+      "note": "QR plate at the exit; a person scanning it faces back down the main corridor."
+    },
+    {
+      "anchorId": "N1-A02",
+      "label": "Entrance",
+      "cell": {
+        "x": 63,
+        "y": 96
+      },
+      "headingDeg": 0,
+      "note": "QR plate at the entrance; a person scanning it faces INTO the block (up the map). Re-measure headingDeg with a compass on site."
+    }
+  ],
+  "pois": [
+    {
+      "id": "N1-CUB-017",
+      "type": "CUBICLE",
+      "label": "CUB 017",
+      "badge": "CUB 017",
+      "zone": "top",
+      "cell": {
+        "x": 11,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 3
+      },
+      "tags": [
+        "n1-cub-017",
+        "cub 017",
+        "17"
+      ]
+    },
+    {
+      "id": "N1-CUB-018",
+      "type": "CUBICLE",
+      "label": "CUB 018",
+      "badge": "CUB 018",
+      "zone": "top",
+      "cell": {
+        "x": 18,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 18,
+        "y": 3
+      },
+      "tags": [
+        "n1-cub-018",
+        "cub 018",
+        "18"
+      ]
+    },
+    {
+      "id": "N1-CUB-019",
+      "type": "CUBICLE",
+      "label": "CUB 019",
+      "badge": "CUB 019",
+      "zone": "top",
+      "cell": {
+        "x": 26,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 26,
+        "y": 3
+      },
+      "tags": [
+        "n1-cub-019",
+        "cub 019",
+        "19"
+      ]
+    },
+    {
+      "id": "N1-MC-002",
+      "type": "CABIN",
+      "label": "Master cabin 002",
+      "badge": "Cabin 002",
+      "zone": "cabinExit",
+      "cell": {
+        "x": 80,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 80,
+        "y": 3
+      },
+      "tags": [
+        "n1-mc-002",
+        "cabin 002",
+        "2"
+      ]
+    },
+    {
+      "id": "N1-MC-001",
+      "type": "CABIN",
+      "label": "Master cabin 001",
+      "badge": "Cabin 001",
+      "zone": "cabinEntrance",
+      "cell": {
+        "x": 80,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 80,
+        "y": 93
+      },
+      "tags": [
+        "n1-mc-001",
+        "cabin 001",
+        "1"
+      ]
+    },
+    {
+      "id": "N1-CUB-016",
+      "type": "CUBICLE",
+      "label": "CUB 016",
+      "badge": "CUB 016",
+      "zone": "left",
+      "cell": {
+        "x": 7,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 12
+      },
+      "tags": [
+        "n1-cub-016",
+        "cub 016",
+        "16"
+      ]
+    },
+    {
+      "id": "N1-CUB-015",
+      "type": "CUBICLE",
+      "label": "CUB 015",
+      "badge": "CUB 015",
+      "zone": "left",
+      "cell": {
+        "x": 14,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 12
+      },
+      "tags": [
+        "n1-cub-015",
+        "cub 015",
+        "15"
+      ]
+    },
+    {
+      "id": "N1-CUB-014",
+      "type": "CUBICLE",
+      "label": "CUB 014",
+      "badge": "CUB 014",
+      "zone": "left",
+      "cell": {
+        "x": 7,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 19
+      },
+      "tags": [
+        "n1-cub-014",
+        "cub 014",
+        "14"
+      ]
+    },
+    {
+      "id": "N1-CUB-013",
+      "type": "CUBICLE",
+      "label": "CUB 013",
+      "badge": "CUB 013",
+      "zone": "left",
+      "cell": {
+        "x": 14,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 19
+      },
+      "tags": [
+        "n1-cub-013",
+        "cub 013",
+        "13"
+      ]
+    },
+    {
+      "id": "N1-CUB-012",
+      "type": "CUBICLE",
+      "label": "CUB 012",
+      "badge": "CUB 012",
+      "zone": "left",
+      "cell": {
+        "x": 11,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 26
+      },
+      "tags": [
+        "n1-cub-012",
+        "cub 012",
+        "12"
+      ]
+    },
+    {
+      "id": "N1-CUB-011",
+      "type": "CUBICLE",
+      "label": "CUB 011",
+      "badge": "CUB 011",
+      "zone": "left",
+      "cell": {
+        "x": 11,
+        "y": 36
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 33
+      },
+      "tags": [
+        "n1-cub-011",
+        "cub 011",
+        "11"
+      ]
+    },
+    {
+      "id": "N1-CUB-010",
+      "type": "CUBICLE",
+      "label": "CUB 010",
+      "badge": "CUB 010",
+      "zone": "left",
+      "cell": {
+        "x": 11,
+        "y": 43
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 40
+      },
+      "tags": [
+        "n1-cub-010",
+        "cub 010",
+        "10"
+      ]
+    },
+    {
+      "id": "N1-CUB-008",
+      "type": "CUBICLE",
+      "label": "CUB 008",
+      "badge": "CUB 008",
+      "zone": "left",
+      "cell": {
+        "x": 7,
+        "y": 50
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 47
+      },
+      "tags": [
+        "n1-cub-008",
+        "cub 008",
+        "8"
+      ]
+    },
+    {
+      "id": "N1-CUB-009",
+      "type": "CUBICLE",
+      "label": "CUB 009",
+      "badge": "CUB 009",
+      "zone": "left",
+      "cell": {
+        "x": 14,
+        "y": 50
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 47
+      },
+      "tags": [
+        "n1-cub-009",
+        "cub 009",
+        "9"
+      ]
+    },
+    {
+      "id": "N1-CUB-006",
+      "type": "CUBICLE",
+      "label": "CUB 006",
+      "badge": "CUB 006",
+      "zone": "left",
+      "cell": {
+        "x": 7,
+        "y": 57
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 54
+      },
+      "tags": [
+        "n1-cub-006",
+        "cub 006",
+        "6"
+      ]
+    },
+    {
+      "id": "N1-CUB-007",
+      "type": "CUBICLE",
+      "label": "CUB 007",
+      "badge": "CUB 007",
+      "zone": "left",
+      "cell": {
+        "x": 14,
+        "y": 57
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 54
+      },
+      "tags": [
+        "n1-cub-007",
+        "cub 007",
+        "7"
+      ]
+    },
+    {
+      "id": "N1-CUB-004",
+      "type": "CUBICLE",
+      "label": "CUB 004",
+      "badge": "CUB 004",
+      "zone": "left",
+      "cell": {
+        "x": 7,
+        "y": 64
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 61
+      },
+      "tags": [
+        "n1-cub-004",
+        "cub 004",
+        "4"
+      ]
+    },
+    {
+      "id": "N1-CUB-005",
+      "type": "CUBICLE",
+      "label": "CUB 005",
+      "badge": "CUB 005",
+      "zone": "left",
+      "cell": {
+        "x": 14,
+        "y": 64
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 61
+      },
+      "tags": [
+        "n1-cub-005",
+        "cub 005",
+        "5"
+      ]
+    },
+    {
+      "id": "N1-CUB-003",
+      "type": "CUBICLE",
+      "label": "CUB 003",
+      "badge": "CUB 003",
+      "zone": "bottom",
+      "cell": {
+        "x": 7,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 93
+      },
+      "tags": [
+        "n1-cub-003",
+        "cub 003",
+        "3"
+      ]
+    },
+    {
+      "id": "N1-CUB-002",
+      "type": "CUBICLE",
+      "label": "CUB 002",
+      "badge": "CUB 002",
+      "zone": "bottom",
+      "cell": {
+        "x": 14,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 93
+      },
+      "tags": [
+        "n1-cub-002",
+        "cub 002",
+        "2"
+      ]
+    },
+    {
+      "id": "N1-CUB-001",
+      "type": "CUBICLE",
+      "label": "CUB 001",
+      "badge": "CUB 001",
+      "zone": "bottom",
+      "cell": {
+        "x": 22,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 22,
+        "y": 93
+      },
+      "tags": [
+        "n1-cub-001",
+        "cub 001",
+        "1"
+      ]
+    },
+    {
+      "id": "N1-WS-78",
+      "type": "WORKSTATION",
+      "label": "WS 78",
+      "badge": "WS 78",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 12
+      },
+      "tags": [
+        "n1-ws-78",
+        "ws 78",
+        "78"
+      ]
+    },
+    {
+      "id": "N1-WS-77",
+      "type": "WORKSTATION",
+      "label": "WS 77",
+      "badge": "WS 77",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 12
+      },
+      "tags": [
+        "n1-ws-77",
+        "ws 77",
+        "77"
+      ]
+    },
+    {
+      "id": "N1-WS-76",
+      "type": "WORKSTATION",
+      "label": "WS 76",
+      "badge": "WS 76",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 12
+      },
+      "tags": [
+        "n1-ws-76",
+        "ws 76",
+        "76"
+      ]
+    },
+    {
+      "id": "N1-WS-75",
+      "type": "WORKSTATION",
+      "label": "WS 75",
+      "badge": "WS 75",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 12
+      },
+      "tags": [
+        "n1-ws-75",
+        "ws 75",
+        "75"
+      ]
+    },
+    {
+      "id": "N1-WS-74",
+      "type": "WORKSTATION",
+      "label": "WS 74",
+      "badge": "WS 74",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 12
+      },
+      "tags": [
+        "n1-ws-74",
+        "ws 74",
+        "74"
+      ]
+    },
+    {
+      "id": "N1-WS-73",
+      "type": "WORKSTATION",
+      "label": "WS 73",
+      "badge": "WS 73",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 12
+      },
+      "tags": [
+        "n1-ws-73",
+        "ws 73",
+        "73"
+      ]
+    },
+    {
+      "id": "N1-WS-72",
+      "type": "WORKSTATION",
+      "label": "WS 72",
+      "badge": "WS 72",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 20
+      },
+      "tags": [
+        "n1-ws-72",
+        "ws 72",
+        "72"
+      ]
+    },
+    {
+      "id": "N1-WS-71",
+      "type": "WORKSTATION",
+      "label": "WS 71",
+      "badge": "WS 71",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 20
+      },
+      "tags": [
+        "n1-ws-71",
+        "ws 71",
+        "71"
+      ]
+    },
+    {
+      "id": "N1-WS-70",
+      "type": "WORKSTATION",
+      "label": "WS 70",
+      "badge": "WS 70",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 20
+      },
+      "tags": [
+        "n1-ws-70",
+        "ws 70",
+        "70"
+      ]
+    },
+    {
+      "id": "N1-WS-69",
+      "type": "WORKSTATION",
+      "label": "WS 69",
+      "badge": "WS 69",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 20
+      },
+      "tags": [
+        "n1-ws-69",
+        "ws 69",
+        "69"
+      ]
+    },
+    {
+      "id": "N1-WS-68",
+      "type": "WORKSTATION",
+      "label": "WS 68",
+      "badge": "WS 68",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 20
+      },
+      "tags": [
+        "n1-ws-68",
+        "ws 68",
+        "68"
+      ]
+    },
+    {
+      "id": "N1-WS-67",
+      "type": "WORKSTATION",
+      "label": "WS 67",
+      "badge": "WS 67",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 20
+      },
+      "tags": [
+        "n1-ws-67",
+        "ws 67",
+        "67"
+      ]
+    },
+    {
+      "id": "N1-WS-66",
+      "type": "WORKSTATION",
+      "label": "WS 66",
+      "badge": "WS 66",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 24
+      },
+      "tags": [
+        "n1-ws-66",
+        "ws 66",
+        "66"
+      ]
+    },
+    {
+      "id": "N1-WS-65",
+      "type": "WORKSTATION",
+      "label": "WS 65",
+      "badge": "WS 65",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 24
+      },
+      "tags": [
+        "n1-ws-65",
+        "ws 65",
+        "65"
+      ]
+    },
+    {
+      "id": "N1-WS-64",
+      "type": "WORKSTATION",
+      "label": "WS 64",
+      "badge": "WS 64",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 24
+      },
+      "tags": [
+        "n1-ws-64",
+        "ws 64",
+        "64"
+      ]
+    },
+    {
+      "id": "N1-WS-63",
+      "type": "WORKSTATION",
+      "label": "WS 63",
+      "badge": "WS 63",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 24
+      },
+      "tags": [
+        "n1-ws-63",
+        "ws 63",
+        "63"
+      ]
+    },
+    {
+      "id": "N1-WS-62",
+      "type": "WORKSTATION",
+      "label": "WS 62",
+      "badge": "WS 62",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 24
+      },
+      "tags": [
+        "n1-ws-62",
+        "ws 62",
+        "62"
+      ]
+    },
+    {
+      "id": "N1-WS-61",
+      "type": "WORKSTATION",
+      "label": "WS 61",
+      "badge": "WS 61",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 24
+      },
+      "tags": [
+        "n1-ws-61",
+        "ws 61",
+        "61"
+      ]
+    },
+    {
+      "id": "N1-WS-60",
+      "type": "WORKSTATION",
+      "label": "WS 60",
+      "badge": "WS 60",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 32
+      },
+      "tags": [
+        "n1-ws-60",
+        "ws 60",
+        "60"
+      ]
+    },
+    {
+      "id": "N1-WS-59",
+      "type": "WORKSTATION",
+      "label": "WS 59",
+      "badge": "WS 59",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 32
+      },
+      "tags": [
+        "n1-ws-59",
+        "ws 59",
+        "59"
+      ]
+    },
+    {
+      "id": "N1-WS-58",
+      "type": "WORKSTATION",
+      "label": "WS 58",
+      "badge": "WS 58",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 32
+      },
+      "tags": [
+        "n1-ws-58",
+        "ws 58",
+        "58"
+      ]
+    },
+    {
+      "id": "N1-WS-57",
+      "type": "WORKSTATION",
+      "label": "WS 57",
+      "badge": "WS 57",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 32
+      },
+      "tags": [
+        "n1-ws-57",
+        "ws 57",
+        "57"
+      ]
+    },
+    {
+      "id": "N1-WS-56",
+      "type": "WORKSTATION",
+      "label": "WS 56",
+      "badge": "WS 56",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 32
+      },
+      "tags": [
+        "n1-ws-56",
+        "ws 56",
+        "56"
+      ]
+    },
+    {
+      "id": "N1-WS-55",
+      "type": "WORKSTATION",
+      "label": "WS 55",
+      "badge": "WS 55",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 32
+      },
+      "tags": [
+        "n1-ws-55",
+        "ws 55",
+        "55"
+      ]
+    },
+    {
+      "id": "N1-WS-54",
+      "type": "WORKSTATION",
+      "label": "WS 54",
+      "badge": "WS 54",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 36
+      },
+      "tags": [
+        "n1-ws-54",
+        "ws 54",
+        "54"
+      ]
+    },
+    {
+      "id": "N1-WS-53",
+      "type": "WORKSTATION",
+      "label": "WS 53",
+      "badge": "WS 53",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 36
+      },
+      "tags": [
+        "n1-ws-53",
+        "ws 53",
+        "53"
+      ]
+    },
+    {
+      "id": "N1-WS-52",
+      "type": "WORKSTATION",
+      "label": "WS 52",
+      "badge": "WS 52",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 36
+      },
+      "tags": [
+        "n1-ws-52",
+        "ws 52",
+        "52"
+      ]
+    },
+    {
+      "id": "N1-WS-51",
+      "type": "WORKSTATION",
+      "label": "WS 51",
+      "badge": "WS 51",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 36
+      },
+      "tags": [
+        "n1-ws-51",
+        "ws 51",
+        "51"
+      ]
+    },
+    {
+      "id": "N1-WS-50",
+      "type": "WORKSTATION",
+      "label": "WS 50",
+      "badge": "WS 50",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 36
+      },
+      "tags": [
+        "n1-ws-50",
+        "ws 50",
+        "50"
+      ]
+    },
+    {
+      "id": "N1-WS-49",
+      "type": "WORKSTATION",
+      "label": "WS 49",
+      "badge": "WS 49",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 36
+      },
+      "tags": [
+        "n1-ws-49",
+        "ws 49",
+        "49"
+      ]
+    },
+    {
+      "id": "N1-WS-48",
+      "type": "WORKSTATION",
+      "label": "WS 48",
+      "badge": "WS 48",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 44
+      },
+      "tags": [
+        "n1-ws-48",
+        "ws 48",
+        "48"
+      ]
+    },
+    {
+      "id": "N1-WS-47",
+      "type": "WORKSTATION",
+      "label": "WS 47",
+      "badge": "WS 47",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 44
+      },
+      "tags": [
+        "n1-ws-47",
+        "ws 47",
+        "47"
+      ]
+    },
+    {
+      "id": "N1-WS-46",
+      "type": "WORKSTATION",
+      "label": "WS 46",
+      "badge": "WS 46",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 44
+      },
+      "tags": [
+        "n1-ws-46",
+        "ws 46",
+        "46"
+      ]
+    },
+    {
+      "id": "N1-WS-45",
+      "type": "WORKSTATION",
+      "label": "WS 45",
+      "badge": "WS 45",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 44
+      },
+      "tags": [
+        "n1-ws-45",
+        "ws 45",
+        "45"
+      ]
+    },
+    {
+      "id": "N1-WS-44",
+      "type": "WORKSTATION",
+      "label": "WS 44",
+      "badge": "WS 44",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 44
+      },
+      "tags": [
+        "n1-ws-44",
+        "ws 44",
+        "44"
+      ]
+    },
+    {
+      "id": "N1-WS-43",
+      "type": "WORKSTATION",
+      "label": "WS 43",
+      "badge": "WS 43",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 44
+      },
+      "tags": [
+        "n1-ws-43",
+        "ws 43",
+        "43"
+      ]
+    },
+    {
+      "id": "N1-WS-42",
+      "type": "WORKSTATION",
+      "label": "WS 42",
+      "badge": "WS 42",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 48
+      },
+      "tags": [
+        "n1-ws-42",
+        "ws 42",
+        "42"
+      ]
+    },
+    {
+      "id": "N1-WS-41",
+      "type": "WORKSTATION",
+      "label": "WS 41",
+      "badge": "WS 41",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 48
+      },
+      "tags": [
+        "n1-ws-41",
+        "ws 41",
+        "41"
+      ]
+    },
+    {
+      "id": "N1-WS-40",
+      "type": "WORKSTATION",
+      "label": "WS 40",
+      "badge": "WS 40",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 48
+      },
+      "tags": [
+        "n1-ws-40",
+        "ws 40",
+        "40"
+      ]
+    },
+    {
+      "id": "N1-WS-39",
+      "type": "WORKSTATION",
+      "label": "WS 39",
+      "badge": "WS 39",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 48
+      },
+      "tags": [
+        "n1-ws-39",
+        "ws 39",
+        "39"
+      ]
+    },
+    {
+      "id": "N1-WS-38",
+      "type": "WORKSTATION",
+      "label": "WS 38",
+      "badge": "WS 38",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 48
+      },
+      "tags": [
+        "n1-ws-38",
+        "ws 38",
+        "38"
+      ]
+    },
+    {
+      "id": "N1-WS-37",
+      "type": "WORKSTATION",
+      "label": "WS 37",
+      "badge": "WS 37",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 48
+      },
+      "tags": [
+        "n1-ws-37",
+        "ws 37",
+        "37"
+      ]
+    },
+    {
+      "id": "N1-WS-36",
+      "type": "WORKSTATION",
+      "label": "WS 36",
+      "badge": "WS 36",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 56
+      },
+      "tags": [
+        "n1-ws-36",
+        "ws 36",
+        "36"
+      ]
+    },
+    {
+      "id": "N1-WS-35",
+      "type": "WORKSTATION",
+      "label": "WS 35",
+      "badge": "WS 35",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 56
+      },
+      "tags": [
+        "n1-ws-35",
+        "ws 35",
+        "35"
+      ]
+    },
+    {
+      "id": "N1-WS-34",
+      "type": "WORKSTATION",
+      "label": "WS 34",
+      "badge": "WS 34",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 56
+      },
+      "tags": [
+        "n1-ws-34",
+        "ws 34",
+        "34"
+      ]
+    },
+    {
+      "id": "N1-WS-33",
+      "type": "WORKSTATION",
+      "label": "WS 33",
+      "badge": "WS 33",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 56
+      },
+      "tags": [
+        "n1-ws-33",
+        "ws 33",
+        "33"
+      ]
+    },
+    {
+      "id": "N1-WS-32",
+      "type": "WORKSTATION",
+      "label": "WS 32",
+      "badge": "WS 32",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 56
+      },
+      "tags": [
+        "n1-ws-32",
+        "ws 32",
+        "32"
+      ]
+    },
+    {
+      "id": "N1-WS-31",
+      "type": "WORKSTATION",
+      "label": "WS 31",
+      "badge": "WS 31",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 56
+      },
+      "tags": [
+        "n1-ws-31",
+        "ws 31",
+        "31"
+      ]
+    },
+    {
+      "id": "N1-WS-30",
+      "type": "WORKSTATION",
+      "label": "WS 30",
+      "badge": "WS 30",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 60
+      },
+      "tags": [
+        "n1-ws-30",
+        "ws 30",
+        "30"
+      ]
+    },
+    {
+      "id": "N1-WS-29",
+      "type": "WORKSTATION",
+      "label": "WS 29",
+      "badge": "WS 29",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 60
+      },
+      "tags": [
+        "n1-ws-29",
+        "ws 29",
+        "29"
+      ]
+    },
+    {
+      "id": "N1-WS-28",
+      "type": "WORKSTATION",
+      "label": "WS 28",
+      "badge": "WS 28",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 60
+      },
+      "tags": [
+        "n1-ws-28",
+        "ws 28",
+        "28"
+      ]
+    },
+    {
+      "id": "N1-WS-27",
+      "type": "WORKSTATION",
+      "label": "WS 27",
+      "badge": "WS 27",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 60
+      },
+      "tags": [
+        "n1-ws-27",
+        "ws 27",
+        "27"
+      ]
+    },
+    {
+      "id": "N1-WS-26",
+      "type": "WORKSTATION",
+      "label": "WS 26",
+      "badge": "WS 26",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 60
+      },
+      "tags": [
+        "n1-ws-26",
+        "ws 26",
+        "26"
+      ]
+    },
+    {
+      "id": "N1-WS-25",
+      "type": "WORKSTATION",
+      "label": "WS 25",
+      "badge": "WS 25",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 60
+      },
+      "tags": [
+        "n1-ws-25",
+        "ws 25",
+        "25"
+      ]
+    },
+    {
+      "id": "N1-WS-24",
+      "type": "WORKSTATION",
+      "label": "WS 24",
+      "badge": "WS 24",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 68
+      },
+      "tags": [
+        "n1-ws-24",
+        "ws 24",
+        "24"
+      ]
+    },
+    {
+      "id": "N1-WS-23",
+      "type": "WORKSTATION",
+      "label": "WS 23",
+      "badge": "WS 23",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 68
+      },
+      "tags": [
+        "n1-ws-23",
+        "ws 23",
+        "23"
+      ]
+    },
+    {
+      "id": "N1-WS-22",
+      "type": "WORKSTATION",
+      "label": "WS 22",
+      "badge": "WS 22",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 68
+      },
+      "tags": [
+        "n1-ws-22",
+        "ws 22",
+        "22"
+      ]
+    },
+    {
+      "id": "N1-WS-21",
+      "type": "WORKSTATION",
+      "label": "WS 21",
+      "badge": "WS 21",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 68
+      },
+      "tags": [
+        "n1-ws-21",
+        "ws 21",
+        "21"
+      ]
+    },
+    {
+      "id": "N1-WS-20",
+      "type": "WORKSTATION",
+      "label": "WS 20",
+      "badge": "WS 20",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 68
+      },
+      "tags": [
+        "n1-ws-20",
+        "ws 20",
+        "20"
+      ]
+    },
+    {
+      "id": "N1-WS-19",
+      "type": "WORKSTATION",
+      "label": "WS 19",
+      "badge": "WS 19",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 68
+      },
+      "tags": [
+        "n1-ws-19",
+        "ws 19",
+        "19"
+      ]
+    },
+    {
+      "id": "N1-WS-18",
+      "type": "WORKSTATION",
+      "label": "WS 18",
+      "badge": "WS 18",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 72
+      },
+      "tags": [
+        "n1-ws-18",
+        "ws 18",
+        "18"
+      ]
+    },
+    {
+      "id": "N1-WS-17",
+      "type": "WORKSTATION",
+      "label": "WS 17",
+      "badge": "WS 17",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 72
+      },
+      "tags": [
+        "n1-ws-17",
+        "ws 17",
+        "17"
+      ]
+    },
+    {
+      "id": "N1-WS-16",
+      "type": "WORKSTATION",
+      "label": "WS 16",
+      "badge": "WS 16",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 72
+      },
+      "tags": [
+        "n1-ws-16",
+        "ws 16",
+        "16"
+      ]
+    },
+    {
+      "id": "N1-WS-15",
+      "type": "WORKSTATION",
+      "label": "WS 15",
+      "badge": "WS 15",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 72
+      },
+      "tags": [
+        "n1-ws-15",
+        "ws 15",
+        "15"
+      ]
+    },
+    {
+      "id": "N1-WS-14",
+      "type": "WORKSTATION",
+      "label": "WS 14",
+      "badge": "WS 14",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 72
+      },
+      "tags": [
+        "n1-ws-14",
+        "ws 14",
+        "14"
+      ]
+    },
+    {
+      "id": "N1-WS-13",
+      "type": "WORKSTATION",
+      "label": "WS 13",
+      "badge": "WS 13",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 72
+      },
+      "tags": [
+        "n1-ws-13",
+        "ws 13",
+        "13"
+      ]
+    },
+    {
+      "id": "N1-WS-12",
+      "type": "WORKSTATION",
+      "label": "WS 12",
+      "badge": "WS 12",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 80
+      },
+      "tags": [
+        "n1-ws-12",
+        "ws 12",
+        "12"
+      ]
+    },
+    {
+      "id": "N1-WS-11",
+      "type": "WORKSTATION",
+      "label": "WS 11",
+      "badge": "WS 11",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 80
+      },
+      "tags": [
+        "n1-ws-11",
+        "ws 11",
+        "11"
+      ]
+    },
+    {
+      "id": "N1-WS-10",
+      "type": "WORKSTATION",
+      "label": "WS 10",
+      "badge": "WS 10",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 80
+      },
+      "tags": [
+        "n1-ws-10",
+        "ws 10",
+        "10"
+      ]
+    },
+    {
+      "id": "N1-WS-9",
+      "type": "WORKSTATION",
+      "label": "WS 9",
+      "badge": "WS 9",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 80
+      },
+      "tags": [
+        "n1-ws-9",
+        "ws 9",
+        "9"
+      ]
+    },
+    {
+      "id": "N1-WS-8",
+      "type": "WORKSTATION",
+      "label": "WS 8",
+      "badge": "WS 8",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 80
+      },
+      "tags": [
+        "n1-ws-8",
+        "ws 8",
+        "8"
+      ]
+    },
+    {
+      "id": "N1-WS-7",
+      "type": "WORKSTATION",
+      "label": "WS 7",
+      "badge": "WS 7",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 80
+      },
+      "tags": [
+        "n1-ws-7",
+        "ws 7",
+        "7"
+      ]
+    },
+    {
+      "id": "N1-WS-6",
+      "type": "WORKSTATION",
+      "label": "WS 6",
+      "badge": "WS 6",
+      "zone": "ws",
+      "cell": {
+        "x": 24,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 84
+      },
+      "tags": [
+        "n1-ws-6",
+        "ws 6",
+        "6"
+      ]
+    },
+    {
+      "id": "N1-WS-5",
+      "type": "WORKSTATION",
+      "label": "WS 5",
+      "badge": "WS 5",
+      "zone": "ws",
+      "cell": {
+        "x": 31,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 84
+      },
+      "tags": [
+        "n1-ws-5",
+        "ws 5",
+        "5"
+      ]
+    },
+    {
+      "id": "N1-WS-4",
+      "type": "WORKSTATION",
+      "label": "WS 4",
+      "badge": "WS 4",
+      "zone": "ws",
+      "cell": {
+        "x": 38,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 84
+      },
+      "tags": [
+        "n1-ws-4",
+        "ws 4",
+        "4"
+      ]
+    },
+    {
+      "id": "N1-WS-3",
+      "type": "WORKSTATION",
+      "label": "WS 3",
+      "badge": "WS 3",
+      "zone": "ws",
+      "cell": {
+        "x": 45,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 84
+      },
+      "tags": [
+        "n1-ws-3",
+        "ws 3",
+        "3"
+      ]
+    },
+    {
+      "id": "N1-WS-2",
+      "type": "WORKSTATION",
+      "label": "WS 2",
+      "badge": "WS 2",
+      "zone": "ws",
+      "cell": {
+        "x": 51,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 84
+      },
+      "tags": [
+        "n1-ws-2",
+        "ws 2",
+        "2"
+      ]
+    },
+    {
+      "id": "N1-WS-1",
+      "type": "WORKSTATION",
+      "label": "WS 1",
+      "badge": "WS 1",
+      "zone": "ws",
+      "cell": {
+        "x": 58,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 84
+      },
+      "tags": [
+        "n1-ws-1",
+        "ws 1",
+        "1"
+      ]
+    },
+    {
+      "id": "N1-CUB-020",
+      "type": "CUBICLE",
+      "label": "CUB 020",
+      "badge": "CUB 020",
+      "zone": "right",
+      "cell": {
+        "x": 68,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 12
+      },
+      "tags": [
+        "n1-cub-020",
+        "cub 020",
+        "20"
+      ]
+    },
+    {
+      "id": "N1-CUB-021",
+      "type": "CUBICLE",
+      "label": "CUB 021",
+      "badge": "CUB 021",
+      "zone": "right",
+      "cell": {
+        "x": 76,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 12
+      },
+      "tags": [
+        "n1-cub-021",
+        "cub 021",
+        "21"
+      ]
+    },
+    {
+      "id": "N1-CUB-022",
+      "type": "CUBICLE",
+      "label": "CUB 022",
+      "badge": "CUB 022",
+      "zone": "right",
+      "cell": {
+        "x": 83,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 12
+      },
+      "tags": [
+        "n1-cub-022",
+        "cub 022",
+        "22"
+      ]
+    },
+    {
+      "id": "N1-CUB-023",
+      "type": "CUBICLE",
+      "label": "CUB 023",
+      "badge": "CUB 023",
+      "zone": "right",
+      "cell": {
+        "x": 68,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 19
+      },
+      "tags": [
+        "n1-cub-023",
+        "cub 023",
+        "23"
+      ]
+    },
+    {
+      "id": "N1-CUB-024",
+      "type": "CUBICLE",
+      "label": "CUB 024",
+      "badge": "CUB 024",
+      "zone": "right",
+      "cell": {
+        "x": 76,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 19
+      },
+      "tags": [
+        "n1-cub-024",
+        "cub 024",
+        "24"
+      ]
+    },
+    {
+      "id": "N1-CUB-027",
+      "type": "CUBICLE",
+      "label": "CUB 027",
+      "badge": "CUB 027",
+      "zone": "right",
+      "cell": {
+        "x": 83,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 19
+      },
+      "tags": [
+        "n1-cub-027",
+        "cub 027",
+        "27"
+      ]
+    },
+    {
+      "id": "N1-CUB-026",
+      "type": "CUBICLE",
+      "label": "CUB 026",
+      "badge": "CUB 026",
+      "zone": "right",
+      "cell": {
+        "x": 68,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 26
+      },
+      "tags": [
+        "n1-cub-026",
+        "cub 026",
+        "26"
+      ]
+    },
+    {
+      "id": "N1-CUB-025",
+      "type": "CUBICLE",
+      "label": "CUB 025",
+      "badge": "CUB 025",
+      "zone": "right",
+      "cell": {
+        "x": 76,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 26
+      },
+      "tags": [
+        "n1-cub-025",
+        "cub 025",
+        "25"
+      ]
+    },
+    {
+      "id": "N1-CUB-028",
+      "type": "CUBICLE",
+      "label": "CUB 028",
+      "badge": "CUB 028",
+      "zone": "right",
+      "cell": {
+        "x": 83,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 26
+      },
+      "tags": [
+        "n1-cub-028",
+        "cub 028",
+        "28"
+      ]
+    },
+    {
+      "id": "N1-CUB-029",
+      "type": "CUBICLE",
+      "label": "CUB 029",
+      "badge": "CUB 029",
+      "zone": "right",
+      "cell": {
+        "x": 72,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 72,
+        "y": 36
+      },
+      "tags": [
+        "n1-cub-029",
+        "cub 029",
+        "29"
+      ]
+    },
+    {
+      "id": "N1-CUB-031",
+      "type": "CUBICLE",
+      "label": "CUB 031",
+      "badge": "CUB 031",
+      "zone": "right",
+      "cell": {
+        "x": 83,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 36
+      },
+      "tags": [
+        "n1-cub-031",
+        "cub 031",
+        "31"
+      ]
+    },
+    {
+      "id": "N1-CUB-030",
+      "type": "CUBICLE",
+      "label": "CUB 030",
+      "badge": "CUB 030",
+      "zone": "right",
+      "cell": {
+        "x": 68,
+        "y": 46
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 43
+      },
+      "tags": [
+        "n1-cub-030",
+        "cub 030",
+        "30"
+      ]
+    },
+    {
+      "id": "N1-CUB-032",
+      "type": "CUBICLE",
+      "label": "CUB 032",
+      "badge": "CUB 032",
+      "zone": "right",
+      "cell": {
+        "x": 76,
+        "y": 46
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 43
+      },
+      "tags": [
+        "n1-cub-032",
+        "cub 032",
+        "32"
+      ]
+    },
+    {
+      "id": "N1-CUB-033",
+      "type": "CUBICLE",
+      "label": "CUB 033",
+      "badge": "CUB 033",
+      "zone": "right",
+      "cell": {
+        "x": 83,
+        "y": 46
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 43
+      },
+      "tags": [
+        "n1-cub-033",
+        "cub 033",
+        "33"
+      ]
+    },
+    {
+      "id": "N1-CUB-034",
+      "type": "CUBICLE",
+      "label": "CUB 034",
+      "badge": "CUB 034",
+      "zone": "right",
+      "cell": {
+        "x": 68,
+        "y": 53
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 50
+      },
+      "tags": [
+        "n1-cub-034",
+        "cub 034",
+        "34"
+      ]
+    },
+    {
+      "id": "N1-CUB-035",
+      "type": "CUBICLE",
+      "label": "CUB 035",
+      "badge": "CUB 035",
+      "zone": "right",
+      "cell": {
+        "x": 76,
+        "y": 53
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 50
+      },
+      "tags": [
+        "n1-cub-035",
+        "cub 035",
+        "35"
+      ]
+    },
+    {
+      "id": "N1-CUB-036",
+      "type": "CUBICLE",
+      "label": "CUB 036",
+      "badge": "CUB 036",
+      "zone": "right",
+      "cell": {
+        "x": 83,
+        "y": 53
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 50
+      },
+      "tags": [
+        "n1-cub-036",
+        "cub 036",
+        "36"
+      ]
+    },
+    {
+      "id": "N1-CUB-039",
+      "type": "CUBICLE",
+      "label": "CUB 039",
+      "badge": "CUB 039",
+      "zone": "right",
+      "cell": {
+        "x": 68,
+        "y": 60
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 57
+      },
+      "tags": [
+        "n1-cub-039",
+        "cub 039",
+        "39"
+      ]
+    },
+    {
+      "id": "N1-CUB-038",
+      "type": "CUBICLE",
+      "label": "CUB 038",
+      "badge": "CUB 038",
+      "zone": "right",
+      "cell": {
+        "x": 76,
+        "y": 60
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 57
+      },
+      "tags": [
+        "n1-cub-038",
+        "cub 038",
+        "38"
+      ]
+    },
+    {
+      "id": "N1-CUB-037",
+      "type": "CUBICLE",
+      "label": "CUB 037",
+      "badge": "CUB 037",
+      "zone": "right",
+      "cell": {
+        "x": 83,
+        "y": 60
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 57
+      },
+      "tags": [
+        "n1-cub-037",
+        "cub 037",
+        "37"
+      ]
+    }
+  ],
+  "verified": {
+    "allSeatsReachableFromEntrance": true,
+    "walkableCells": 5174
+  }
+}

@@ -270,7 +270,7 @@ fun StudentCampusShell(
                         )
                     }
                     BottomTab.MAP -> {
-                        ComponentGalleryScreen(
+                        com.example.projectx.map.MapScreen(
                             onMenuClick = { coroutineScope.launch { drawerState.open() } }
                         )
                     }
