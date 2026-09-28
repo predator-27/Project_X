@@ -26,27 +26,33 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectx.components.AmbientBackground
 import com.example.projectx.components.SideNavDrawerContent
 import com.example.projectx.map.MapScreen
+import com.example.projectx.model.UserRole
 import com.example.projectx.theme.CampusTheme
 import com.example.projectx.theme.CampusTokens
 import com.example.projectx.ui.*
 import com.example.projectx.ui.academics.AcademicViewModel
 import com.example.projectx.ui.academics.CoursesScreen
+import com.example.projectx.ui.auth.*
 import com.example.projectx.ui.lms.AssignmentDetailScreen
 import com.example.projectx.ui.lms.CourseDetailScreen
 import kotlinx.coroutines.launch
 
 enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {
     HOME("home", "Home", Icons.Default.Home),
-    TIMETABLE("timetable", "Timetable", Icons.Default.Schedule),
-    MAP("campus_map", "Campus Map", Icons.Default.Map),
+    ACADEMICS("academics", "Academics", Icons.Default.School),
+    CAMPUS("campus", "Campus", Icons.Default.LocationOn),
     MESSAGES("messages", "Messages", Icons.Default.Email),
     PROFILE("profile", "Profile", Icons.Default.Person)
 }
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: TeacherManagementViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
+    private val facultyViewModel: FacultyViewModel by viewModels()
+    private val appointmentViewModel: AppointmentViewModel by viewModels()
+    private val teacherViewModel: TeacherManagementViewModel by viewModels()
     private val aiViewModel: CampusAiViewModel by viewModels()
+    private val announcementViewModel: AnnouncementViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +63,14 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = Color.Transparent
                     ) {
-                        CampusAppShell(viewModel = viewModel, aiViewModel = aiViewModel)
+                        CampusAppShell(
+                            authViewModel = authViewModel,
+                            facultyViewModel = facultyViewModel,
+                            appointmentViewModel = appointmentViewModel,
+                            teacherViewModel = teacherViewModel,
+                            aiViewModel = aiViewModel,
+                            announcementViewModel = announcementViewModel
+                        )
                     }
                 }
             }
@@ -67,42 +80,99 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CampusAppShell(
-    viewModel: TeacherManagementViewModel,
-    aiViewModel: CampusAiViewModel
+    authViewModel: AuthViewModel,
+    facultyViewModel: FacultyViewModel,
+    appointmentViewModel: AppointmentViewModel,
+    teacherViewModel: TeacherManagementViewModel,
+    aiViewModel: CampusAiViewModel,
+    announcementViewModel: AnnouncementViewModel
 ) {
-    val authState by viewModel.authState.collectAsState()
+    val sessionState by authViewModel.sessionState.collectAsState()
     val context = LocalContext.current
     var showSplash by rememberSaveable { mutableStateOf(true) }
+    var isWebViewActive by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadSavedAuth(context)
-        viewModel.checkForAppUpdates(context)
+        teacherViewModel.checkForAppUpdates(context)
     }
 
     if (showSplash) {
         SplashScreen(
             onFinished = { showSplash = false }
         )
+    } else if (isWebViewActive) {
+        WebViewScreen(viewModel = teacherViewModel)
     } else {
-        when (authState) {
-            AuthState.UNAUTHENTICATED -> {
+        when (val session = sessionState) {
+            is AuthSessionState.Loading -> {
+                AuthLoadingScreen(message = "Restoring university session...")
+            }
+            is AuthSessionState.Unauthenticated -> {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    LoginScreen(viewModel = viewModel)
+                    LoginScreen(
+                        authViewModel = authViewModel,
+                        onOpenWebView = { isWebViewActive = true }
+                    )
 
                     UpdateNotificationOverlay(
-                        viewModel = viewModel,
+                        viewModel = teacherViewModel,
                         modifier = Modifier.align(Alignment.TopCenter)
                     )
                 }
             }
-            AuthState.STUDENT -> {
-                StudentCampusShell(viewModel = viewModel, aiViewModel = aiViewModel)
+            is AuthSessionState.EmailVerificationRequired -> {
+                EmailVerificationScreen(
+                    email = session.email,
+                    authViewModel = authViewModel
+                )
             }
-            AuthState.TEACHER_ADMIN -> {
-                AdminTeacherScreen(viewModel = viewModel)
+            is AuthSessionState.ProfileMissing -> {
+                CompleteProfileScreen(
+                    authViewModel = authViewModel
+                )
             }
-            AuthState.WEB_VIEW -> {
-                WebViewScreen(viewModel = viewModel)
+            is AuthSessionState.AccountInactive -> {
+                AccountInactiveScreen(
+                    email = session.email,
+                    authViewModel = authViewModel
+                )
+            }
+            is AuthSessionState.Error -> {
+                AuthErrorScreen(
+                    message = session.message,
+                    authViewModel = authViewModel
+                )
+            }
+            is AuthSessionState.Authenticated -> {
+                when (session.role) {
+                    UserRole.STUDENT -> {
+                        StudentCampusShell(
+                            authViewModel = authViewModel,
+                            facultyViewModel = facultyViewModel,
+                            appointmentViewModel = appointmentViewModel,
+                            teacherViewModel = teacherViewModel,
+                            aiViewModel = aiViewModel,
+                            announcementViewModel = announcementViewModel
+                        )
+                    }
+                    UserRole.FACULTY -> {
+                        AdminTeacherScreen(
+                            facultyViewModel = facultyViewModel,
+                            appointmentViewModel = appointmentViewModel,
+                            authViewModel = authViewModel
+                        )
+                    }
+                    UserRole.LOST_FOUND_STAFF,
+                    UserRole.COLLEGE_ADMIN,
+                    UserRole.SUPER_ADMIN -> {
+                        RolePlaceholderScreen(
+                            role = session.role,
+                            userEmail = session.user.email,
+                            displayName = session.publicProfile?.displayName,
+                            authViewModel = authViewModel
+                        )
+                    }
+                }
             }
         }
     }
@@ -110,17 +180,28 @@ fun CampusAppShell(
 
 @Composable
 fun StudentCampusShell(
-    viewModel: TeacherManagementViewModel,
+    authViewModel: AuthViewModel,
+    facultyViewModel: FacultyViewModel,
+    appointmentViewModel: AppointmentViewModel,
+    teacherViewModel: TeacherManagementViewModel,
     aiViewModel: CampusAiViewModel,
+    announcementViewModel: AnnouncementViewModel,
     academicViewModel: AcademicViewModel = viewModel()
 ) {
-    val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+
+    val session = authViewModel.sessionState.collectAsState().value as? AuthSessionState.Authenticated
+    val studentDisplayName = session?.publicProfile?.displayName
+    val studentRollNumber = session?.user?.rollNumber
+    val studentEmail = session?.user?.email
 
     var activeDrawerModule by remember { mutableStateOf("home") }
     var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
     var showAiAssistantSheet by remember { mutableStateOf(false) }
+
+    // Map Target Seat Handoff State
+    var targetMapSeatId by remember { mutableStateOf<String?>(null) }
 
     // LMS Sub-Navigation State
     var selectedCourseCode by remember { mutableStateOf<String?>(null) }
@@ -137,6 +218,9 @@ fun StudentCampusShell(
             ) {
                 SideNavDrawerContent(
                     activeItemId = activeDrawerModule,
+                    displayName = studentDisplayName,
+                    rollNumber = studentRollNumber,
+                    email = studentEmail,
                     onItemClick = { moduleId ->
                         activeDrawerModule = moduleId
                         // Reset sub-navigation when switching main modules
@@ -146,19 +230,18 @@ fun StudentCampusShell(
 
                         when (moduleId) {
                             "home" -> selectedBottomTab = BottomTab.HOME
-                            "timetable" -> selectedBottomTab = BottomTab.TIMETABLE
-                            "messages" -> selectedBottomTab = BottomTab.MESSAGES
-                            "attendance" -> selectedBottomTab = BottomTab.HOME
-                            "courses" -> selectedBottomTab = BottomTab.HOME
-                            "community" -> selectedBottomTab = BottomTab.HOME
-                            "teachers" -> selectedBottomTab = BottomTab.HOME
-                            "campus_map" -> selectedBottomTab = BottomTab.MAP
-                            "gallery" -> selectedBottomTab = BottomTab.MAP
+                            "courses", "attendance", "timetable", "assignments", "exam_schedules", "results", "reports" -> selectedBottomTab = BottomTab.ACADEMICS
+                            "teachers", "campus_map", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
+                            "messages", "announcements", "community" -> selectedBottomTab = BottomTab.MESSAGES
+                            "profile", "settings" -> selectedBottomTab = BottomTab.PROFILE
+                            "ai_assistant" -> {
+                                showAiAssistantSheet = true
+                            }
                         }
                         coroutineScope.launch { drawerState.close() }
                     },
                     onLogoutClick = {
-                        viewModel.logout(context)
+                        authViewModel.signOut()
                         coroutineScope.launch { drawerState.close() }
                     }
                 )
@@ -191,9 +274,9 @@ fun StudentCampusShell(
                                 selectedAssignmentId = null
                                 when (tab) {
                                     BottomTab.HOME -> activeDrawerModule = "home"
-                                    BottomTab.TIMETABLE -> activeDrawerModule = "timetable"
+                                    BottomTab.ACADEMICS -> activeDrawerModule = "courses"
+                                    BottomTab.CAMPUS -> activeDrawerModule = "teachers"
                                     BottomTab.MESSAGES -> activeDrawerModule = "messages"
-                                    BottomTab.MAP -> activeDrawerModule = "campus_map"
                                     BottomTab.PROFILE -> activeDrawerModule = "profile"
                                 }
                             },
@@ -228,7 +311,16 @@ fun StudentCampusShell(
                                 academicViewModel = academicViewModel,
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } }
                             )
-                        } else if (activeDrawerModule == "courses") {
+                        } else if (activeDrawerModule == "timetable") {
+                            TimetableScreen(
+                                academicViewModel = academicViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                onNavigateToRoom = {
+                                    selectedBottomTab = BottomTab.CAMPUS
+                                    activeDrawerModule = "campus_map"
+                                }
+                            )
+                        } else if (activeDrawerModule == "courses" || activeDrawerModule == "assignments") {
                             if (selectedAssignmentId != null) {
                                 AssignmentDetailScreen(
                                     assignmentId = selectedAssignmentId!!,
@@ -257,38 +349,79 @@ fun StudentCampusShell(
                             SocialCommunityScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } }
                             )
-                        } else if (activeDrawerModule == "teachers") {
+                        } else if (activeDrawerModule == "teachers" || activeDrawerModule == "appointments") {
                             StudentScreen(
-                                viewModel = viewModel
+                                facultyViewModel = facultyViewModel,
+                                appointmentViewModel = appointmentViewModel,
+                                authViewModel = authViewModel,
+                                onLocateOnMap = { seatId ->
+                                    targetMapSeatId = seatId
+                                    selectedBottomTab = BottomTab.CAMPUS
+                                    activeDrawerModule = "campus_map"
+                                }
+                            )
+                        } else if (activeDrawerModule == "campus_map") {
+                            MapScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                targetSeatId = targetMapSeatId
+                            )
+                        } else if (activeDrawerModule == "lost_found") {
+                            LostFoundScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                authViewModel = authViewModel
+                            )
+                        } else if (activeDrawerModule == "messages" || activeDrawerModule == "announcements") {
+                            MessagesScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                announcementViewModel = announcementViewModel,
+                                authViewModel = authViewModel
+                            )
+                        } else if (activeDrawerModule == "profile") {
+                            ProfileScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
                             )
                         } else {
                             HomeScreen(
                                 academicViewModel = academicViewModel,
+                                appointmentViewModel = appointmentViewModel,
+                                announcementViewModel = announcementViewModel,
+                                authViewModel = authViewModel,
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 onNavigateToTab = { tabId ->
                                     when (tabId) {
                                         "timetable" -> {
-                                            selectedBottomTab = BottomTab.TIMETABLE
+                                            selectedBottomTab = BottomTab.ACADEMICS
                                             activeDrawerModule = "timetable"
                                         }
                                         "attendance" -> {
+                                            selectedBottomTab = BottomTab.ACADEMICS
                                             activeDrawerModule = "attendance"
                                         }
                                         "courses" -> {
+                                            selectedBottomTab = BottomTab.ACADEMICS
                                             activeDrawerModule = "courses"
                                             selectedCourseCode = null
                                             selectedCourseName = null
                                             selectedAssignmentId = null
                                         }
+                                        "teachers" -> {
+                                            selectedBottomTab = BottomTab.CAMPUS
+                                            activeDrawerModule = "teachers"
+                                        }
                                         "campus_map" -> {
-                                            selectedBottomTab = BottomTab.MAP
+                                            selectedBottomTab = BottomTab.CAMPUS
                                             activeDrawerModule = "campus_map"
+                                        }
+                                        "lost_found" -> {
+                                            selectedBottomTab = BottomTab.CAMPUS
+                                            activeDrawerModule = "lost_found"
                                         }
                                         "messages" -> {
                                             selectedBottomTab = BottomTab.MESSAGES
                                             activeDrawerModule = "messages"
                                         }
                                         "community" -> {
+                                            selectedBottomTab = BottomTab.MESSAGES
                                             activeDrawerModule = "community"
                                         }
                                     }
@@ -296,25 +429,84 @@ fun StudentCampusShell(
                             )
                         }
                     }
-                    BottomTab.TIMETABLE -> {
-                        TimetableScreen(
-                            academicViewModel = academicViewModel,
-                            onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                            onNavigateToRoom = {
-                                selectedBottomTab = BottomTab.MAP
-                                activeDrawerModule = "campus_map"
+                    BottomTab.ACADEMICS -> {
+                        if (activeDrawerModule == "attendance") {
+                            AttendanceScreen(
+                                academicViewModel = academicViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "timetable") {
+                            TimetableScreen(
+                                academicViewModel = academicViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                onNavigateToRoom = {
+                                    selectedBottomTab = BottomTab.CAMPUS
+                                    activeDrawerModule = "campus_map"
+                                }
+                            )
+                        } else {
+                            if (selectedAssignmentId != null) {
+                                AssignmentDetailScreen(
+                                    assignmentId = selectedAssignmentId!!,
+                                    onBackClick = { selectedAssignmentId = null },
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                                )
+                            } else if (selectedCourseCode != null) {
+                                CourseDetailScreen(
+                                    courseCode = selectedCourseCode!!,
+                                    courseName = selectedCourseName,
+                                    onBackClick = { selectedCourseCode = null; selectedCourseName = null },
+                                    onAssignmentClick = { assignmentId -> selectedAssignmentId = assignmentId },
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                                )
+                            } else {
+                                CoursesScreen(
+                                    academicViewModel = academicViewModel,
+                                    onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                    onCourseClick = { course ->
+                                        selectedCourseCode = course.courseCode
+                                        selectedCourseName = course.courseName
+                                    }
+                                )
                             }
-                        )
+                        }
                     }
-                    BottomTab.MAP -> {
-                        MapScreen(
-                            onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                        )
+                    BottomTab.CAMPUS -> {
+                        if (activeDrawerModule == "campus_map") {
+                            MapScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                targetSeatId = targetMapSeatId
+                            )
+                        } else if (activeDrawerModule == "lost_found") {
+                            LostFoundScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                authViewModel = authViewModel
+                            )
+                        } else {
+                            StudentScreen(
+                                facultyViewModel = facultyViewModel,
+                                appointmentViewModel = appointmentViewModel,
+                                authViewModel = authViewModel,
+                                onLocateOnMap = { seatId ->
+                                    targetMapSeatId = seatId
+                                    selectedBottomTab = BottomTab.CAMPUS
+                                    activeDrawerModule = "campus_map"
+                                }
+                            )
+                        }
                     }
                     BottomTab.MESSAGES -> {
-                        MessagesScreen(
-                            onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                        )
+                        if (activeDrawerModule == "community") {
+                            SocialCommunityScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else {
+                            MessagesScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                announcementViewModel = announcementViewModel,
+                                authViewModel = authViewModel
+                            )
+                        }
                     }
                     BottomTab.PROFILE -> {
                         ProfileScreen(
@@ -324,7 +516,7 @@ fun StudentCampusShell(
                 }
 
                 UpdateNotificationOverlay(
-                    viewModel = viewModel,
+                    viewModel = teacherViewModel,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
 

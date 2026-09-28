@@ -3,6 +3,7 @@ package com.example.projectx.model
 enum class AppointmentStatus(val label: String) {
     PENDING("Pending"),
     CONFIRMED("Confirmed"),
+    REJECTED("Rejected"),
     COMPLETED("Completed"),
     CANCELLED("Cancelled")
 }

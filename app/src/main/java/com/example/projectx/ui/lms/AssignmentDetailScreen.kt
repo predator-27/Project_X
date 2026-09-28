@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Grade
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
@@ -87,15 +86,23 @@ fun AssignmentDetailScreen(
         modifier = modifier
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            // Header with Back Action
+            // Header Card with Back Action
             item {
-                SectionFormCard(sectionTitle = "Assignment Overview") {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                    border = BorderStroke(1.dp, SurfaceBorder),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -111,8 +118,8 @@ fun AssignmentDetailScreen(
                                 )
                             }
                             Text(
-                                text = "Assignment Portal",
-                                fontSize = 16.sp,
+                                text = "Assignment Submission Portal",
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = HeadingNavy
                             )
@@ -122,7 +129,7 @@ fun AssignmentDetailScreen(
                             viewModel.loadAssignment(assignmentId)
                             submissionViewModel.loadStudentSubmission(assignmentId)
                         }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = PrimaryIndigo)
+                            Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = PrimaryIndigo, modifier = Modifier.size(20.dp))
                         }
                     }
                 }
@@ -133,23 +140,29 @@ fun AssignmentDetailScreen(
                 is Resource.Loading -> {
                     item {
                         Box(
-                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            modifier = Modifier.fillMaxWidth().padding(24.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(color = PrimaryIndigo)
+                            CircularProgressIndicator(color = PrimaryIndigo, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                         }
                     }
                 }
                 is Resource.Error -> {
                     item {
-                        SectionFormCard(sectionTitle = "Error Loading Assignment") {
-                            Text(text = state.message, fontSize = 13.sp, color = AccentCoral)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(
-                                onClick = { viewModel.refreshAssignment() },
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Retry")
+                                Text(text = state.message, fontSize = 12.sp, color = MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.weight(1f))
+                                TextButton(onClick = { viewModel.refreshAssignment() }) {
+                                    Text("Retry", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                     }
@@ -163,6 +176,21 @@ fun AssignmentDetailScreen(
                     val assignment = state.data
 
                     item {
+                        val now = remember { System.currentTimeMillis() }
+                        val (dueText, isPastDue) = remember(assignment.dueDateTimestamp, now) {
+                            val ts = assignment.dueDateTimestamp
+                            if (ts != null && ts > 0) {
+                                val dateStr = SimpleDateFormat("dd-MMM-yyyy, hh:mm a", Locale.getDefault()).format(Date(ts))
+                                if (ts < now) {
+                                    "Past Due: $dateStr" to true
+                                } else {
+                                    "Due: $dateStr" to false
+                                }
+                            } else {
+                                "Due date not specified" to false
+                            }
+                        }
+
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = CardShape,
@@ -170,8 +198,8 @@ fun AssignmentDetailScreen(
                             border = BorderStroke(1.dp, SurfaceBorder)
                         ) {
                             Column(
-                                modifier = Modifier.padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -180,7 +208,7 @@ fun AssignmentDetailScreen(
                                 ) {
                                     Text(
                                         text = assignment.title,
-                                        fontSize = 18.sp,
+                                        fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = HeadingNavy,
                                         modifier = Modifier.weight(1f)
@@ -189,19 +217,25 @@ fun AssignmentDetailScreen(
                                 }
 
                                 if (assignment.courseCode.isNotBlank()) {
-                                    Text(
-                                        text = "Course Code: ${assignment.courseCode}",
-                                        fontSize = 12.sp,
-                                        color = PrimaryIndigo,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = InfoBannerBg
+                                    ) {
+                                        Text(
+                                            text = "Course: ${assignment.courseCode}",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = PrimaryIndigo,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
                                 }
 
                                 HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
 
                                 Text(
                                     text = assignment.description.ifBlank { "No additional details provided." },
-                                    fontSize = 13.sp,
+                                    fontSize = 12.sp,
                                     color = BodyText
                                 )
 
@@ -216,24 +250,27 @@ fun AssignmentDetailScreen(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                                     ) {
-                                        Icon(Icons.Default.Schedule, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(16.dp))
-                                        val dueText = remember(assignment.dueDateTimestamp) {
-                                            if (assignment.dueDateTimestamp != null) {
-                                                "Due: " + SimpleDateFormat("dd-MMM-yyyy, hh:mm a", Locale.getDefault()).format(Date(assignment.dueDateTimestamp))
-                                            } else {
-                                                "Due date not specified"
-                                            }
-                                        }
-                                        Text(text = dueText, fontSize = 12.sp, color = PrimaryIndigo, fontWeight = FontWeight.Bold)
+                                        Icon(
+                                            Icons.Default.Schedule,
+                                            contentDescription = null,
+                                            tint = if (isPastDue) AccentCoral else PrimaryIndigo,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Text(
+                                            text = dueText,
+                                            fontSize = 11.sp,
+                                            color = if (isPastDue) AccentCoral else PrimaryIndigo,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     }
 
                                     if (!assignment.attachmentUrl.isNullOrBlank()) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                            horizontalArrangement = Arrangement.spacedBy(2.dp)
                                         ) {
-                                            Icon(Icons.Default.AttachFile, contentDescription = null, tint = MutedText, modifier = Modifier.size(14.dp))
-                                            Text(text = "Reference Material", fontSize = 11.sp, color = MutedText)
+                                            Icon(Icons.Default.AttachFile, contentDescription = null, tint = MutedText, modifier = Modifier.size(12.dp))
+                                            Text(text = "Reference File", fontSize = 11.sp, color = MutedText)
                                         }
                                     }
                                 }
@@ -250,11 +287,11 @@ fun AssignmentDetailScreen(
                                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        CircularProgressIndicator(color = PrimaryIndigo)
+                                        CircularProgressIndicator(color = PrimaryIndigo, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                                     }
                                 }
                                 is Resource.Error -> {
-                                    Text(text = subState.message, fontSize = 13.sp, color = AccentCoral)
+                                    Text(text = subState.message, fontSize = 12.sp, color = AccentCoral)
                                 }
                                 else -> {
                                     val currentSubmission = (subState as? Resource.Success)?.data
@@ -317,11 +354,11 @@ fun AssignmentDetailScreen(
                                                     "Submitted"
                                                 }
                                             }
-                                            Text(text = "Submitted at: $submittedDateStr", fontSize = 12.sp, color = MutedText)
+                                            Text(text = "Submitted on: $submittedDateStr", fontSize = 11.sp, color = MutedText)
 
                                             if (!currentSubmission.responseText.isNullOrBlank()) {
                                                 Text(text = "Text Response:", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = HeadingNavy)
-                                                Text(text = currentSubmission.responseText, fontSize = 13.sp, color = BodyText)
+                                                Text(text = currentSubmission.responseText, fontSize = 12.sp, color = BodyText)
                                             }
 
                                             if (!currentSubmission.storagePath.isNullOrBlank()) {
@@ -329,10 +366,10 @@ fun AssignmentDetailScreen(
                                                     verticalAlignment = Alignment.CenterVertically,
                                                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                                                 ) {
-                                                    Icon(Icons.Default.AttachFile, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(16.dp))
+                                                    Icon(Icons.Default.AttachFile, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(14.dp))
                                                     Text(
                                                         text = "Attachment: ${currentSubmission.storagePath.substringAfterLast('/')}",
-                                                        fontSize = 12.sp,
+                                                        fontSize = 11.sp,
                                                         color = PrimaryIndigo,
                                                         fontWeight = FontWeight.Medium
                                                     )
@@ -358,12 +395,12 @@ fun AssignmentDetailScreen(
 
                                                 if (!currentSubmission.facultyFeedback.isNullOrBlank()) {
                                                     Text(text = "Faculty Feedback:", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = HeadingNavy)
-                                                    Text(text = currentSubmission.facultyFeedback, fontSize = 13.sp, color = BodyText)
+                                                    Text(text = currentSubmission.facultyFeedback, fontSize = 12.sp, color = BodyText)
                                                 }
 
                                                 Text(
                                                     text = "🔒 Submission Graded & Locked",
-                                                    fontSize = 12.sp,
+                                                    fontSize = 11.sp,
                                                     color = MutedText,
                                                     fontWeight = FontWeight.Medium
                                                 )
@@ -375,9 +412,10 @@ fun AssignmentDetailScreen(
                                                     OutlinedButton(
                                                         onClick = { showResubmitForm = true },
                                                         modifier = Modifier.fillMaxWidth(),
-                                                        border = BorderStroke(1.dp, PrimaryIndigo)
+                                                        border = BorderStroke(1.dp, PrimaryIndigo),
+                                                        shape = RoundedCornerShape(10.dp)
                                                     ) {
-                                                        Text("Resubmit Assignment", color = PrimaryIndigo, fontWeight = FontWeight.Bold)
+                                                        Text("Resubmit Assignment", color = PrimaryIndigo, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                                     }
                                                 } else {
                                                     SubmissionFormView(
@@ -459,8 +497,9 @@ fun SubmissionFormView(
             value = responseText,
             onValueChange = onResponseTextChange,
             label = { Text("Text Response (Optional)") },
-            placeholder = { Text("Enter your text response here...") },
-            modifier = Modifier.fillMaxWidth().height(120.dp),
+            placeholder = { Text("Enter your response text here...") },
+            modifier = Modifier.fillMaxWidth().height(100.dp),
+            shape = RoundedCornerShape(10.dp),
             enabled = !isSubmitting
         )
 
@@ -473,13 +512,14 @@ fun SubmissionFormView(
                 onClick = onSelectFileClick,
                 enabled = !isSubmitting,
                 colors = ButtonDefaults.buttonColors(containerColor = SurfaceCard),
-                border = BorderStroke(1.dp, SurfaceBorder)
+                border = BorderStroke(1.dp, SurfaceBorder),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Icon(Icons.Default.AttachFile, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = if (selectedFileName != null) "Change Attachment" else "Attach File (PDF, ZIP, DOCX, Image)",
-                    fontSize = 12.sp,
+                    text = if (selectedFileName != null) "Change File" else "Attach File (PDF, ZIP, DOCX, Image)",
+                    fontSize = 11.sp,
                     color = HeadingNavy
                 )
             }
@@ -493,25 +533,26 @@ fun SubmissionFormView(
 
         if (selectedFileName != null) {
             Text(
-                text = "Attached: $selectedFileName",
-                fontSize = 12.sp,
+                text = "Attached: $selectedFileName (Max 25 MB)",
+                fontSize = 11.sp,
                 color = PrimaryIndigo,
                 fontWeight = FontWeight.Medium
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
         Button(
             onClick = onSubmitClick,
             enabled = !isSubmitting,
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
         ) {
             if (isSubmitting) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp))
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Uploading & Submitting...", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text("Uploading & Submitting...", fontSize = 12.sp, fontWeight = FontWeight.Bold)
             } else {
                 Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))

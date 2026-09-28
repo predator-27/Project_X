@@ -119,6 +119,7 @@ class AuthRepository(
         val privateUser = User(
             uid = firebaseUser.uid,
             email = firebaseUser.email ?: "",
+            rollNumber = academicProfile?.rollNumber,
             role = UserRole.STUDENT,
             isActive = true
         )

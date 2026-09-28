@@ -15,11 +15,7 @@ data class Institution(
 
     companion object {
         val DEFAULT_LIST = listOf(
-            Institution("Global Tech University", "university.edu"),
-            Institution("MIT", "mit.edu"),
-            Institution("Stanford University", "stanford.edu"),
-            Institution("Harvard University", "harvard.edu"),
-            Institution("Oxford University", "ox.ac.uk")
+            Institution("Bennett University", "bennett.edu.in")
         )
     }
 }
@@ -32,8 +28,8 @@ data class Teacher(
     val deskNumber: String,
     val timings: String,
     val email: String,
-    val institution: String = "Global Tech University",
-    val institutionDomain: String = "university.edu",
+    val institution: String = "Bennett University",
+    val institutionDomain: String = "bennett.edu.in",
     val status: TeacherStatus = TeacherStatus.AT_DESK,
     val isAvailableForAppointments: Boolean = true,
     val bio: String = ""

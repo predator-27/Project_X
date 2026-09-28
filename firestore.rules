@@ -137,7 +137,7 @@ service cloud.firestore {
       );
 
       allow create: if isActiveVerifiedBennettUser()
-        && request.resource.data.keys().hasOnly(['appointmentId', 'studentUid', 'facultyUid', 'purpose', 'proposedTime', 'status', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['appointmentId', 'studentUid', 'facultyUid', 'studentName', 'studentEmail', 'facultyName', 'purpose', 'proposedTime', 'date', 'timeSlot', 'status', 'createdAt'])
         && request.resource.data.studentUid == request.auth.uid
         && request.resource.data.status == 'PENDING'
         && request.resource.data.createdAt == request.time;

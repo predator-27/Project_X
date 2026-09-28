@@ -1,6 +1,5 @@
 package com.example.projectx.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -13,6 +12,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
@@ -20,33 +20,75 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.projectx.map.MapViewModel
 import com.example.projectx.model.Appointment
+import com.example.projectx.model.AppointmentStatus
 import com.example.projectx.model.Teacher
-
-import androidx.compose.ui.platform.LocalContext
+import com.example.projectx.ui.auth.AuthSessionState
+import com.example.projectx.ui.auth.AuthViewModel
+import com.example.projectx.util.Resource
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentScreen(
-    viewModel: TeacherManagementViewModel,
+    facultyViewModel: FacultyViewModel = viewModel(),
+    appointmentViewModel: AppointmentViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel(),
+    mapViewModel: MapViewModel = viewModel(),
+    onLocateOnMap: ((seatId: String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val teachers by viewModel.filteredTeachers.collectAsState()
-    val appointments by viewModel.appointments.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val selectedDept by viewModel.selectedDepartment.collectAsState()
+    val currentUser = remember { FirebaseAuth.getInstance().currentUser }
+    val studentUid = currentUser?.uid ?: ""
+
+    val sessionState by authViewModel.sessionState.collectAsState()
+    val filteredTeachersResource by facultyViewModel.filteredTeachersState.collectAsState()
+    val studentAppointmentsResource by appointmentViewModel.studentAppointmentsState.collectAsState()
+    val actionState by appointmentViewModel.actionState.collectAsState()
+    val mapState by mapViewModel.state.collectAsState()
+
+    val searchQuery by facultyViewModel.searchQuery.collectAsState()
+    val selectedDept by facultyViewModel.selectedDepartment.collectAsState()
 
     var selectedTab by remember { mutableStateOf(0) } // 0 = Teachers Directory, 1 = My Appointments
     var bookingTeacher by remember { mutableStateOf<Teacher?>(null) }
     var showSuccessSnackbar by remember { mutableStateOf(false) }
 
+    val availableSeatIds = remember(mapState.map) {
+        mapState.map?.vector?.seats?.map { it.id }?.toSet() ?: emptySet()
+    }
+
+    val studentDisplayName = remember(sessionState, currentUser) {
+        val authSession = sessionState as? AuthSessionState.Authenticated
+        authSession?.publicProfile?.displayName?.ifBlank { null }
+            ?: currentUser?.email?.substringBefore("@")
+            ?: "Student"
+    }
+
+    val studentEmailAddress = remember(currentUser) {
+        currentUser?.email ?: ""
+    }
+
     val departments = remember { listOf("All", "Computer Science", "Data Science", "Software Engineering", "Cybersecurity") }
+
+    LaunchedEffect(studentUid) {
+        if (studentUid.isNotBlank()) {
+            appointmentViewModel.loadStudentAppointments(studentUid)
+        }
+    }
+
+    LaunchedEffect(actionState) {
+        if (actionState is Resource.Success) {
+            showSuccessSnackbar = true
+            appointmentViewModel.resetActionState()
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -54,7 +96,7 @@ fun StudentScreen(
             TopAppBar(
                 title = { Text("👨‍🎓 Student Desk Portal", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { viewModel.logout(context) }) {
+                    IconButton(onClick = { authViewModel.signOut() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                             contentDescription = "Log Out",
@@ -86,10 +128,11 @@ fun StudentScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // Tab Row
+            val apptCount = (studentAppointmentsResource as? Resource.Success)?.data?.size ?: 0
             TabRow(
                 selectedTabIndex = selectedTab,
                 modifier = Modifier.fillMaxWidth()
@@ -97,12 +140,12 @@ fun StudentScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("🔍 Teacher Directory", fontWeight = FontWeight.Bold) }
+                    text = { Text("🔍 Faculty Directory", fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("📅 My Appointments (${appointments.size})", fontWeight = FontWeight.Bold) }
+                    text = { Text("📅 My Appointments ($apptCount)", fontWeight = FontWeight.Bold) }
                 )
             }
 
@@ -110,18 +153,18 @@ fun StudentScreen(
                 // Search Bar
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { viewModel.setSearchQuery(it) },
-                    placeholder = { Text("Search by teacher, desk #, or subject...") },
+                    onValueChange = { facultyViewModel.setSearchQuery(it) },
+                    placeholder = { Text("Search by faculty name, desk #, or title...") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { viewModel.setSearchQuery("") }) {
+                            IconButton(onClick = { facultyViewModel.setSearchQuery("") }) {
                                 Icon(Icons.Default.Clear, contentDescription = "Clear")
                             }
                         }
                     },
                     singleLine = true,
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -132,76 +175,198 @@ fun StudentScreen(
                     items(departments, key = { it }) { dept ->
                         FilterChip(
                             selected = dept == selectedDept,
-                            onClick = { viewModel.setDepartmentFilter(dept) },
-                            label = { Text(dept) },
-                            shape = RoundedCornerShape(12.dp)
+                            onClick = { facultyViewModel.setDepartmentFilter(dept) },
+                            label = { Text(dept, fontSize = 12.sp) },
+                            shape = RoundedCornerShape(10.dp)
                         )
                     }
                 }
 
-                // Teachers Directory List
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(teachers, key = { it.id }) { teacher ->
-                        TeacherCard(
-                            teacher = teacher,
-                            onBookClick = { bookingTeacher = teacher }
-                        )
+                // Teachers Directory List from Firestore
+                when (val resource = filteredTeachersResource) {
+                    is Resource.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
                     }
-                }
-            } else {
-                // My Appointments List
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    if (appointments.isEmpty()) {
-                        item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                ),
-                                shape = RoundedCornerShape(12.dp)
+                    is Resource.Empty -> {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(24.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text("No appointments booked yet.")
+                                Text(
+                                    text = "No faculty profiles available in Bennett directory.",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Error -> {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = resource.message,
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    fontSize = 13.sp
+                                )
+                                TextButton(onClick = { facultyViewModel.loadFacultyDirectory() }) {
+                                    Text("Retry")
                                 }
                             }
                         }
-                    } else {
-                        items(appointments, key = { it.id }) { appointment ->
-                            StudentAppointmentCard(appointment = appointment)
+                    }
+                    is Resource.Success -> {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(resource.data, key = { it.id }) { teacher ->
+                                TeacherCard(
+                                    teacher = teacher,
+                                    availableSeatIds = availableSeatIds,
+                                    onBookClick = { bookingTeacher = teacher },
+                                    onLocateOnMap = onLocateOnMap
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                // My Appointments List from Firestore
+                when (val resource = studentAppointmentsResource) {
+                    is Resource.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                    is Resource.Empty -> {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No appointments booked yet.",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Error -> {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = resource.message,
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    fontSize = 13.sp
+                                )
+                                TextButton(onClick = { appointmentViewModel.loadStudentAppointments(studentUid) }) {
+                                    Text("Retry")
+                                }
+                            }
+                        }
+                    }
+                    is Resource.Success -> {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(resource.data, key = { it.id }) { appointment ->
+                                StudentAppointmentCard(
+                                    appointment = appointment,
+                                    onCancelClick = {
+                                        appointmentViewModel.updateAppointmentStatus(
+                                            appointmentId = appointment.id,
+                                            newStatus = AppointmentStatus.CANCELLED,
+                                            studentUid = studentUid
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
         }
 
-        // Booking Modal Dialog
+        // Booking Modal Dialog with REAL user inputs
         bookingTeacher?.let { teacher ->
             BookAppointmentDialog(
                 teacher = teacher,
+                studentDisplayName = studentDisplayName,
+                studentEmailAddress = studentEmailAddress,
                 onDismiss = { bookingTeacher = null },
-                onConfirm = { name, email, date, slot, purpose ->
-                    viewModel.bookAppointment(
+                onConfirm = { date, slot, purpose ->
+                    val newAppointment = Appointment(
+                        id = "",
                         teacherId = teacher.id,
                         teacherName = teacher.name,
-                        studentName = name,
-                        studentEmail = email,
+                        studentName = studentDisplayName,
+                        studentEmail = studentEmailAddress,
                         date = date,
                         timeSlot = slot,
-                        purpose = purpose
+                        purpose = purpose,
+                        status = AppointmentStatus.PENDING
+                    )
+
+                    appointmentViewModel.bookAppointment(
+                        appointment = newAppointment,
+                        studentUid = studentUid
                     )
                     bookingTeacher = null
-                    showSuccessSnackbar = true
                     selectedTab = 1
                 }
             )
@@ -212,17 +377,28 @@ fun StudentScreen(
 @Composable
 fun TeacherCard(
     teacher: Teacher,
-    onBookClick: () -> Unit
+    availableSeatIds: Set<String>,
+    onBookClick: () -> Unit,
+    onLocateOnMap: ((seatId: String) -> Unit)? = null
 ) {
+    val resolvedSeatId = remember(teacher.deskNumber, availableSeatIds) {
+        val trimmed = teacher.deskNumber.trim()
+        if (trimmed.isNotBlank() && availableSeatIds.contains(trimmed)) {
+            trimmed
+        } else {
+            null
+        }
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -231,23 +407,22 @@ fun TeacherCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    // Initials Avatar Circle
                     val initials = remember(teacher.name) {
                         teacher.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString("")
                     }
                     Surface(
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.size(42.dp)
+                        modifier = Modifier.size(38.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
                                 text = initials,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
@@ -256,12 +431,12 @@ fun TeacherCard(
                     Column {
                         Text(
                             text = teacher.name,
-                            fontSize = 16.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = "${teacher.title} • ${teacher.department}",
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -280,18 +455,18 @@ fun TeacherCard(
                     Icons.Default.LocationOn,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Desk:",
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = teacher.deskNumber,
-                    fontSize = 13.sp,
+                    text = teacher.deskNumber.ifBlank { "Unassigned" },
+                    fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
                 )
@@ -305,45 +480,79 @@ fun TeacherCard(
                     Icons.Default.Schedule,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Office Hours:",
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = teacher.timings,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            if (teacher.bio.isNotEmpty()) {
-                Text(
-                    text = teacher.bio,
+                    text = teacher.timings.ifBlank { "Not specified" },
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            Button(
-                onClick = onBookClick,
-                modifier = Modifier.align(Alignment.End),
-                shape = RoundedCornerShape(10.dp)
+            if (teacher.bio.isNotBlank()) {
+                Text(
+                    text = teacher.bio,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Book Appointment")
+                if (resolvedSeatId != null && onLocateOnMap != null) {
+                    OutlinedButton(
+                        onClick = { onLocateOnMap(resolvedSeatId) },
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Locate on Map", fontSize = 11.sp)
+                    }
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    ) {
+                        Text(
+                            text = "Map location unavailable",
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
+                Button(
+                    onClick = onBookClick,
+                    enabled = teacher.isAvailableForAppointments,
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                ) {
+                    Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Book Appointment", fontSize = 11.sp)
+                }
             }
         }
     }
 }
 
 @Composable
-fun StudentAppointmentCard(appointment: Appointment) {
+fun StudentAppointmentCard(
+    appointment: Appointment,
+    onCancelClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -351,7 +560,7 @@ fun StudentAppointmentCard(appointment: Appointment) {
         shape = RoundedCornerShape(14.dp)
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
@@ -361,7 +570,7 @@ fun StudentAppointmentCard(appointment: Appointment) {
             ) {
                 Text(
                     text = appointment.teacherName,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
                 AppointmentStatusBadge(status = appointment.status)
@@ -369,15 +578,27 @@ fun StudentAppointmentCard(appointment: Appointment) {
 
             Text(
                 text = "📅 ${appointment.date} @ ${appointment.timeSlot}",
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )
 
             Text(
                 text = "Topic: ${appointment.purpose}",
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            if (appointment.status == AppointmentStatus.PENDING || appointment.status == AppointmentStatus.CONFIRMED) {
+                OutlinedButton(
+                    onClick = onCancelClick,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.align(Alignment.End),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text("Cancel Request", fontSize = 11.sp)
+                }
+            }
         }
     }
 }
@@ -385,13 +606,13 @@ fun StudentAppointmentCard(appointment: Appointment) {
 @Composable
 fun BookAppointmentDialog(
     teacher: Teacher,
+    studentDisplayName: String,
+    studentEmailAddress: String,
     onDismiss: () -> Unit,
-    onConfirm: (name: String, email: String, date: String, timeSlot: String, purpose: String) -> Unit
+    onConfirm: (date: String, timeSlot: String, purpose: String) -> Unit
 ) {
-    var studentName by remember { mutableStateOf("Alex Rivera") }
-    var studentEmail by remember { mutableStateOf("alex.r@student.edu") }
-    var selectedDate by remember { mutableStateOf("2026-09-20") }
-    var selectedSlot by remember { mutableStateOf("11:00 AM - 11:30 AM") }
+    var selectedDate by remember { mutableStateOf("") }
+    var selectedSlot by remember { mutableStateOf("") }
     var purpose by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -403,16 +624,17 @@ fun BookAppointmentDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "📍 Location: ${teacher.deskNumber}",
-                    fontSize = 13.sp,
+                    text = "📍 Location: ${teacher.deskNumber.ifBlank { "Faculty Desk" }}",
+                    fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
                 )
 
                 OutlinedTextField(
-                    value = studentName,
-                    onValueChange = { studentName = it },
-                    label = { Text("Your Full Name") },
+                    value = studentDisplayName,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Student Name") },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
@@ -420,9 +642,10 @@ fun BookAppointmentDialog(
                 )
 
                 OutlinedTextField(
-                    value = studentEmail,
-                    onValueChange = { studentEmail = it },
-                    label = { Text("Your Email") },
+                    value = studentEmailAddress,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Student Email") },
                     leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
@@ -433,6 +656,7 @@ fun BookAppointmentDialog(
                     value = selectedDate,
                     onValueChange = { selectedDate = it },
                     label = { Text("Date (YYYY-MM-DD)") },
+                    placeholder = { Text("e.g. 2026-09-20") },
                     leadingIcon = { Icon(Icons.Default.CalendarMonth, contentDescription = null) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
@@ -443,6 +667,7 @@ fun BookAppointmentDialog(
                     value = selectedSlot,
                     onValueChange = { selectedSlot = it },
                     label = { Text("Preferred Time Slot") },
+                    placeholder = { Text("e.g. 11:00 AM - 11:30 AM") },
                     leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
@@ -452,7 +677,7 @@ fun BookAppointmentDialog(
                 OutlinedTextField(
                     value = purpose,
                     onValueChange = { purpose = it },
-                    label = { Text("Purpose / Discussion Topic") },
+                    label = { Text("Discussion Topic / Purpose") },
                     placeholder = { Text("e.g. Guidance on Internship or AI Project") },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -462,11 +687,11 @@ fun BookAppointmentDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (studentName.isNotBlank() && purpose.isNotBlank()) {
-                        onConfirm(studentName, studentEmail, selectedDate, selectedSlot, purpose)
+                    if (selectedDate.isNotBlank() && selectedSlot.isNotBlank() && purpose.isNotBlank()) {
+                        onConfirm(selectedDate, selectedSlot, purpose)
                     }
                 },
-                enabled = studentName.isNotBlank() && purpose.isNotBlank(),
+                enabled = selectedDate.isNotBlank() && selectedSlot.isNotBlank() && purpose.isNotBlank(),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text("Confirm Request")

@@ -5,10 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
@@ -59,15 +59,23 @@ fun CourseDetailScreen(
         modifier = modifier
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             // Header Card with Back Button and Course Info
             item {
-                SectionFormCard(sectionTitle = "Course LMS Portal") {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                    border = BorderStroke(1.dp, SurfaceBorder),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -84,22 +92,29 @@ fun CourseDetailScreen(
                                 )
                             }
                             Column {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = InfoBannerBg
+                                ) {
+                                    Text(
+                                        text = courseCode,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PrimaryIndigo,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
                                 Text(
                                     text = courseName?.ifBlank { null } ?: "Course $courseCode",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.ExtraBold,
                                     color = HeadingNavy
-                                )
-                                Text(
-                                    text = "Code: $courseCode",
-                                    fontSize = 12.sp,
-                                    color = MutedText
                                 )
                             }
                         }
 
                         IconButton(onClick = { viewModel.loadCourseLmsData(courseCode) }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = PrimaryIndigo)
+                            Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = PrimaryIndigo, modifier = Modifier.size(20.dp))
                         }
                     }
                 }
@@ -123,23 +138,29 @@ fun CourseDetailScreen(
                         is Resource.Loading -> {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(24.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator(color = PrimaryIndigo)
+                                    CircularProgressIndicator(color = PrimaryIndigo, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                                 }
                             }
                         }
                         is Resource.Error -> {
                             item {
-                                SectionFormCard(sectionTitle = "Materials Error") {
-                                    Text(text = state.message, fontSize = 13.sp, color = AccentCoral)
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Button(
-                                        onClick = { viewModel.refreshMaterials() },
-                                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text("Retry")
+                                        Text(text = state.message, fontSize = 12.sp, color = MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.weight(1f))
+                                        TextButton(onClick = { viewModel.refreshMaterials() }) {
+                                            Text("Retry", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        }
                                     }
                                 }
                             }
@@ -162,23 +183,29 @@ fun CourseDetailScreen(
                         is Resource.Loading -> {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(24.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator(color = PrimaryIndigo)
+                                    CircularProgressIndicator(color = PrimaryIndigo, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                                 }
                             }
                         }
                         is Resource.Error -> {
                             item {
-                                SectionFormCard(sectionTitle = "Assignments Error") {
-                                    Text(text = state.message, fontSize = 13.sp, color = AccentCoral)
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Button(
-                                        onClick = { viewModel.refreshAssignments() },
-                                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text("Retry")
+                                        Text(text = state.message, fontSize = 12.sp, color = MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.weight(1f))
+                                        TextButton(onClick = { viewModel.refreshAssignments() }) {
+                                            Text("Retry", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        }
                                     }
                                 }
                             }
@@ -204,23 +231,29 @@ fun CourseDetailScreen(
                         is Resource.Loading -> {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(24.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator(color = PrimaryIndigo)
+                                    CircularProgressIndicator(color = PrimaryIndigo, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                                 }
                             }
                         }
                         is Resource.Error -> {
                             item {
-                                SectionFormCard(sectionTitle = "Announcements Error") {
-                                    Text(text = state.message, fontSize = 13.sp, color = AccentCoral)
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Button(
-                                        onClick = { viewModel.refreshAnnouncements() },
-                                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text("Retry")
+                                        Text(text = state.message, fontSize = 12.sp, color = MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.weight(1f))
+                                        TextButton(onClick = { viewModel.refreshAnnouncements() }) {
+                                            Text("Retry", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        }
                                     }
                                 }
                             }
@@ -251,8 +284,8 @@ fun MaterialItemCard(material: CourseMaterial) {
         border = BorderStroke(1.dp, SurfaceBorder)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -261,7 +294,7 @@ fun MaterialItemCard(material: CourseMaterial) {
             ) {
                 Text(
                     text = material.title,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = HeadingNavy,
                     modifier = Modifier.weight(1f)
@@ -314,6 +347,21 @@ fun AssignmentItemCard(
     assignment: Assignment,
     onClick: () -> Unit
 ) {
+    val now = remember { System.currentTimeMillis() }
+    val (dueText, isPastDue) = remember(assignment.dueDateTimestamp, now) {
+        val ts = assignment.dueDateTimestamp
+        if (ts != null && ts > 0) {
+            val dateStr = SimpleDateFormat("dd-MMM-yyyy, hh:mm a", Locale.getDefault()).format(Date(ts))
+            if (ts < now) {
+                "Past Due: $dateStr" to true
+            } else {
+                "Due: $dateStr" to false
+            }
+        } else {
+            "Due date not specified" to false
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -324,8 +372,8 @@ fun AssignmentItemCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -334,7 +382,7 @@ fun AssignmentItemCard(
             ) {
                 Text(
                     text = assignment.title,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = HeadingNavy,
                     modifier = Modifier.weight(1f)
@@ -362,15 +410,18 @@ fun AssignmentItemCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Icon(Icons.Default.Schedule, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(14.dp))
-                    val dueText = remember(assignment.dueDateTimestamp) {
-                        if (assignment.dueDateTimestamp != null) {
-                            "Due: " + SimpleDateFormat("dd-MMM-yyyy, hh:mm a", Locale.getDefault()).format(Date(assignment.dueDateTimestamp))
-                        } else {
-                            "Due date not specified"
-                        }
-                    }
-                    Text(text = dueText, fontSize = 11.sp, color = PrimaryIndigo, fontWeight = FontWeight.Medium)
+                    Icon(
+                        Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = if (isPastDue) AccentCoral else PrimaryIndigo,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Text(
+                        text = dueText,
+                        fontSize = 11.sp,
+                        color = if (isPastDue) AccentCoral else PrimaryIndigo,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
 
                 if (!assignment.attachmentUrl.isNullOrBlank()) {
@@ -396,8 +447,8 @@ fun AnnouncementItemCard(announcement: CourseAnnouncement) {
         border = BorderStroke(1.dp, SurfaceBorder)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -406,7 +457,7 @@ fun AnnouncementItemCard(announcement: CourseAnnouncement) {
             ) {
                 Text(
                     text = announcement.title,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = HeadingNavy,
                     modifier = Modifier.weight(1f)
@@ -417,7 +468,7 @@ fun AnnouncementItemCard(announcement: CourseAnnouncement) {
                 )
             }
 
-            Text(text = announcement.content, fontSize = 13.sp, color = BodyText)
+            Text(text = announcement.content, fontSize = 12.sp, color = BodyText)
 
             HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
 

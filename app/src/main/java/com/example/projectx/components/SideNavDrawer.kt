@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
@@ -43,40 +42,59 @@ data class NavDrawerItem(
 
 val CATEGORIZED_DRAWER_ITEMS = listOf(
     NavDrawerCategory(
+        categoryTitle = "HOME",
+        items = listOf(
+            NavDrawerItem("home", "Dashboard", Icons.Default.Dashboard)
+        )
+    ),
+    NavDrawerCategory(
         categoryTitle = "ACADEMICS",
         items = listOf(
-            NavDrawerItem("home", "Dashboard", Icons.Default.Dashboard),
-            NavDrawerItem("timetable", "Timetable", Icons.Default.Schedule),
-            NavDrawerItem("attendance", "Attendance", Icons.Default.CheckCircle, badgeText = "64%", badgeTone = StatusTone.DANGER),
-            NavDrawerItem("courses", "My Courses & Subjects", Icons.Default.Book),
-            NavDrawerItem("teachers", "Teacher Directory & Booking", Icons.Default.PersonSearch, badgeText = "Booking", badgeTone = StatusTone.SUCCESS),
-            NavDrawerItem("exams", "Exam Schedules", Icons.AutoMirrored.Filled.EventNote),
-            NavDrawerItem("reports", "Reports & Hall Ticket", Icons.AutoMirrored.Filled.Assignment),
-            NavDrawerItem("progress", "Progress Report", Icons.AutoMirrored.Filled.TrendingUp),
-            NavDrawerItem("result", "Final Result", Icons.Default.Grade)
+            NavDrawerItem("courses", "Courses & Syllabus", Icons.Default.Book),
+            NavDrawerItem("attendance", "Attendance Tracker", Icons.Default.CheckCircle),
+            NavDrawerItem("timetable", "Class Timetable", Icons.Default.Schedule),
+            NavDrawerItem("assignments", "Assignments & Submissions", Icons.Default.Assignment),
+            NavDrawerItem("exam_schedules", "Exam Schedule", Icons.AutoMirrored.Filled.EventNote),
+            NavDrawerItem("results", "Results & Grades", Icons.Default.Grade),
+            NavDrawerItem("reports", "Academic Reports", Icons.AutoMirrored.Filled.TrendingUp)
         )
     ),
     NavDrawerCategory(
-        categoryTitle = "CAMPUS LIFE & SERVICES",
+        categoryTitle = "CAMPUS",
         items = listOf(
-            NavDrawerItem("messages", "Messages", Icons.Default.Email, badgeText = "1 New", badgeTone = StatusTone.SUCCESS),
-            NavDrawerItem("community", "Social Community", Icons.Default.Groups, badgeText = "Peer", badgeTone = StatusTone.SUCCESS),
-            NavDrawerItem("campus_map", "Campus Map & Navigation", Icons.Default.Map),
-            NavDrawerItem("cafeteria", "Cafeteria & QR Menu", Icons.Default.Restaurant),
-            NavDrawerItem("holidays", "Holidays & Events", Icons.Default.CalendarMonth),
-            NavDrawerItem("services", "Service Requests", Icons.Default.Build),
-            NavDrawerItem("leave", "Apply Leave", Icons.Default.FlightTakeoff),
-            NavDrawerItem("gallery", "Component Gallery", Icons.Default.Collections)
+            NavDrawerItem("teachers", "Faculty Directory", Icons.Default.PersonSearch),
+            NavDrawerItem("campus_map", "Campus Map & Indoor Nav", Icons.Default.Map),
+            NavDrawerItem("appointments", "Faculty Appointments", Icons.Default.CalendarMonth),
+            NavDrawerItem("lost_found", "Lost & Found Portal", Icons.Default.FindInPage)
         )
     ),
     NavDrawerCategory(
-        categoryTitle = "ADMINISTRATION",
+        categoryTitle = "COMMUNICATION",
         items = listOf(
-            NavDrawerItem("institution", "My Institution", Icons.Default.AccountBalance),
-            NavDrawerItem("enrollment", "Enrollment (> Pre enlistment)", Icons.Default.HowToReg),
-            NavDrawerItem("clearance", "Clearance", Icons.Default.Verified),
-            NavDrawerItem("announcement", "Announcements", Icons.Default.Campaign),
-            NavDrawerItem("room_partner", "Room Partner Selection", Icons.Default.MeetingRoom)
+            NavDrawerItem("announcements", "Announcements", Icons.Default.Campaign),
+            NavDrawerItem("messages", "Messages", Icons.Default.Email),
+            NavDrawerItem("community", "Community & Mentorship", Icons.Default.Groups)
+        )
+    ),
+    NavDrawerCategory(
+        categoryTitle = "SERVICES",
+        items = listOf(
+            NavDrawerItem("holidays", "Holidays & Calendar", Icons.Default.DateRange),
+            NavDrawerItem("leave", "Leave Application", Icons.Default.FlightTakeoff),
+            NavDrawerItem("cafeteria", "Cafeteria & Dining", Icons.Default.Restaurant),
+            NavDrawerItem("feedback", "Institutional Feedback", Icons.Default.Feedback)
+        )
+    ),
+    NavDrawerCategory(
+        categoryTitle = "AI ASSISTANT",
+        items = listOf(
+            NavDrawerItem("ai_assistant", "Ask AI Campus Tutor", Icons.Default.AutoAwesome, badgeText = "Gemini", badgeTone = StatusTone.SUCCESS)
+        )
+    ),
+    NavDrawerCategory(
+        categoryTitle = "SETTINGS",
+        items = listOf(
+            NavDrawerItem("settings", "Settings & Appearance", Icons.Default.Settings)
         )
     )
 )
@@ -86,9 +104,25 @@ fun SideNavDrawerContent(
     activeItemId: String,
     onItemClick: (String) -> Unit,
     onLogoutClick: () -> Unit,
+    displayName: String? = null,
+    rollNumber: String? = null,
+    email: String? = null,
     modifier: Modifier = Modifier
 ) {
     var searchQuery by remember { mutableStateOf("") }
+
+    val resolvedName = remember(displayName, email) {
+        displayName?.ifBlank { null }
+            ?: email?.substringBefore("@")
+            ?: "Bennett Student"
+    }
+
+    val resolvedSubtext = remember(rollNumber, email) {
+        listOfNotNull(
+            rollNumber?.ifBlank { null },
+            email?.ifBlank { null }
+        ).joinToString(" • ").ifBlank { "Bennett University" }
+    }
 
     Column(
         modifier = modifier
@@ -96,7 +130,7 @@ fun SideNavDrawerContent(
             .background(NavySidebar)
             .padding(18.dp)
     ) {
-        // Logo Card Header
+        // Bennett University Student Header Card (NO ROLE SWITCHING)
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = NavySidebarActive,
@@ -104,37 +138,54 @@ fun SideNavDrawerContent(
                 .fillMaxWidth()
                 .padding(bottom = 14.dp)
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color.White,
-                    modifier = Modifier.size(40.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_app_logo),
-                            contentDescription = "Logo",
-                            modifier = Modifier.size(32.dp)
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color.White,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_app_logo),
+                                contentDescription = "Logo",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+                    Column {
+                        Text(
+                            text = resolvedName,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HeadingNavy
+                        )
+                        Text(
+                            text = resolvedSubtext,
+                            fontSize = 11.sp,
+                            color = MutedText
                         )
                     }
                 }
-                Column {
+
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = PrimaryIndigo.copy(alpha = 0.15f)
+                ) {
                     Text(
-                        text = "Project-X Portal",
-                        fontSize = 17.sp,
+                        text = "Bennett University • Student Portal",
+                        fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        color = HeadingNavy
-                    )
-                    Text(
-                        text = "Bennett University",
-                        fontSize = 12.sp,
-                        color = MutedText
+                        color = PrimaryIndigo,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }

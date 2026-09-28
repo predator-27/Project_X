@@ -32,6 +32,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,11 +61,18 @@ import com.example.projectx.theme.CampusTokens
 @Composable
 fun MapScreen(
     onMenuClick: () -> Unit,
+    targetSeatId: String? = null,
     modifier: Modifier = Modifier,
     vm: MapViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
     val c = CampusTokens.colors
+
+    LaunchedEffect(targetSeatId, state.map) {
+        if (!targetSeatId.isNullOrBlank() && state.map != null) {
+            vm.select(targetSeatId)
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         // Canvas (full-bleed, behind everything else)

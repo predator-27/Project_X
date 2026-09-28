@@ -10,58 +10,50 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectx.model.Appointment
 import com.example.projectx.model.AppointmentStatus
-import com.example.projectx.model.Institution
 import com.example.projectx.model.Teacher
 import com.example.projectx.model.TeacherStatus
-
-import androidx.compose.ui.platform.LocalContext
+import com.example.projectx.ui.auth.AuthViewModel
+import com.example.projectx.util.Resource
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminTeacherScreen(
-    viewModel: TeacherManagementViewModel,
+    facultyViewModel: FacultyViewModel = viewModel(),
+    appointmentViewModel: AppointmentViewModel = viewModel(),
+    authViewModel: AuthViewModel? = null,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val activeTeacher by viewModel.activeTeacher.collectAsState()
-    val appointments by viewModel.appointments.collectAsState()
+    val currentFacultyUid = remember { FirebaseAuth.getInstance().currentUser?.uid ?: "" }
 
-    var name by remember(activeTeacher) { mutableStateOf(activeTeacher?.name ?: "") }
-    var title by remember(activeTeacher) { mutableStateOf(activeTeacher?.title ?: "") }
-    var department by remember(activeTeacher) { mutableStateOf(activeTeacher?.department ?: "") }
-    var email by remember(activeTeacher) { mutableStateOf(activeTeacher?.email ?: "") }
-    var editableDesk by remember(activeTeacher) { mutableStateOf(activeTeacher?.deskNumber ?: "") }
-    var editableTimings by remember(activeTeacher) { mutableStateOf(activeTeacher?.timings ?: "") }
-
-    val institutions = remember { Institution.DEFAULT_LIST }
-    var selectedInstitution by remember(activeTeacher) {
-        mutableStateOf(institutions.find { it.name == activeTeacher?.institution } ?: institutions.first())
-    }
+    val activeFacultyResource by facultyViewModel.activeFacultyProfile.collectAsState()
+    val facultyAppointmentsResource by appointmentViewModel.facultyAppointmentsState.collectAsState()
 
     var showSavedSnackbar by remember { mutableStateOf(false) }
 
-    val teacherAppointments = remember(appointments, activeTeacher) {
-        appointments.filter { it.teacherId == activeTeacher?.id }
+    LaunchedEffect(currentFacultyUid) {
+        if (currentFacultyUid.isNotBlank()) {
+            facultyViewModel.loadActiveFacultyProfile(currentFacultyUid)
+            appointmentViewModel.loadFacultyAppointments(currentFacultyUid)
+        }
     }
 
     Scaffold(
@@ -70,7 +62,11 @@ fun AdminTeacherScreen(
             TopAppBar(
                 title = { Text("👨‍🏫 Teacher Admin Dashboard", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { viewModel.logout(context) }) {
+                    IconButton(onClick = {
+                        if (authViewModel != null) {
+                            authViewModel.signOut()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                             contentDescription = "Log Out",
@@ -93,7 +89,7 @@ fun AdminTeacherScreen(
                     },
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text("Teacher profile & institution details updated!")
+                    Text("Faculty settings updated in Firestore!")
                 }
             }
         }
@@ -102,274 +98,123 @@ fun AdminTeacherScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Header
             item {
-                Text(
-                    text = "Welcome, $name",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "Customize your teacher profile, institution, desk location, and office hours",
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                when (val teacherResource = activeFacultyResource) {
+                    is Resource.Success -> {
+                        val teacher = teacherResource.data
+                        Text(
+                            text = "Welcome, ${teacher?.name ?: "Faculty Member"}",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "${teacher?.title ?: ""} • ${teacher?.department ?: ""}",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    else -> {
+                        Text(
+                            text = "Faculty Desk Portal",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
 
             // Status Control Card
-            activeTeacher?.let { teacher ->
-                item {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(14.dp)
+            item {
+                when (val teacherResource = activeFacultyResource) {
+                    is Resource.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Real-time Presence Status",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                StatusBadge(status = teacher.status)
-                            }
-
-                            HorizontalDivider()
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                TeacherStatus.entries.forEach { status ->
-                                    val isSelected = teacher.status == status
-                                    val animatedBg by animateColorAsState(
-                                        targetValue = if (isSelected) getStatusColor(status) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                        label = "bgAnimation"
-                                    )
-
-                                    Button(
-                                        onClick = { viewModel.updateStatus(teacher.id, status) },
-                                        modifier = Modifier.weight(1f),
-                                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 10.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = animatedBg,
-                                            contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
-                                        ),
-                                        shape = RoundedCornerShape(10.dp)
-                                    ) {
-                                        Text(
-                                            text = status.label.split(" ").first(),
-                                            fontSize = 11.sp,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                                        )
-                                    }
-                                }
-                            }
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         }
                     }
-                }
-
-                // Teacher Profile & Institution Customization Card
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                text = "Teacher Profile & Institution Settings",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            // Name Input
-                            OutlinedTextField(
-                                value = name,
-                                onValueChange = { name = it },
-                                label = { Text("Full Name") },
-                                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            // Title & Department Row
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                OutlinedTextField(
-                                    value = title,
-                                    onValueChange = { title = it },
-                                    label = { Text("Title / Designation") },
-                                    leadingIcon = { Icon(Icons.Default.Work, contentDescription = null) },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.weight(1f)
-                                )
-
-                                OutlinedTextField(
-                                    value = department,
-                                    onValueChange = { department = it },
-                                    label = { Text("Department") },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-
-                            // Institution Dropdown
-                            var expandedInst by remember { mutableStateOf(false) }
-
-                            ExposedDropdownMenuBox(
-                                expanded = expandedInst,
-                                onExpandedChange = { expandedInst = !expandedInst }
-                            ) {
-                                OutlinedTextField(
-                                    value = "${selectedInstitution.name} (@${selectedInstitution.domain})",
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    label = { Text("College / Institution") },
-                                    leadingIcon = { Icon(Icons.Default.Business, contentDescription = null) },
-                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInst) },
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier
-                                        .menuAnchor()
-                                        .fillMaxWidth()
-                                )
-                                ExposedDropdownMenu(
-                                    expanded = expandedInst,
-                                    onDismissRequest = { expandedInst = false }
-                                ) {
-                                    institutions.forEach { inst ->
-                                        DropdownMenuItem(
-                                            text = { Text("${inst.name} (@${inst.domain})") },
-                                            onClick = {
-                                                selectedInstitution = inst
-                                                // Auto-update email domain suffix if email contains @
-                                                if (email.contains("@")) {
-                                                    val prefix = email.substringBefore("@")
-                                                    email = "$prefix@${inst.domain}"
-                                                }
-                                                expandedInst = false
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-
-                            // Work Email with Validation Badge
-                            val isEmailValid = email.endsWith("@${selectedInstitution.domain}")
-                            OutlinedTextField(
-                                value = email,
-                                onValueChange = { email = it },
-                                label = { Text("Institutional Work Email") },
-                                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                                trailingIcon = {
-                                    if (isEmailValid) {
-                                        Icon(Icons.Default.CheckCircle, contentDescription = "Valid Domain", tint = Color(0xFF2E7D32))
-                                    }
+                    is Resource.Success -> {
+                        val teacher = teacherResource.data
+                        if (teacher != null) {
+                            FacultyPresenceCard(
+                                teacher = teacher,
+                                onStatusChange = { newStatus ->
+                                    facultyViewModel.updateOwnStatus(currentFacultyUid, newStatus)
                                 },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            if (!isEmailValid) {
-                                Text(
-                                    text = "💡 Email should match institutional domain: @${selectedInstitution.domain}",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            } else {
-                                Text(
-                                    text = "✅ Valid Institutional Domain: @${selectedInstitution.domain}",
-                                    fontSize = 11.sp,
-                                    color = Color(0xFF2E7D32),
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-
-                            HorizontalDivider()
-
-                            // Desk & Timings
-                            OutlinedTextField(
-                                value = editableDesk,
-                                onValueChange = { editableDesk = it },
-                                label = { Text("Desk / Stall Location") },
-                                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
-                                placeholder = { Text("e.g. Desk #304, Block B") },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            OutlinedTextField(
-                                value = editableTimings,
-                                onValueChange = { editableTimings = it },
-                                label = { Text("Available Timings / Office Hours") },
-                                leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
-                                placeholder = { Text("e.g. Mon-Fri: 10:00 AM - 01:00 PM") },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            Button(
-                                onClick = {
-                                    viewModel.updateFullProfile(
-                                        teacherId = teacher.id,
-                                        name = name.ifBlank { teacher.name },
-                                        title = title.ifBlank { teacher.title },
-                                        department = department.ifBlank { teacher.department },
-                                        email = email.ifBlank { teacher.email },
-                                        deskNumber = editableDesk.ifBlank { teacher.deskNumber },
-                                        timings = editableTimings.ifBlank { teacher.timings },
-                                        institution = selectedInstitution.name,
-                                        institutionDomain = selectedInstitution.domain
-                                    )
+                                onTimingsSave = { newTimings ->
+                                    facultyViewModel.updateOwnTimings(currentFacultyUid, newTimings)
                                     showSavedSnackbar = true
                                 },
-                                modifier = Modifier.align(Alignment.End),
-                                shape = RoundedCornerShape(10.dp)
+                                onBioSave = { newBio ->
+                                    facultyViewModel.updateOwnBio(currentFacultyUid, newBio)
+                                    showSavedSnackbar = true
+                                }
+                            )
+                        } else {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
+                                shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Save Profile & Settings")
+                                Text(
+                                    text = "Faculty profile document missing in Firestore (/faculty_profiles/$currentFacultyUid). Please contact College Admin.",
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(14.dp)
+                                )
                             }
                         }
                     }
+                    is Resource.Error -> {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = teacherResource.message,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(14.dp)
+                            )
+                        }
+                    }
+                    else -> {}
                 }
+            }
 
-                // Student Appointments List
-                item {
-                    Text(
-                        text = "Student Appointment Requests (${teacherAppointments.size})",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+            // Student Appointments Section
+            val apptCount = (facultyAppointmentsResource as? Resource.Success)?.data?.size ?: 0
+            item {
+                Text(
+                    text = "Student Appointment Requests ($apptCount)",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            when (val apptResource = facultyAppointmentsResource) {
+                is Resource.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
                 }
-
-                if (teacherAppointments.isEmpty()) {
+                is Resource.Empty -> {
                     item {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -384,16 +229,62 @@ fun AdminTeacherScreen(
                                     .padding(24.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("No appointment requests yet.")
+                                Text(
+                                    text = "No appointment requests for your faculty account.",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 12.sp
+                                )
                             }
                         }
                     }
-                } else {
-                    items(teacherAppointments, key = { it.id }) { appointment ->
+                }
+                is Resource.Error -> {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = apptResource.message,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(14.dp)
+                            )
+                        }
+                    }
+                }
+                is Resource.Success -> {
+                    items(apptResource.data, key = { it.id }) { appointment ->
                         AppointmentRequestCard(
                             appointment = appointment,
-                            onUpdateStatus = { newStatus ->
-                                viewModel.updateAppointmentStatus(appointment.id, newStatus)
+                            onAccept = {
+                                appointmentViewModel.updateAppointmentStatus(
+                                    appointmentId = appointment.id,
+                                    newStatus = AppointmentStatus.CONFIRMED,
+                                    facultyUid = currentFacultyUid
+                                )
+                            },
+                            onReject = {
+                                appointmentViewModel.updateAppointmentStatus(
+                                    appointmentId = appointment.id,
+                                    newStatus = AppointmentStatus.REJECTED,
+                                    facultyUid = currentFacultyUid
+                                )
+                            },
+                            onComplete = {
+                                appointmentViewModel.updateAppointmentStatus(
+                                    appointmentId = appointment.id,
+                                    newStatus = AppointmentStatus.COMPLETED,
+                                    facultyUid = currentFacultyUid
+                                )
+                            },
+                            onCancel = {
+                                appointmentViewModel.updateAppointmentStatus(
+                                    appointmentId = appointment.id,
+                                    newStatus = AppointmentStatus.CANCELLED,
+                                    facultyUid = currentFacultyUid
+                                )
                             }
                         )
                     }
@@ -404,18 +295,136 @@ fun AdminTeacherScreen(
 }
 
 @Composable
+fun FacultyPresenceCard(
+    teacher: Teacher,
+    onStatusChange: (TeacherStatus) -> Unit,
+    onTimingsSave: (String) -> Unit,
+    onBioSave: (String) -> Unit
+) {
+    var editableTimings by remember(teacher.timings) { mutableStateOf(teacher.timings) }
+    var editableBio by remember(teacher.bio) { mutableStateOf(teacher.bio) }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Real-time Presence Status",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                StatusBadge(status = teacher.status)
+            }
+
+            HorizontalDivider()
+
+            // Status Toggles
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                TeacherStatus.entries.forEach { status ->
+                    val isSelected = teacher.status == status
+                    val animatedBg by animateColorAsState(
+                        targetValue = if (isSelected) getStatusColor(status) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        label = "bgAnimation"
+                    )
+
+                    Button(
+                        onClick = { onStatusChange(status) },
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = animatedBg,
+                            contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = status.label.split(" ").first(),
+                            fontSize = 11.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider()
+
+            // Desk Location (Read-Only for Faculty; Admin controlled)
+            OutlinedTextField(
+                value = teacher.deskNumber.ifBlank { "Unassigned Desk" },
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Desk Location (College Admin Managed)") },
+                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+                singleLine = true,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Timings Input
+            OutlinedTextField(
+                value = editableTimings,
+                onValueChange = { editableTimings = it },
+                label = { Text("Available Office Hours / Timings") },
+                leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
+                placeholder = { Text("e.g. Mon-Fri: 10:00 AM - 01:00 PM") },
+                trailingIcon = {
+                    IconButton(onClick = { onTimingsSave(editableTimings) }) {
+                        Icon(Icons.Default.Save, contentDescription = "Save Office Hours")
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Bio Input
+            OutlinedTextField(
+                value = editableBio,
+                onValueChange = { editableBio = it },
+                label = { Text("Faculty Bio / Discussion Focus") },
+                placeholder = { Text("Specializes in AI and Distributed Systems mentorship.") },
+                trailingIcon = {
+                    IconButton(onClick = { onBioSave(editableBio) }) {
+                        Icon(Icons.Default.Save, contentDescription = "Save Bio")
+                    }
+                },
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
 fun AppointmentRequestCard(
     appointment: Appointment,
-    onUpdateStatus: (AppointmentStatus) -> Unit
+    onAccept: () -> Unit,
+    onReject: () -> Unit,
+    onComplete: () -> Unit,
+    onCancel: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(14.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -426,11 +435,11 @@ fun AppointmentRequestCard(
                     Text(
                         text = appointment.studentName,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 14.sp
                     )
                     Text(
                         text = appointment.studentEmail,
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -446,43 +455,77 @@ fun AppointmentRequestCard(
             ) {
                 Text(
                     text = "📅 ${appointment.date} @ ${appointment.timeSlot}",
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Medium
                 )
             }
 
             Text(
                 text = "Purpose: ${appointment.purpose}",
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
+            // Actions for PENDING
             AnimatedVisibility(visible = appointment.status == AppointmentStatus.PENDING) {
                 Row(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 6.dp)
+                        .padding(top = 4.dp)
                 ) {
                     OutlinedButton(
-                        onClick = { onUpdateStatus(AppointmentStatus.CANCELLED) },
+                        onClick = onReject,
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
                         shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
-                        Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Decline")
+                        Text("Reject", fontSize = 11.sp)
                     }
 
                     Button(
-                        onClick = { onUpdateStatus(AppointmentStatus.CONFIRMED) },
+                        onClick = onAccept,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Accept")
+                        Text("Accept", fontSize = 11.sp)
+                    }
+                }
+            }
+
+            // Actions for CONFIRMED
+            AnimatedVisibility(visible = appointment.status == AppointmentStatus.CONFIRMED) {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onCancel,
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text("Cancel", fontSize = 11.sp)
+                    }
+
+                    Button(
+                        onClick = onComplete,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0)),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Mark Completed", fontSize = 11.sp)
                     }
                 }
             }
@@ -497,19 +540,19 @@ fun StatusBadge(status: TeacherStatus) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(8.dp)
+                    .size(7.dp)
                     .clip(CircleShape)
                     .background(getStatusColor(status))
             )
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = status.label,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = getStatusColor(status)
             )
@@ -522,20 +565,21 @@ fun AppointmentStatusBadge(status: AppointmentStatus) {
     val color = when (status) {
         AppointmentStatus.CONFIRMED -> Color(0xFF2E7D32)
         AppointmentStatus.PENDING -> Color(0xFFE65100)
+        AppointmentStatus.REJECTED -> Color(0xFFC62828)
         AppointmentStatus.COMPLETED -> Color(0xFF1565C0)
-        AppointmentStatus.CANCELLED -> Color(0xFFC62828)
+        AppointmentStatus.CANCELLED -> Color(0xFF616161)
     }
 
     Surface(
         color = color.copy(alpha = 0.15f),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(10.dp)
     ) {
         Text(
             text = status.label,
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             color = color,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
         )
     }
 }
