@@ -265,7 +265,7 @@ fun LoginScreen(
                         } else {
                             // REGISTER FORM
                             Text(
-                                text = "Self-Register Bennett Account",
+                                text = "Self-Register Account",
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -280,7 +280,7 @@ fun LoginScreen(
                             OutlinedTextField(
                                 value = email,
                                 onValueChange = { email = it },
-                                label = { Text("Bennett Student Email") },
+                                label = { Text("Institutional Email (@bennett.edu.in)") },
                                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                                 placeholder = { Text("student@bennett.edu.in") },
                                 singleLine = true,
@@ -322,7 +322,7 @@ fun LoginScreen(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
-                                        Text("Register Bennett Account", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                        Text("Register Account", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }

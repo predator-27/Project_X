@@ -96,15 +96,19 @@ fun HomeScreen(
                             Box(contentAlignment = Alignment.Center) {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_app_logo),
-                                    contentDescription = "Bennett Logo",
+                                    contentDescription = "Project X Logo",
                                     modifier = Modifier.size(32.dp)
                                 )
                             }
                         }
 
                         Column(modifier = Modifier.weight(1f)) {
+                            val schoolHeader = remember(sessionState) {
+                                ((sessionState as? AuthSessionState.Authenticated)?.publicProfile?.schoolName?.ifBlank { null } ?: "Bennett University").uppercase()
+                            }
+
                             Text(
-                                text = "BENNETT UNIVERSITY",
+                                text = schoolHeader,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = PrimaryIndigo,

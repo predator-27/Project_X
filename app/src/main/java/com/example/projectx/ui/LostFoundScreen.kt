@@ -120,7 +120,7 @@ fun LostFoundScreen(
                                 color = HeadingNavy
                             )
                             Text(
-                                text = "Bennett University Digital Repository",
+                                text = "Project X Digital Repository",
                                 fontSize = 11.sp,
                                 color = MutedText
                             )

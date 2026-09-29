@@ -209,7 +209,7 @@ fun StudentScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "No faculty profiles available in Bennett directory.",
+                                    text = "No faculty profiles available in campus directory.",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 13.sp
                                 )

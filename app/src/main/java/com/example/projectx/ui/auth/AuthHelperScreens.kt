@@ -207,7 +207,7 @@ fun CompleteProfileScreen(
                     )
 
                     Text(
-                        text = "Set up your student profile to complete Bennett University registration.",
+                        text = "Set up your student profile to complete Project X registration.",
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -356,7 +356,7 @@ fun AccountInactiveScreen(
                 )
 
                 Text(
-                    text = "The user account ($email) has been deactivated by Bennett University administration.\n\nIf you believe this is an error, please contact the IT helpdesk.",
+                    text = "The user account ($email) has been deactivated by campus administration.\n\nIf you believe this is an error, please contact the IT helpdesk.",
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -110,7 +110,7 @@ fun MessagesScreen(
                                     color = HeadingNavy
                                 )
                                 Text(
-                                    text = "Official Bennett University Communications",
+                                    text = "Official Campus & University Communications",
                                     fontSize = 11.sp,
                                     color = MutedText
                                 )

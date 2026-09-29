@@ -114,7 +114,7 @@ fun SideNavDrawerContent(
     val resolvedName = remember(displayName, email) {
         displayName?.ifBlank { null }
             ?: email?.substringBefore("@")
-            ?: "Bennett Student"
+            ?: "Project X Student"
     }
 
     val resolvedSubtext = remember(rollNumber, email) {
@@ -130,7 +130,7 @@ fun SideNavDrawerContent(
             .background(NavySidebar)
             .padding(18.dp)
     ) {
-        // Bennett University Student Header Card (NO ROLE SWITCHING)
+        // Project X Student Header Card (NO ROLE SWITCHING)
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = NavySidebarActive,
@@ -181,7 +181,7 @@ fun SideNavDrawerContent(
                     color = PrimaryIndigo.copy(alpha = 0.15f)
                 ) {
                     Text(
-                        text = "Bennett University • Student Portal",
+                        text = "Project X • Student Portal",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryIndigo,

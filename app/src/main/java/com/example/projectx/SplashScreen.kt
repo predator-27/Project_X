@@ -214,7 +214,7 @@ private fun LogoPose() {
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Teacher Desk Portal",
+                text = "Digital Campus Platform",
                 color = TaglineColor,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,

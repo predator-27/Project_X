@@ -72,7 +72,7 @@ fun CoursesScreen(
                             Box(contentAlignment = Alignment.Center) {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_app_logo),
-                                    contentDescription = "Bennett Logo",
+                                    contentDescription = "Project X Logo",
                                     modifier = Modifier.size(30.dp)
                                 )
                             }
