@@ -10,12 +10,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -26,6 +28,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,12 +50,15 @@ fun LoginScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
 
     val isEmailValid = remember(email) { AuthValidation.isValidEmail(email) }
     val isPasswordValid = remember(password) { AuthValidation.isValidPassword(password) }
+    val isPhoneValid = remember(phone) { AuthValidation.isValidPhoneNumber(phone) }
 
     val emailError = remember(email) { if (email.isNotBlank() && !isEmailValid) AuthValidation.getEmailError(email) else null }
     val passwordError = remember(password) { if (password.isNotBlank() && !isPasswordValid) AuthValidation.getPasswordError(password) else null }
+    val phoneError = remember(phone) { if (phone.isNotBlank() && !isPhoneValid) AuthValidation.getPhoneNumberError(phone) else null }
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -432,6 +438,20 @@ fun LoginScreen(
                                 )
 
                                 OutlinedTextField(
+                                    value = phone,
+                                    onValueChange = { phone = it },
+                                    label = { Text("Mobile Phone Number") },
+                                    leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
+                                    placeholder = { Text("+91 98765 43210") },
+                                    singleLine = true,
+                                    isError = phoneError != null,
+                                    supportingText = phoneError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                OutlinedTextField(
                                     value = password,
                                     onValueChange = { password = it },
                                     label = { Text("Create Password") },
@@ -470,9 +490,9 @@ fun LoginScreen(
 
                                 Button(
                                     onClick = {
-                                        authViewModel.register(email, password)
+                                        authViewModel.register(email, password, phone)
                                     },
-                                    enabled = isEmailValid && isPasswordValid && !isLoading,
+                                    enabled = isEmailValid && isPhoneValid && isPasswordValid && !isLoading,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(48.dp),

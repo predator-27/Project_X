@@ -62,4 +62,27 @@ object AuthValidation {
         }
         return null
     }
+
+    /**
+     * Validates phone number (must be at least 10 digits).
+     */
+    fun isValidPhoneNumber(phone: String): Boolean {
+        val digits = phone.filter { it.isDigit() }
+        return digits.length >= 10
+    }
+
+    /**
+     * Returns a human-readable error message if phone validation fails, or null if valid.
+     */
+    fun getPhoneNumberError(phone: String): String? {
+        val trimmed = phone.trim()
+        if (trimmed.isBlank()) {
+            return "Phone number is required."
+        }
+        val digits = trimmed.filter { it.isDigit() }
+        if (digits.length < 10) {
+            return "Phone number must be at least 10 digits."
+        }
+        return null
+    }
 }

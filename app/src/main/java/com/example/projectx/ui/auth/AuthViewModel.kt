@@ -49,11 +49,11 @@ class AuthViewModel(
         }
     }
 
-    fun register(email: String, password: String) {
+    fun register(email: String, password: String, phoneNumber: String? = null) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
-            val state = authRepository.register(email, password)
+            val state = authRepository.register(email, password, phoneNumber)
             if (state is AuthSessionState.Error) {
                 _errorMessage.value = state.message
             }

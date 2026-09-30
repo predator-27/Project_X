@@ -67,11 +67,15 @@ class AuthRepository(
         state
     }
 
+    private var cachedPhoneNumber: String? = null
+
     suspend fun register(
         email: String,
-        password: String
+        password: String,
+        phoneNumber: String? = null
     ): AuthSessionState = withContext(Dispatchers.IO) {
         _sessionState.value = AuthSessionState.Loading
+        cachedPhoneNumber = phoneNumber?.trim()
 
         val authResult = firebaseAuthRepo.registerWithEmailAndPassword(email, password)
         val firebaseUser = authResult.getOrElse { error ->
@@ -119,6 +123,7 @@ class AuthRepository(
         val privateUser = User(
             uid = firebaseUser.uid,
             email = firebaseUser.email ?: "",
+            phoneNumber = cachedPhoneNumber,
             rollNumber = academicProfile?.rollNumber,
             role = UserRole.STUDENT,
             isActive = true
