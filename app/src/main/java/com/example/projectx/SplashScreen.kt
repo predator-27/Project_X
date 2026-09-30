@@ -1,5 +1,6 @@
-package com.projectx.app
+package com.projectx.app.ui
 
+import com.projectx.app.R
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
