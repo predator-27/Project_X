@@ -63,6 +63,7 @@ class UpdateManager private constructor() {
     suspend fun checkForUpdates(context: Context): UpdateInfo? = withContext(Dispatchers.IO) {
         _isChecking.value = true
         _downloadError.value = null
+        cleanupOldApkFiles(context)
         val installedVersion = getInstalledVersion(context)
         try {
             val githubApiUrl = "https://api.github.com/repos/predator-27/Project_X/releases/latest"
@@ -178,6 +179,18 @@ class UpdateManager private constructor() {
             e.printStackTrace()
             _isDownloading.value = false
             _downloadError.value = "Failed to download update: ${e.message}"
+        }
+    }
+
+    fun cleanupOldApkFiles(context: Context) {
+        try {
+            val dir = context.externalCacheDir ?: context.cacheDir
+            val apkFile = File(dir, "update_app.apk")
+            if (apkFile.exists()) {
+                apkFile.delete()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
