@@ -1,7 +1,7 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.UniversityAnnouncement
-import com.example.projectx.model.lms.AnnouncementPriority
+import com.projectx.app.model.UniversityAnnouncement
+import com.projectx.app.model.lms.AnnouncementPriority
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue

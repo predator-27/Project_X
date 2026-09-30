@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,9 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.components.StatusPill
-import com.example.projectx.components.StatusTone
-import com.example.projectx.theme.*
+import com.projectx.app.components.StatusPill
+import com.projectx.app.components.StatusTone
+import com.projectx.app.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

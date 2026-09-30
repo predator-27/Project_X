@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -19,11 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.components.*
-import com.example.projectx.model.TimetableSlot
-import com.example.projectx.theme.*
-import com.example.projectx.ui.academics.AcademicViewModel
-import com.example.projectx.util.Resource
+import com.projectx.app.components.*
+import com.projectx.app.model.TimetableSlot
+import com.projectx.app.theme.*
+import com.projectx.app.ui.academics.AcademicViewModel
+import com.projectx.app.util.Resource
 
 @Composable
 fun TimetableScreen(

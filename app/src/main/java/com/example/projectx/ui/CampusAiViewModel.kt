@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel

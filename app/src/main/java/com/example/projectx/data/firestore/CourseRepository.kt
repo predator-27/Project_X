@@ -1,6 +1,6 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.Course
+import com.projectx.app.model.Course
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await

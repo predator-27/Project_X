@@ -1,4 +1,4 @@
-package com.example.projectx.theme
+package com.projectx.app.theme
 
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +14,12 @@ enum class CampusThemePreset(
     val fieldLabelColor: Color
 ) {
     FROSTED_MIDNIGHT(
-        themeName = "Frosted Midnight",
-        primaryColor    = Color(0xFF60A5FA),   // cornflower
-        pageBackground  = Color(0xFF0B1220),   // deep splash navy
-        surfaceColor    = Color(0xFF131B30),   // 1st glass tier
-        sidebarColor    = Color(0xFF060B18),   // darkest anchor
-        fieldLabelColor = Color(0xFFE0B872)    // warm gold on navy
+        themeName = "Pixel Glass Green",
+        primaryColor    = Color(0xFFA8B840),   // mosaic green from LO.png
+        pageBackground  = Color(0xFF0A100A),   // near-black, olive undertone
+        surfaceColor    = Color(0xFF101812),   // 1st glass tier
+        sidebarColor    = Color(0xFF050805),   // darkest anchor
+        fieldLabelColor = Color(0xFFC8A840)    // warm gold pops on olive
     ),
     AURA_INDIGO(
         themeName = "Aura Indigo",

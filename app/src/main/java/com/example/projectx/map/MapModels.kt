@@ -1,4 +1,4 @@
-package com.example.projectx.map
+package com.projectx.app.map
 
 /**
  * Kotlin mirrors of the three map JSON files shipped in `assets/maps/`.

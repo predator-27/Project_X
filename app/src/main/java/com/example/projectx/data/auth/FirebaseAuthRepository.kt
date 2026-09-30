@@ -1,4 +1,4 @@
-package com.example.projectx.data.auth
+package com.projectx.app.data.auth
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+
+import com.projectx.app.util.AuthValidation
 
 class FirebaseAuthRepository(
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -34,10 +36,17 @@ class FirebaseAuthRepository(
         email: String,
         password: String
     ): Result<FirebaseUser> = withContext(Dispatchers.IO) {
-        val trimmedEmail = email.trim()
-        if (trimmedEmail.isBlank() || password.isBlank()) {
-            return@withContext Result.failure(IllegalArgumentException("Email and password cannot be empty."))
+        val emailError = AuthValidation.getEmailError(email)
+        if (emailError != null) {
+            return@withContext Result.failure(IllegalArgumentException(emailError))
         }
+
+        val passwordError = AuthValidation.getPasswordError(password)
+        if (passwordError != null) {
+            return@withContext Result.failure(IllegalArgumentException(passwordError))
+        }
+
+        val trimmedEmail = email.trim().lowercase()
 
         try {
             val authResult = firebaseAuth.signInWithEmailAndPassword(trimmedEmail, password).await()
@@ -59,13 +68,17 @@ class FirebaseAuthRepository(
         email: String,
         password: String
     ): Result<FirebaseUser> = withContext(Dispatchers.IO) {
+        val emailError = AuthValidation.getEmailError(email)
+        if (emailError != null) {
+            return@withContext Result.failure(IllegalArgumentException(emailError))
+        }
+
+        val passwordError = AuthValidation.getPasswordError(password)
+        if (passwordError != null) {
+            return@withContext Result.failure(IllegalArgumentException(passwordError))
+        }
+
         val trimmedEmail = email.trim().lowercase()
-        if (!trimmedEmail.endsWith("@bennett.edu.in")) {
-            return@withContext Result.failure(IllegalArgumentException("Self-registration requires a valid @bennett.edu.in institutional email address."))
-        }
-        if (password.length < 8) {
-            return@withContext Result.failure(IllegalArgumentException("Password must be at least 8 characters long."))
-        }
 
         try {
             val authResult = firebaseAuth.createUserWithEmailAndPassword(trimmedEmail, password).await()
@@ -78,7 +91,7 @@ class FirebaseAuthRepository(
         } catch (e: FirebaseAuthUserCollisionException) {
             Result.failure(Exception("An account with this Bennett email address already exists."))
         } catch (e: FirebaseAuthWeakPasswordException) {
-            Result.failure(Exception("Password is too weak. Please use at least 8 characters."))
+            Result.failure(Exception("Password does not meet security requirements: Must contain at least 8 characters, 1 capital letter, 1 number, and 1 special character."))
         } catch (e: Exception) {
             val errorMsg = e.localizedMessage ?: "Registration failed. Please check your network connection."
             Result.failure(Exception(errorMsg))

@@ -1,4 +1,4 @@
-package com.example.projectx.components
+package com.projectx.app.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.projectx.theme.CampusTokens
+import com.projectx.app.theme.CampusTokens
 
 /**
  * The definitive glass card for Frosted Midnight.

@@ -1,10 +1,10 @@
-package com.example.projectx.ui.lms
+package com.projectx.app.ui.lms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.firestore.AssignmentRepository
-import com.example.projectx.model.lms.Assignment
-import com.example.projectx.util.Resource
+import com.projectx.app.data.firestore.AssignmentRepository
+import com.projectx.app.model.lms.Assignment
+import com.projectx.app.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

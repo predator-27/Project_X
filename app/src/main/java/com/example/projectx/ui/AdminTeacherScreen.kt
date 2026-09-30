@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -26,12 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.projectx.model.Appointment
-import com.example.projectx.model.AppointmentStatus
-import com.example.projectx.model.Teacher
-import com.example.projectx.model.TeacherStatus
-import com.example.projectx.ui.auth.AuthViewModel
-import com.example.projectx.util.Resource
+import com.projectx.app.model.Appointment
+import com.projectx.app.model.AppointmentStatus
+import com.projectx.app.model.Teacher
+import com.projectx.app.model.TeacherStatus
+import com.projectx.app.ui.auth.AuthViewModel
+import com.projectx.app.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)

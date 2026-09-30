@@ -1,4 +1,4 @@
-package com.example.projectx.model
+package com.projectx.app.model
 
 enum class AppointmentStatus(val label: String) {
     PENDING("Pending"),

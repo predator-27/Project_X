@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.projectx"
+    namespace = "com.projectx.app"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.projectx"
+        applicationId = "com.projectx.app"
         minSdk = 30
         targetSdk = 37
         versionCode = 6
@@ -42,7 +42,7 @@ android {
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")

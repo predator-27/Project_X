@@ -1,4 +1,4 @@
-package com.example.projectx.data.storage
+package com.projectx.app.data.storage
 
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata

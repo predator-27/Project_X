@@ -1,9 +1,9 @@
-package com.example.projectx.data
+package com.projectx.app.data
 
-import com.example.projectx.model.Appointment
-import com.example.projectx.model.AppointmentStatus
-import com.example.projectx.model.Teacher
-import com.example.projectx.model.TeacherStatus
+import com.projectx.app.model.Appointment
+import com.projectx.app.model.AppointmentStatus
+import com.projectx.app.model.Teacher
+import com.projectx.app.model.TeacherStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

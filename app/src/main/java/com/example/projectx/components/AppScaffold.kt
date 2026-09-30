@@ -1,4 +1,4 @@
-package com.example.projectx.components
+package com.projectx.app.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.theme.*
+import com.projectx.app.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

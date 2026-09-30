@@ -1,6 +1,6 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.PublicProfile
+import com.projectx.app.model.PublicProfile
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.Dispatchers

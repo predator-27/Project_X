@@ -1,9 +1,9 @@
-package com.example.projectx.ui.auth
+package com.projectx.app.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.auth.AuthRepository
-import com.example.projectx.model.AcademicProfile
+import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.model.AcademicProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

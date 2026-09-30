@@ -1,4 +1,4 @@
-package com.example.projectx.ui.auth
+package com.projectx.app.ui.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,10 +25,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.R
-import com.example.projectx.model.AcademicProfile
-import com.example.projectx.model.UserRole
-import com.example.projectx.theme.CampusTokens
+import com.projectx.app.R
+import com.projectx.app.model.AcademicProfile
+import com.projectx.app.model.UserRole
+import com.projectx.app.theme.CampusTokens
 
 @Composable
 fun AuthLoadingScreen(

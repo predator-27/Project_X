@@ -1,8 +1,8 @@
-package com.example.projectx.ui.auth
+package com.projectx.app.ui.auth
 
-import com.example.projectx.model.PublicProfile
-import com.example.projectx.model.User
-import com.example.projectx.model.UserRole
+import com.projectx.app.model.PublicProfile
+import com.projectx.app.model.User
+import com.projectx.app.model.UserRole
 
 sealed class AuthSessionState {
     object Unauthenticated : AuthSessionState()

@@ -1,14 +1,14 @@
-package com.example.projectx.ui.lms
+package com.projectx.app.ui.lms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.firestore.AssignmentRepository
-import com.example.projectx.data.firestore.CourseAnnouncementRepository
-import com.example.projectx.data.firestore.CourseMaterialRepository
-import com.example.projectx.model.lms.Assignment
-import com.example.projectx.model.lms.CourseAnnouncement
-import com.example.projectx.model.lms.CourseMaterial
-import com.example.projectx.util.Resource
+import com.projectx.app.data.firestore.AssignmentRepository
+import com.projectx.app.data.firestore.CourseAnnouncementRepository
+import com.projectx.app.data.firestore.CourseMaterialRepository
+import com.projectx.app.model.lms.Assignment
+import com.projectx.app.model.lms.CourseAnnouncement
+import com.projectx.app.model.lms.CourseMaterial
+import com.projectx.app.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,11 +15,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.components.*
-import com.example.projectx.model.AttendanceSubject
-import com.example.projectx.theme.*
-import com.example.projectx.ui.academics.AcademicViewModel
-import com.example.projectx.util.Resource
+import com.projectx.app.components.*
+import com.projectx.app.model.AttendanceSubject
+import com.projectx.app.theme.*
+import com.projectx.app.ui.academics.AcademicViewModel
+import com.projectx.app.util.Resource
 
 @Composable
 fun AttendanceScreen(

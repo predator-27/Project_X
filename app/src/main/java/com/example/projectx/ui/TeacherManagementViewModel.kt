@@ -1,15 +1,15 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.TeacherRepository
-import com.example.projectx.model.Appointment
-import com.example.projectx.model.AppointmentStatus
-import com.example.projectx.model.Teacher
-import com.example.projectx.model.TeacherStatus
-import com.example.projectx.update.UpdateInfo
-import com.example.projectx.update.UpdateManager
+import com.projectx.app.data.TeacherRepository
+import com.projectx.app.model.Appointment
+import com.projectx.app.model.AppointmentStatus
+import com.projectx.app.model.Teacher
+import com.projectx.app.model.TeacherStatus
+import com.projectx.app.update.UpdateInfo
+import com.projectx.app.update.UpdateManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

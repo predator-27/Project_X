@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -28,14 +28,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.projectx.components.*
-import com.example.projectx.model.LostItem
-import com.example.projectx.model.LostItemStatus
-import com.example.projectx.model.UserRole
-import com.example.projectx.theme.*
-import com.example.projectx.ui.auth.AuthSessionState
-import com.example.projectx.ui.auth.AuthViewModel
-import com.example.projectx.util.Resource
+import com.projectx.app.components.*
+import com.projectx.app.model.LostItem
+import com.projectx.app.model.LostItemStatus
+import com.projectx.app.model.UserRole
+import com.projectx.app.theme.*
+import com.projectx.app.ui.auth.AuthSessionState
+import com.projectx.app.ui.auth.AuthViewModel
+import com.projectx.app.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date

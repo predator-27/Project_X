@@ -1,7 +1,7 @@
-package com.example.projectx.model
+package com.projectx.app.model
 
 import androidx.compose.runtime.Immutable
-import com.example.projectx.model.lms.AnnouncementPriority
+import com.projectx.app.model.lms.AnnouncementPriority
 
 @Immutable
 data class UniversityAnnouncement(

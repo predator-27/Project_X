@@ -1,6 +1,6 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.lms.CourseMaterial
+import com.projectx.app.model.lms.CourseMaterial
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers

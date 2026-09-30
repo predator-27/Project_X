@@ -1,7 +1,7 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.Teacher
-import com.example.projectx.model.TeacherStatus
+import com.projectx.app.model.Teacher
+import com.projectx.app.model.TeacherStatus
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers

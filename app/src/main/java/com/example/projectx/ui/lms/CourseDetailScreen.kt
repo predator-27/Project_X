@@ -1,4 +1,4 @@
-package com.example.projectx.ui.lms
+package com.projectx.app.ui.lms
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -21,13 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.projectx.components.*
-import com.example.projectx.model.lms.AnnouncementPriority
-import com.example.projectx.model.lms.Assignment
-import com.example.projectx.model.lms.CourseAnnouncement
-import com.example.projectx.model.lms.CourseMaterial
-import com.example.projectx.theme.*
-import com.example.projectx.util.Resource
+import com.projectx.app.components.*
+import com.projectx.app.model.lms.AnnouncementPriority
+import com.projectx.app.model.lms.Assignment
+import com.projectx.app.model.lms.CourseAnnouncement
+import com.projectx.app.model.lms.CourseMaterial
+import com.projectx.app.theme.*
+import com.projectx.app.util.Resource
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

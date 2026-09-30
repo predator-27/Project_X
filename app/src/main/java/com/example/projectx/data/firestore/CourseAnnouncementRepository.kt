@@ -1,7 +1,7 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.lms.AnnouncementPriority
-import com.example.projectx.model.lms.CourseAnnouncement
+import com.projectx.app.model.lms.AnnouncementPriority
+import com.projectx.app.model.lms.CourseAnnouncement
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers

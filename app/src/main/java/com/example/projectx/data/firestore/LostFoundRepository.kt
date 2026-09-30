@@ -1,7 +1,7 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.LostItem
-import com.example.projectx.model.LostItemStatus
+import com.projectx.app.model.LostItem
+import com.projectx.app.model.LostItemStatus
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore

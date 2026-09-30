@@ -1,4 +1,4 @@
-package com.example.projectx.model.lms
+package com.projectx.app.model.lms
 
 import androidx.compose.runtime.Immutable
 

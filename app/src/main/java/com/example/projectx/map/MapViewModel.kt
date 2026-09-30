@@ -1,4 +1,4 @@
-package com.example.projectx.map
+package com.projectx.app.map
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

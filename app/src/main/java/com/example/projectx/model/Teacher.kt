@@ -1,4 +1,4 @@
-package com.example.projectx.model
+package com.projectx.app.model
 
 enum class TeacherStatus(val label: String) {
     AT_DESK("At Desk"),

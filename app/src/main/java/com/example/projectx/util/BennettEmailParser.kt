@@ -1,4 +1,4 @@
-package com.example.projectx.util
+package com.projectx.app.util
 
 data class BennettEmailParseResult(
     val isBennettEmail: Boolean,

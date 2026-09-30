@@ -1,4 +1,4 @@
-package com.example.projectx.util
+package com.projectx.app.util
 
 sealed class Resource<out T> {
     object Loading : Resource<Nothing>()

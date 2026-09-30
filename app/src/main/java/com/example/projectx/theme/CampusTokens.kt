@@ -1,4 +1,4 @@
-package com.example.projectx.theme
+package com.projectx.app.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable

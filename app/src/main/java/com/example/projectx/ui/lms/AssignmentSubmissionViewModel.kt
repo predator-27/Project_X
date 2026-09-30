@@ -1,17 +1,17 @@
-package com.example.projectx.ui.lms
+package com.projectx.app.ui.lms
 
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.firestore.AssignmentSubmissionRepository
-import com.example.projectx.data.firestore.PublicProfileRepository
-import com.example.projectx.data.firestore.UserRepository
-import com.example.projectx.data.storage.AssignmentSubmissionStorageRepository
-import com.example.projectx.model.lms.AssignmentSubmission
-import com.example.projectx.model.lms.SubmissionStatus
-import com.example.projectx.util.Resource
+import com.projectx.app.data.firestore.AssignmentSubmissionRepository
+import com.projectx.app.data.firestore.PublicProfileRepository
+import com.projectx.app.data.firestore.UserRepository
+import com.projectx.app.data.storage.AssignmentSubmissionStorageRepository
+import com.projectx.app.model.lms.AssignmentSubmission
+import com.projectx.app.model.lms.SubmissionStatus
+import com.projectx.app.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

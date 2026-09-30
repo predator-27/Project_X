@@ -1,4 +1,4 @@
-package com.example.projectx.components
+package com.projectx.app.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.theme.*
+import com.projectx.app.theme.*
 
 @Composable
 fun UnderlineTabRow(

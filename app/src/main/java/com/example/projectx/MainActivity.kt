@@ -1,4 +1,4 @@
-package com.example.projectx
+package com.projectx.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,18 +23,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.projectx.components.AmbientBackground
-import com.example.projectx.components.SideNavDrawerContent
-import com.example.projectx.map.MapScreen
-import com.example.projectx.model.UserRole
-import com.example.projectx.theme.CampusTheme
-import com.example.projectx.theme.CampusTokens
-import com.example.projectx.ui.*
-import com.example.projectx.ui.academics.AcademicViewModel
-import com.example.projectx.ui.academics.CoursesScreen
-import com.example.projectx.ui.auth.*
-import com.example.projectx.ui.lms.AssignmentDetailScreen
-import com.example.projectx.ui.lms.CourseDetailScreen
+import com.projectx.app.components.AmbientBackground
+import com.projectx.app.components.SideNavDrawerContent
+import com.projectx.app.map.MapScreen
+import com.projectx.app.model.UserRole
+import com.projectx.app.theme.CampusTheme
+import com.projectx.app.theme.CampusTokens
+import com.projectx.app.ui.*
+import com.projectx.app.ui.academics.AcademicViewModel
+import com.projectx.app.ui.academics.CoursesScreen
+import com.projectx.app.ui.auth.*
+import com.projectx.app.ui.lms.AssignmentDetailScreen
+import com.projectx.app.ui.lms.CourseDetailScreen
 import kotlinx.coroutines.launch
 
 enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {

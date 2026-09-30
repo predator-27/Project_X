@@ -1,4 +1,4 @@
-package com.example.projectx.map
+package com.projectx.app.map
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -44,8 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.projectx.components.FrostedSurface
-import com.example.projectx.theme.CampusTokens
+import com.projectx.app.components.FrostedSurface
+import com.projectx.app.theme.CampusTokens
 
 /**
  * Full-screen indoor map for Block N1.

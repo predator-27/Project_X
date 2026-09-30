@@ -1,9 +1,13 @@
-package com.example.projectx
+package com.projectx.app
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,39 +42,76 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 /**
- * Animated Project X Brand Splash Screen.
+ * Two-phase Project X splash:
  *
- * Displays the dark navy background with radial glow, Project X brand logo,
- * "Project X" title, and "Digital Campus Platform" tagline before advancing to the app shell.
+ *   Phase.Poster   ~1.2 s   full-bleed SP.png (deep-navy hero image)
+ *   Phase.LogoHold ~1.8 s   LO.png brand mark + "Project X" + tagline
+ *                           on the same navy, with a soft radial glow.
+ *
+ * The whole thing sits on `SplashBackground` (#0B1220), which is exactly
+ * the tone of both SP.png and the Frosted Midnight app background —
+ * so the cross-fade between phases is invisible and the hand-off to the
+ * app is seamless.
  */
 @Composable
 fun SplashScreen(
-    logoHoldMs: Long = 1_850L,
+    posterHoldMs: Long = 1_200L,
+    logoHoldMs: Long = 1_800L,
     onFinished: () -> Unit,
 ) {
+    var phase by remember { mutableStateOf(Phase.Poster) }
     var completed by remember { mutableStateOf(false) }
 
-    fun done() {
-        if (!completed) {
-            completed = true
-            onFinished()
+    fun toLogo() { if (phase == Phase.Poster) phase = Phase.LogoHold }
+    fun done() { if (!completed) { completed = true; onFinished() } }
+
+    // Poster → advance to logo hold
+    LaunchedEffect(Unit) {
+        delay(posterHoldMs)
+        toLogo()
+    }
+
+    // Logo hold → finish
+    LaunchedEffect(phase) {
+        if (phase == Phase.LogoHold) {
+            delay(logoHoldMs)
+            done()
         }
     }
 
-    LaunchedEffect(Unit) {
-        delay(logoHoldMs)
-        done()
-    }
-
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(SplashBackground),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize().background(SplashBackground),
+        contentAlignment = Alignment.Center,
     ) {
-        LogoPose()
+        // Phase 1 — SP.png hero
+        AnimatedVisibility(
+            visible = phase == Phase.Poster,
+            enter = fadeIn(tween(200)),
+            exit = fadeOut(tween(400)),
+        ) {
+            Image(
+                painter = painterResource(R.drawable.splash),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
+        }
+
+        // Phase 2 — LO.png brand pose
+        AnimatedVisibility(
+            visible = phase == Phase.LogoHold,
+            enter = fadeIn(tween(400)) + scaleIn(
+                initialScale = 0.90f,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+            ),
+            exit = fadeOut(tween(350)),
+        ) {
+            LogoPose()
+        }
     }
 }
+
+private enum class Phase { Poster, LogoHold }
 
 @Composable
 private fun LogoPose() {
@@ -77,10 +119,8 @@ private fun LogoPose() {
     var tagVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        delay(150)
-        brandVisible = true
-        delay(250)
-        tagVisible = true
+        delay(200); brandVisible = true
+        delay(280); tagVisible = true
     }
 
     val brandAlpha by animateFloatAsState(
@@ -95,15 +135,13 @@ private fun LogoPose() {
     )
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(SplashBackground),
+        modifier = Modifier.fillMaxSize().background(SplashBackground),
         contentAlignment = Alignment.Center,
     ) {
-        // Soft radial glow — matches Frosted Midnight palette
+        // Soft radial glow — Frosted Midnight ambient hue
         Canvas(modifier = Modifier.fillMaxSize()) {
             val cx = size.width / 2f
-            val cy = size.height * 0.48f
+            val cy = size.height * 0.46f
             drawRect(
                 brush = Brush.radialGradient(
                     colors = listOf(GlowPrimary, Color.Transparent),
@@ -117,25 +155,14 @@ private fun LogoPose() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
-            // Project X Logo
-            Box(
-                modifier = Modifier.size(160.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .background(HaloTint),
-                )
-                Image(
-                    painter = painterResource(R.drawable.ic_app_logo),
-                    contentDescription = "Project X",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape),
-                )
-            }
+            // Logo — native aspect ratio (source PNG drives shape).
+            // No halo, no square container — just the mark on the ambient bg.
+            Image(
+                painter = painterResource(R.drawable.ic_app_logo),
+                contentDescription = "Project X",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.height(190.dp),
+            )
             Spacer(Modifier.height(20.dp))
             Text(
                 text = "Project X",
@@ -159,9 +186,9 @@ private fun LogoPose() {
     }
 }
 
-// ── Palette (matches Frosted Midnight so splash → app is seamless) ──
-private val SplashBackground = Color(0xFF0B1220)          // deep navy
-private val GlowPrimary      = Color(0x3360A5FA)          // 20% cornflower for radial glow
-private val HaloTint         = Color(0x1AFFFFFF)          // subtle white halo behind logo
-private val BrandNameColor   = Color(0xFFF1F5F9)          // near-white heading
-private val TaglineColor     = Color(0xFF94A3B8)          // mutedText
+// ── Palette — Pixel Glass Green (matches app theme so splash → app is seamless) ──
+private val SplashBackground = Color(0xFF0A100A)   // near-black olive (= pageBackground)
+private val GlowPrimary      = Color(0x40A8B840)   // 25% mosaic green radial
+private val HaloTint         = Color(0x14FFFFFF)   // barely-there white halo
+private val BrandNameColor   = Color(0xFFE8F0D8)   // warm off-white, green cast
+private val TaglineColor     = Color(0xFF7A8870)   // muted olive

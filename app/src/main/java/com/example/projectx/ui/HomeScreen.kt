@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -21,17 +21,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.projectx.R
-import com.example.projectx.components.*
-import com.example.projectx.model.Appointment
-import com.example.projectx.model.TimetableSlot
-import com.example.projectx.model.UniversityAnnouncement
-import com.example.projectx.model.lms.AnnouncementPriority
-import com.example.projectx.theme.*
-import com.example.projectx.ui.academics.AcademicViewModel
-import com.example.projectx.ui.auth.AuthSessionState
-import com.example.projectx.ui.auth.AuthViewModel
-import com.example.projectx.util.Resource
+import com.projectx.app.R
+import com.projectx.app.components.*
+import com.projectx.app.model.Appointment
+import com.projectx.app.model.TimetableSlot
+import com.projectx.app.model.UniversityAnnouncement
+import com.projectx.app.model.lms.AnnouncementPriority
+import com.projectx.app.theme.*
+import com.projectx.app.ui.academics.AcademicViewModel
+import com.projectx.app.ui.auth.AuthSessionState
+import com.projectx.app.ui.auth.AuthViewModel
+import com.projectx.app.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date

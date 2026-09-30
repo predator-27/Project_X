@@ -1,4 +1,4 @@
-package com.example.projectx.components
+package com.projectx.app.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.example.projectx.theme.CampusTokens
+import com.projectx.app.theme.CampusTokens
 
 /**
  * The ambient layer painted BEHIND everything.

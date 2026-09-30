@@ -1,11 +1,11 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.firestore.AppointmentRepository
-import com.example.projectx.model.Appointment
-import com.example.projectx.model.AppointmentStatus
-import com.example.projectx.util.Resource
+import com.projectx.app.data.firestore.AppointmentRepository
+import com.projectx.app.model.Appointment
+import com.projectx.app.model.AppointmentStatus
+import com.projectx.app.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

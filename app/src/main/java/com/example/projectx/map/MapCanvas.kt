@@ -1,4 +1,4 @@
-package com.example.projectx.map
+package com.projectx.app.map
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -25,7 +25,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.example.projectx.theme.CampusTokens
+import com.projectx.app.theme.CampusTokens
 import kotlin.math.max
 import kotlin.math.min
 
@@ -136,7 +136,7 @@ fun MapCanvas(
 // ─── Drawing primitives ────────────────────────────────────
 
 private fun DrawScope.drawCorridors(
-    v: MapVector, c: com.example.projectx.theme.CampusColors,
+    v: MapVector, c: com.projectx.app.theme.CampusColors,
     mx: (Float) -> Float, my: (Float) -> Float, s: Float,
 ) {
     val corridorFill = if (c.isFrosted) c.surfaceElevated else c.infoBanner
@@ -154,7 +154,7 @@ private fun DrawScope.drawCorridors(
 }
 
 private fun DrawScope.drawAisles(
-    v: MapVector, c: com.example.projectx.theme.CampusColors,
+    v: MapVector, c: com.projectx.app.theme.CampusColors,
     mx: (Float) -> Float, my: (Float) -> Float, s: Float,
 ) {
     val stroke = c.divider
@@ -171,7 +171,7 @@ private fun DrawScope.drawAisles(
 
 private fun DrawScope.drawSeats(
     v: MapVector, byId: Map<String, Faculty>,
-    c: com.example.projectx.theme.CampusColors,
+    c: com.projectx.app.theme.CampusColors,
     mx: (Float) -> Float, my: (Float) -> Float, s: Float,
     measurer: TextMeasurer,
 ) {
@@ -216,7 +216,7 @@ private fun DrawScope.drawSeats(
 }
 
 private fun DrawScope.drawDoors(
-    v: MapVector, c: com.example.projectx.theme.CampusColors,
+    v: MapVector, c: com.projectx.app.theme.CampusColors,
     mx: (Float) -> Float, my: (Float) -> Float, s: Float,
 ) {
     val color = c.successGreen
@@ -230,7 +230,7 @@ private fun DrawScope.drawDoors(
 }
 
 private fun DrawScope.drawVectorLabels(
-    v: MapVector, c: com.example.projectx.theme.CampusColors,
+    v: MapVector, c: com.projectx.app.theme.CampusColors,
     mx: (Float) -> Float, my: (Float) -> Float, s: Float,
     measurer: TextMeasurer,
 ) {
@@ -249,7 +249,7 @@ private fun DrawScope.drawVectorLabels(
 }
 
 private fun DrawScope.drawSelectionRing(
-    seat: Seat, c: com.example.projectx.theme.CampusColors,
+    seat: Seat, c: com.projectx.app.theme.CampusColors,
     mx: (Float) -> Float, my: (Float) -> Float, s: Float,
 ) {
     val left = mx(seat.x) - 3f

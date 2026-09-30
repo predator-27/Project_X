@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically

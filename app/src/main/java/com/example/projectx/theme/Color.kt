@@ -1,4 +1,4 @@
-package com.example.projectx.theme
+package com.projectx.app.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -41,43 +41,47 @@ val BodyTextDark = Color(0xFFE5E7EB)
 val MutedTextDark = Color(0xFF9CA3AF)
 
 // ─────────────────────────────────────────────────────────────
-// Frosted Midnight — the definitive dark theme.
-// Matches the SP.png splash tone so cold-launch flows straight
-// into the app with no visual jump.
+// Pixel Glass Green — the definitive dark theme.
+// Blends the LO.png logo's mosaic-green + chi-rho black with a
+// frosted-glass surface treatment. Cold-launch flows navy → green
+// with no jump because the splash bg matches pageBackground exactly.
+//
+// The Frost* names are retained for backward compatibility — callers
+// don't need to change. Only the underlying palette has moved to green.
 // ─────────────────────────────────────────────────────────────
-val FrostBackground      = Color(0xFF0B1220)   // deep splash navy
-val FrostSurface         = Color(0xFF131B30)   // 1st glass tier
-val FrostSurfaceElevated = Color(0xFF1A2440)   // 2nd glass tier (nested)
-val FrostOutline         = Color(0xFF2A3550)
-val FrostDivider         = Color(0xFF1F2A44)
-val FrostSidebar         = Color(0xFF060B18)   // darkest — anchors the app
+val FrostBackground      = Color(0xFF0A100A)   // near-black, olive undertone
+val FrostSurface         = Color(0xFF101812)   // 1st glass tier
+val FrostSurfaceElevated = Color(0xFF182218)   // 2nd glass tier (nested)
+val FrostOutline         = Color(0xFF2A3620)   // green-tinged hairline
+val FrostDivider         = Color(0xFF1F2A18)
+val FrostSidebar         = Color(0xFF050805)   // darkest — anchors the app
 
-val FrostPrimary         = Color(0xFF60A5FA)   // cornflower — catches light
-val FrostOnPrimary       = Color(0xFF051021)
-val FrostPrimaryContainer   = Color(0xFF1E3A8A)
-val FrostOnPrimaryContainer = Color(0xFFDBEAFE)
+val FrostPrimary         = Color(0xFFA8B840)   // mosaic green from LO.png
+val FrostOnPrimary       = Color(0xFF0A100A)   // near-black text on green
+val FrostPrimaryContainer   = Color(0xFF2A3618)   // dark olive container
+val FrostOnPrimaryContainer = Color(0xFFE8F0D8)   // warm light text
 
-val FrostSecondary          = Color(0xFFC4B5FD)   // soft lavender partner
-val FrostSecondaryContainer = Color(0xFF4C1D95)
+val FrostSecondary          = Color(0xFF6B8348)   // deeper matcha partner
+val FrostSecondaryContainer = Color(0xFF1E2A10)
 
-val FrostHeading   = Color(0xFFF1F5F9)
-val FrostBody      = Color(0xFFE2E8F0)
-val FrostMuted     = Color(0xFF94A3B8)
-val FrostFieldLabel = Color(0xFFE0B872)          // warm gold pops on navy
-val FrostFieldRequired = Color(0xFFFB7185)
-val FrostFieldFill = Color(0xFF1A2440)
-val FrostInfoBanner = Color(0x2660A5FA)          // 15% primary tint
+val FrostHeading   = Color(0xFFE8F0D8)           // warm off-white, green cast
+val FrostBody      = Color(0xFFC8D4B8)
+val FrostMuted     = Color(0xFF7A8870)
+val FrostFieldLabel = Color(0xFFC8A840)          // warm gold — pops on olive
+val FrostFieldRequired = Color(0xFFE85C4B)
+val FrostFieldFill = Color(0xFF182218)
+val FrostInfoBanner = Color(0x26A8B840)          // 15% primary tint
 
-val FrostSuccess     = Color(0xFF34D399)
-val FrostSuccessBg   = Color(0xFF052E21)
-val FrostWarning     = Color(0xFFFBBF24)
-val FrostWarningBg   = Color(0xFF3B2A05)
-val FrostDanger      = Color(0xFFFB7185)
-val FrostDangerBg    = Color(0xFF431418)
+val FrostSuccess     = Color(0xFF7BAE45)         // matcha — same family
+val FrostSuccessBg   = Color(0xFF182210)
+val FrostWarning     = Color(0xFFE8A83D)
+val FrostWarningBg   = Color(0xFF382608)
+val FrostDanger      = Color(0xFFE85C4B)
+val FrostDangerBg    = Color(0xFF3A1810)
 
-// Frosted glass rendering constants
-val FrostHaze          = Color(0x0AFFFFFF)       // 4% white overlay
-val FrostSheenTop      = Color(0x1AFFFFFF)       // 10% white top-edge highlight
-val FrostBorderGlow    = Color(0x3360A5FA)       // 20% primary glow border
-val FrostAmbientPrimary   = Color(0x2460A5FA)    // 14% for radial glow
-val FrostAmbientSecondary = Color(0x17C4B5FD)    // 9%  for radial glow
+// Frosted glass rendering — pixel-inspired hard border, green glow
+val FrostHaze          = Color(0x0AFFFFFF)       // 4% white haze
+val FrostSheenTop      = Color(0x18FFFFFF)       // 9% white top-edge highlight
+val FrostBorderGlow    = Color(0x40A8B840)       // 25% primary — the "pixel outline"
+val FrostAmbientPrimary   = Color(0x26A8B840)    // 15% green radial glow
+val FrostAmbientSecondary = Color(0x18C8A840)    // 10% gold radial glow

@@ -1,4 +1,4 @@
-package com.example.projectx
+package com.projectx.app
 
 sealed interface UiState {
 

@@ -1,4 +1,4 @@
-package com.example.projectx.components
+package com.projectx.app.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,8 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.R
-import com.example.projectx.theme.*
+import com.projectx.app.R
+import com.projectx.app.theme.*
 
 data class NavDrawerCategory(
     val categoryTitle: String,

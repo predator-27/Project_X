@@ -1,7 +1,7 @@
-package com.example.projectx.data.firestore
+package com.projectx.app.data.firestore
 
-import com.example.projectx.model.lms.AssignmentSubmission
-import com.example.projectx.model.lms.SubmissionStatus
+import com.projectx.app.model.lms.AssignmentSubmission
+import com.projectx.app.model.lms.SubmissionStatus
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue

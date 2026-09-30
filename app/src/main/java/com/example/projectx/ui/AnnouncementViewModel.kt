@@ -1,11 +1,11 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.firestore.AnnouncementRepository
-import com.example.projectx.model.UniversityAnnouncement
-import com.example.projectx.model.lms.AnnouncementPriority
-import com.example.projectx.util.Resource
+import com.projectx.app.data.firestore.AnnouncementRepository
+import com.projectx.app.model.UniversityAnnouncement
+import com.projectx.app.model.lms.AnnouncementPriority
+import com.projectx.app.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

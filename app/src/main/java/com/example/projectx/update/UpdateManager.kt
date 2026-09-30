@@ -1,4 +1,4 @@
-package com.example.projectx.update
+package com.projectx.app.update
 
 import android.content.Context
 import android.content.Intent

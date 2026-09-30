@@ -1,4 +1,4 @@
-package com.example.projectx
+package com.projectx.app
 
 import android.content.res.Resources
 import android.graphics.BitmapFactory

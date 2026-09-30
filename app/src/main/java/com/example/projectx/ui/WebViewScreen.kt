@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import android.webkit.WebView
 import android.webkit.WebViewClient

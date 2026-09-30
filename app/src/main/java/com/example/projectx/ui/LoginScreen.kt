@@ -1,4 +1,4 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
@@ -21,7 +22,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,8 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.projectx.R
-import com.example.projectx.ui.auth.AuthViewModel
+import com.projectx.app.R
+import com.projectx.app.ui.auth.AuthViewModel
+import com.projectx.app.util.AuthValidation
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -42,10 +43,16 @@ fun LoginScreen(
     val isLoading by authViewModel.isLoading.collectAsState()
     val errorMessage by authViewModel.errorMessage.collectAsState()
 
-    var selectedTabIndex by remember { mutableStateOf(0) } // 0 = Sign In, 1 = Register
+    var selectedTabIndex by remember { mutableStateOf(0) } // 0 = Student Login, 1 = Faculty Login, 2 = Register Account
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val isEmailValid = remember(email) { AuthValidation.isValidEmail(email) }
+    val isPasswordValid = remember(password) { AuthValidation.isValidPassword(password) }
+
+    val emailError = remember(email) { if (email.isNotBlank() && !isEmailValid) AuthValidation.getEmailError(email) else null }
+    val passwordError = remember(password) { if (password.isNotBlank() && !isPasswordValid) AuthValidation.getPasswordError(password) else null }
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -83,19 +90,11 @@ fun LoginScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Surface(
-                            shape = CircleShape,
-                            color = Color.White,
-                            modifier = Modifier.size(64.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_app_logo),
-                                    contentDescription = "Logo",
-                                    modifier = Modifier.size(48.dp)
-                                )
-                            }
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_app_logo),
+                            contentDescription = "Logo",
+                            modifier = Modifier.height(72.dp),
+                        )
 
                         Text(
                             text = "Project-X Campus Portal",
@@ -105,7 +104,7 @@ fun LoginScreen(
                         )
 
                         Text(
-                            text = "One Platform. One University.",
+                            text = "Bennett University Academic Portal",
                             fontSize = 13.sp,
                             color = Color.White.copy(alpha = 0.9f)
                         )
@@ -115,7 +114,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Auth Action Segmented Switcher (Sign In vs Register)
+            // 3-Way Top Action Switcher (Student Login | Faculty Login | Register Account)
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
@@ -126,6 +125,7 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(4.dp)
                 ) {
+                    // Student Tab
                     Button(
                         onClick = {
                             selectedTabIndex = 0
@@ -136,12 +136,20 @@ fun LoginScreen(
                             containerColor = if (selectedTabIndex == 0) MaterialTheme.colorScheme.primary else Color.Transparent,
                             contentColor = if (selectedTabIndex == 0) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                         ),
+                        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp),
                         shape = RoundedCornerShape(12.dp),
                         elevation = if (selectedTabIndex == 0) ButtonDefaults.buttonElevation(defaultElevation = 2.dp) else null
                     ) {
-                        Text("Sign In", fontWeight = FontWeight.Bold)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(Icons.Default.School, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Text("Student", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        }
                     }
 
+                    // Faculty Tab
                     Button(
                         onClick = {
                             selectedTabIndex = 1
@@ -152,10 +160,41 @@ fun LoginScreen(
                             containerColor = if (selectedTabIndex == 1) MaterialTheme.colorScheme.primary else Color.Transparent,
                             contentColor = if (selectedTabIndex == 1) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                         ),
+                        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp),
                         shape = RoundedCornerShape(12.dp),
                         elevation = if (selectedTabIndex == 1) ButtonDefaults.buttonElevation(defaultElevation = 2.dp) else null
                     ) {
-                        Text("Register Account", fontWeight = FontWeight.Bold)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(Icons.Default.Badge, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Text("Faculty", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        }
+                    }
+
+                    // Register Tab
+                    Button(
+                        onClick = {
+                            selectedTabIndex = 2
+                            authViewModel.clearErrorMessage()
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedTabIndex == 2) MaterialTheme.colorScheme.primary else Color.Transparent,
+                            contentColor = if (selectedTabIndex == 2) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = if (selectedTabIndex == 2) ButtonDefaults.buttonElevation(defaultElevation = 2.dp) else null
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Text("Register", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        }
                     }
                 }
             }
@@ -209,121 +248,258 @@ fun LoginScreen(
                             .padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        if (tab == 0) {
-                            // SIGN IN FORM
-                            Text(
-                                text = "Sign In with University Account",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                        when (tab) {
+                            0 -> {
+                                // STUDENT LOGIN FORM
+                                Text(
+                                    text = "Student Portal Login",
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
 
-                            OutlinedTextField(
-                                value = email,
-                                onValueChange = { email = it },
-                                label = { Text("University Email") },
-                                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                                placeholder = { Text("username@bennett.edu.in") },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                Text(
+                                    text = "Requires a valid Bennett University student email (@bennett.edu.in)",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
 
-                            OutlinedTextField(
-                                value = password,
-                                onValueChange = { password = it },
-                                label = { Text("Password") },
-                                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                                placeholder = { Text("••••••••") },
-                                singleLine = true,
-                                visualTransformation = PasswordVisualTransformation(),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                OutlinedTextField(
+                                    value = email,
+                                    onValueChange = { email = it },
+                                    label = { Text("Student Email (@bennett.edu.in)") },
+                                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                                    placeholder = { Text("student@bennett.edu.in") },
+                                    singleLine = true,
+                                    isError = emailError != null,
+                                    supportingText = emailError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
-                            Button(
-                                onClick = {
-                                    authViewModel.signIn(email, password)
-                                },
-                                enabled = email.isNotBlank() && password.isNotBlank() && !isLoading,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(48.dp),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                if (isLoading) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        color = Color.White,
-                                        strokeWidth = 2.dp
-                                    )
-                                } else {
-                                    Text("Sign In", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                OutlinedTextField(
+                                    value = password,
+                                    onValueChange = { password = it },
+                                    label = { Text("Password") },
+                                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                                    placeholder = { Text("••••••••") },
+                                    singleLine = true,
+                                    isError = passwordError != null,
+                                    supportingText = passwordError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
+                                    visualTransformation = PasswordVisualTransformation(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Button(
+                                    onClick = {
+                                        authViewModel.signIn(email, password)
+                                    },
+                                    enabled = isEmailValid && isPasswordValid && !isLoading,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    if (isLoading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Text("Sign In as Student", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+
+                                TextButton(
+                                    onClick = { selectedTabIndex = 2 },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                ) {
+                                    Text("New Student? Register Account", fontSize = 13.sp)
                                 }
                             }
 
-                        } else {
-                            // REGISTER FORM
-                            Text(
-                                text = "Self-Register Account",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                            1 -> {
+                                // FACULTY LOGIN FORM
+                                Text(
+                                    text = "Faculty Portal Login",
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
 
-                            Text(
-                                text = "Self-registration requires a valid institutional @bennett.edu.in email address.",
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                                Text(
+                                    text = "Enter your official Bennett University faculty email & credentials",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
 
-                            OutlinedTextField(
-                                value = email,
-                                onValueChange = { email = it },
-                                label = { Text("Institutional Email (@bennett.edu.in)") },
-                                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                                placeholder = { Text("student@bennett.edu.in") },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                OutlinedTextField(
+                                    value = email,
+                                    onValueChange = { email = it },
+                                    label = { Text("Faculty Email (@bennett.edu.in)") },
+                                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                                    placeholder = { Text("faculty.name@bennett.edu.in") },
+                                    singleLine = true,
+                                    isError = emailError != null,
+                                    supportingText = emailError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
-                            OutlinedTextField(
-                                value = password,
-                                onValueChange = { password = it },
-                                label = { Text("Create Password (min 8 chars)") },
-                                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                                placeholder = { Text("••••••••") },
-                                singleLine = true,
-                                visualTransformation = PasswordVisualTransformation(),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                OutlinedTextField(
+                                    value = password,
+                                    onValueChange = { password = it },
+                                    label = { Text("Password") },
+                                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                                    placeholder = { Text("••••••••") },
+                                    singleLine = true,
+                                    isError = passwordError != null,
+                                    supportingText = passwordError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
+                                    visualTransformation = PasswordVisualTransformation(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
-                            Button(
-                                onClick = {
-                                    authViewModel.register(email, password)
-                                },
-                                enabled = email.endsWith("@bennett.edu.in", ignoreCase = true) && password.length >= 8 && !isLoading,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(48.dp),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                if (isLoading) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        color = Color.White,
-                                        strokeWidth = 2.dp
-                                    )
-                                } else {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
-                                        Text("Register Account", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                Button(
+                                    onClick = {
+                                        authViewModel.signIn(email, password)
+                                    },
+                                    enabled = isEmailValid && isPasswordValid && !isLoading,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    if (isLoading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(Icons.Default.Badge, contentDescription = null, modifier = Modifier.size(18.dp))
+                                            Text("Sign In as Faculty", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                        }
                                     }
+                                }
+
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "ℹ️ Faculty accounts are pre-issued by Campus IT Administration.",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(10.dp)
+                                    )
+                                }
+                            }
+
+                            2 -> {
+                                // REGISTER ACCOUNT FORM
+                                Text(
+                                    text = "Self-Register Account",
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+
+                                Text(
+                                    text = "Self-registration requires a valid institutional @bennett.edu.in email address.",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                OutlinedTextField(
+                                    value = email,
+                                    onValueChange = { email = it },
+                                    label = { Text("Institutional Email (@bennett.edu.in)") },
+                                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                                    placeholder = { Text("student@bennett.edu.in") },
+                                    singleLine = true,
+                                    isError = emailError != null,
+                                    supportingText = emailError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                OutlinedTextField(
+                                    value = password,
+                                    onValueChange = { password = it },
+                                    label = { Text("Create Password") },
+                                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                                    placeholder = { Text("••••••••") },
+                                    singleLine = true,
+                                    isError = passwordError != null,
+                                    supportingText = passwordError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
+                                    visualTransformation = PasswordVisualTransformation(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                // Password requirements checklist
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(10.dp),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text(
+                                            text = "Password Requirements:",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        PasswordRequirementRule("At least 8 characters", password.length >= 8)
+                                        PasswordRequirementRule("At least 1 capital letter (A-Z)", password.any { it.isUpperCase() })
+                                        PasswordRequirementRule("At least 1 number (0-9)", password.any { it.isDigit() })
+                                        PasswordRequirementRule("At least 1 special character (!, @, #, $, etc.)", password.any { !it.isLetterOrDigit() })
+                                    }
+                                }
+
+                                Button(
+                                    onClick = {
+                                        authViewModel.register(email, password)
+                                    },
+                                    enabled = isEmailValid && isPasswordValid && !isLoading,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    if (isLoading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
+                                            Text("Register Account", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+
+                                TextButton(
+                                    onClick = { selectedTabIndex = 0 },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                ) {
+                                    Text("Already registered? Sign In here", fontSize = 13.sp)
                                 }
                             }
                         }
@@ -345,5 +521,25 @@ fun LoginScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PasswordRequirementRule(label: String, isMet: Boolean) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = if (isMet) "✓" else "•",
+            color = if (isMet) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp
+        )
+        Text(
+            text = label,
+            color = if (isMet) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 11.sp
+        )
     }
 }

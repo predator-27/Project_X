@@ -1,11 +1,11 @@
-package com.example.projectx.ui
+package com.projectx.app.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectx.data.firestore.FacultyRepository
-import com.example.projectx.model.Teacher
-import com.example.projectx.model.TeacherStatus
-import com.example.projectx.util.Resource
+import com.projectx.app.data.firestore.FacultyRepository
+import com.projectx.app.model.Teacher
+import com.projectx.app.model.TeacherStatus
+import com.projectx.app.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

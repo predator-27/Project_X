@@ -1,12 +1,12 @@
-package com.example.projectx.data.auth
+package com.projectx.app.data.auth
 
-import com.example.projectx.data.firestore.PublicProfileRepository
-import com.example.projectx.data.firestore.UserRepository
-import com.example.projectx.model.AcademicProfile
-import com.example.projectx.model.PublicProfile
-import com.example.projectx.model.User
-import com.example.projectx.model.UserRole
-import com.example.projectx.ui.auth.AuthSessionState
+import com.projectx.app.data.firestore.PublicProfileRepository
+import com.projectx.app.data.firestore.UserRepository
+import com.projectx.app.model.AcademicProfile
+import com.projectx.app.model.PublicProfile
+import com.projectx.app.model.User
+import com.projectx.app.model.UserRole
+import com.projectx.app.ui.auth.AuthSessionState
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

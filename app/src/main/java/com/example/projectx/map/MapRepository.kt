@@ -1,4 +1,4 @@
-package com.example.projectx.map
+package com.projectx.app.map
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
