@@ -2,7 +2,9 @@ package com.projectx.app.ui.academics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.projectx.app.BuildConfig
 import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.data.demo.DemoCampusData
 import com.projectx.app.data.firestore.AttendanceRepository
 import com.projectx.app.data.firestore.CourseRepository
 import com.projectx.app.data.firestore.PublicProfileRepository
@@ -48,6 +50,11 @@ class AcademicViewModel(
         loadAcademicData()
     }
 
+    private fun isDemoSession(): Boolean {
+        return BuildConfig.DEBUG &&
+                (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid == DemoCampusData.DEMO_STUDENT_UID
+    }
+
     fun loadAcademicData() {
         viewModelScope.launch {
             loadUserProfile()
@@ -67,6 +74,10 @@ class AcademicViewModel(
     fun loadTimetable(sectionFilter: String? = null) {
         viewModelScope.launch {
             _timetableState.value = Resource.Loading
+            if (isDemoSession()) {
+                _timetableState.value = Resource.Success(DemoCampusData.demoTimetable)
+                return@launch
+            }
             val result = timetableRepository.getTimetableSlots(sectionFilter)
             result.fold(
                 onSuccess = { slots ->
@@ -82,6 +93,16 @@ class AcademicViewModel(
     fun loadAttendance() {
         viewModelScope.launch {
             _attendanceState.value = Resource.Loading
+            if (isDemoSession()) {
+                val subjects = DemoCampusData.demoAttendance
+                _attendanceState.value = Resource.Success(subjects)
+                val totalAttended = subjects.sumOf { it.attendedClasses }
+                val totalClasses = subjects.sumOf { it.totalClasses }
+                val overall = if (totalClasses == 0) 0f else (totalAttended.toFloat() / totalClasses) * 100f
+                _overallAttendancePercentage.value = overall
+                _shortageSubjectCount.value = subjects.count { it.percentage < 75f }
+                return@launch
+            }
             val uid = (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid ?: ""
             val result = attendanceRepository.getStudentAttendance(uid)
             result.fold(
@@ -109,6 +130,10 @@ class AcademicViewModel(
     fun loadCourses() {
         viewModelScope.launch {
             _coursesState.value = Resource.Loading
+            if (isDemoSession()) {
+                _coursesState.value = Resource.Success(DemoCampusData.demoCourses)
+                return@launch
+            }
             val dept = _publicProfileState.value?.department
             val result = courseRepository.getStudentCourses(dept)
             result.fold(

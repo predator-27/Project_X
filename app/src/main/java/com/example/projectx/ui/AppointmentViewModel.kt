@@ -2,9 +2,13 @@ package com.projectx.app.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.projectx.app.BuildConfig
+import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.data.demo.DemoCampusData
 import com.projectx.app.data.firestore.AppointmentRepository
 import com.projectx.app.model.Appointment
 import com.projectx.app.model.AppointmentStatus
+import com.projectx.app.ui.auth.AuthSessionState
 import com.projectx.app.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AppointmentViewModel(
+    private val authRepository: AuthRepository = AuthRepository(),
     private val appointmentRepository: AppointmentRepository = AppointmentRepository()
 ) : ViewModel() {
 
@@ -24,6 +29,11 @@ class AppointmentViewModel(
     private val _actionState = MutableStateFlow<Resource<Unit>>(Resource.Empty)
     val actionState: StateFlow<Resource<Unit>> = _actionState.asStateFlow()
 
+    private fun isDemoSession(): Boolean {
+        return BuildConfig.DEBUG &&
+                (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid == DemoCampusData.DEMO_STUDENT_UID
+    }
+
     fun loadStudentAppointments(studentUid: String) {
         if (studentUid.isBlank()) {
             _studentAppointmentsState.value = Resource.Empty
@@ -32,6 +42,10 @@ class AppointmentViewModel(
 
         viewModelScope.launch {
             _studentAppointmentsState.value = Resource.Loading
+            if (isDemoSession()) {
+                _studentAppointmentsState.value = Resource.Success(DemoCampusData.demoAppointments.toList())
+                return@launch
+            }
             appointmentRepository.getStudentAppointments(studentUid).fold(
                 onSuccess = { list ->
                     _studentAppointmentsState.value = if (list.isEmpty()) Resource.Empty else Resource.Success(list)
@@ -78,6 +92,13 @@ class AppointmentViewModel(
 
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            if (isDemoSession()) {
+                val newAppt = appointment.copy(id = "appt_demo_${System.currentTimeMillis()}")
+                DemoCampusData.demoAppointments.add(0, newAppt)
+                _actionState.value = Resource.Success(Unit)
+                loadStudentAppointments(studentUid)
+                return@launch
+            }
             appointmentRepository.createAppointment(appointment, studentUid).fold(
                 onSuccess = {
                     _actionState.value = Resource.Success(Unit)
@@ -101,6 +122,15 @@ class AppointmentViewModel(
 
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            if (isDemoSession()) {
+                val index = DemoCampusData.demoAppointments.indexOfFirst { it.id == appointmentId }
+                if (index != -1) {
+                    DemoCampusData.demoAppointments[index] = DemoCampusData.demoAppointments[index].copy(status = newStatus)
+                }
+                _actionState.value = Resource.Success(Unit)
+                if (!studentUid.isNullOrBlank()) loadStudentAppointments(studentUid)
+                return@launch
+            }
             appointmentRepository.updateAppointmentStatus(appointmentId, newStatus, facultyNotes).fold(
                 onSuccess = {
                     _actionState.value = Resource.Success(Unit)

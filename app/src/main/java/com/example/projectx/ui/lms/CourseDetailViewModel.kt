@@ -2,12 +2,16 @@ package com.projectx.app.ui.lms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.projectx.app.BuildConfig
+import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.data.demo.DemoCampusData
 import com.projectx.app.data.firestore.AssignmentRepository
 import com.projectx.app.data.firestore.CourseAnnouncementRepository
 import com.projectx.app.data.firestore.CourseMaterialRepository
 import com.projectx.app.model.lms.Assignment
 import com.projectx.app.model.lms.CourseAnnouncement
 import com.projectx.app.model.lms.CourseMaterial
+import com.projectx.app.ui.auth.AuthSessionState
 import com.projectx.app.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CourseDetailViewModel(
+    private val authRepository: AuthRepository = AuthRepository(),
     private val materialRepository: CourseMaterialRepository = CourseMaterialRepository(),
     private val assignmentRepository: AssignmentRepository = AssignmentRepository(),
     private val announcementRepository: CourseAnnouncementRepository = CourseAnnouncementRepository()
@@ -33,6 +38,11 @@ class CourseDetailViewModel(
     private val _announcementsState = MutableStateFlow<Resource<List<CourseAnnouncement>>>(Resource.Empty)
     val announcementsState: StateFlow<Resource<List<CourseAnnouncement>>> = _announcementsState.asStateFlow()
 
+    private fun isDemoSession(): Boolean {
+        return BuildConfig.DEBUG &&
+                (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid == DemoCampusData.DEMO_STUDENT_UID
+    }
+
     fun loadCourseLmsData(courseCode: String) {
         val trimmedCode = courseCode.trim()
         _currentCourseCode.value = trimmedCode
@@ -41,6 +51,17 @@ class CourseDetailViewModel(
             _materialsState.value = Resource.Empty
             _assignmentsState.value = Resource.Empty
             _announcementsState.value = Resource.Empty
+            return
+        }
+
+        if (isDemoSession()) {
+            val mats = DemoCampusData.demoMaterials[trimmedCode] ?: emptyList()
+            val asgns = DemoCampusData.demoAssignments[trimmedCode] ?: emptyList()
+            val anns = DemoCampusData.demoCourseAnnouncements[trimmedCode] ?: emptyList()
+
+            _materialsState.value = if (mats.isEmpty()) Resource.Empty else Resource.Success(mats)
+            _assignmentsState.value = if (asgns.isEmpty()) Resource.Empty else Resource.Success(asgns)
+            _announcementsState.value = if (anns.isEmpty()) Resource.Empty else Resource.Success(anns)
             return
         }
 
@@ -89,6 +110,11 @@ class CourseDetailViewModel(
     fun refreshMaterials() {
         val code = _currentCourseCode.value
         if (code.isBlank()) return
+        if (isDemoSession()) {
+            val mats = DemoCampusData.demoMaterials[code] ?: emptyList()
+            _materialsState.value = if (mats.isEmpty()) Resource.Empty else Resource.Success(mats)
+            return
+        }
         viewModelScope.launch {
             _materialsState.value = Resource.Loading
             materialRepository.getMaterialsForCourse(code).fold(
@@ -105,6 +131,11 @@ class CourseDetailViewModel(
     fun refreshAssignments() {
         val code = _currentCourseCode.value
         if (code.isBlank()) return
+        if (isDemoSession()) {
+            val asgns = DemoCampusData.demoAssignments[code] ?: emptyList()
+            _assignmentsState.value = if (asgns.isEmpty()) Resource.Empty else Resource.Success(asgns)
+            return
+        }
         viewModelScope.launch {
             _assignmentsState.value = Resource.Loading
             assignmentRepository.getAssignmentsForCourse(code).fold(
@@ -121,6 +152,11 @@ class CourseDetailViewModel(
     fun refreshAnnouncements() {
         val code = _currentCourseCode.value
         if (code.isBlank()) return
+        if (isDemoSession()) {
+            val anns = DemoCampusData.demoCourseAnnouncements[code] ?: emptyList()
+            _announcementsState.value = if (anns.isEmpty()) Resource.Empty else Resource.Success(anns)
+            return
+        }
         viewModelScope.launch {
             _announcementsState.value = Resource.Loading
             announcementRepository.getAnnouncementsForCourse(code).fold(

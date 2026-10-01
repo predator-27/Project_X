@@ -5,12 +5,16 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.projectx.app.BuildConfig
+import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.data.demo.DemoCampusData
 import com.projectx.app.data.firestore.AssignmentSubmissionRepository
 import com.projectx.app.data.firestore.PublicProfileRepository
 import com.projectx.app.data.firestore.UserRepository
 import com.projectx.app.data.storage.AssignmentSubmissionStorageRepository
 import com.projectx.app.model.lms.AssignmentSubmission
 import com.projectx.app.model.lms.SubmissionStatus
+import com.projectx.app.ui.auth.AuthSessionState
 import com.projectx.app.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AssignmentSubmissionViewModel(
+    private val authRepository: AuthRepository = AuthRepository(),
     private val submissionRepository: AssignmentSubmissionRepository = AssignmentSubmissionRepository(),
     private val storageRepository: AssignmentSubmissionStorageRepository = AssignmentSubmissionStorageRepository(),
     private val userRepository: UserRepository = UserRepository(),
@@ -32,7 +37,20 @@ class AssignmentSubmissionViewModel(
     private val _actionState = MutableStateFlow<Resource<Unit>>(Resource.Empty)
     val actionState: StateFlow<Resource<Unit>> = _actionState.asStateFlow()
 
+    private fun isDemoSession(): Boolean {
+        return BuildConfig.DEBUG &&
+                (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid == DemoCampusData.DEMO_STUDENT_UID
+    }
+
     fun loadStudentSubmission(assignmentId: String) {
+        if (isDemoSession()) {
+            val demoKey = "sub_${assignmentId}_${DemoCampusData.DEMO_STUDENT_UID}"
+            if (DemoCampusData.demoSubmissions.containsKey(demoKey)) {
+                _submissionState.value = Resource.Success(DemoCampusData.demoSubmissions[demoKey])
+                return
+            }
+        }
+
         val studentUid = firebaseAuth.currentUser?.uid
         if (studentUid.isNullOrBlank()) {
             _submissionState.value = Resource.Error("User unauthenticated. Please log in.")
@@ -60,20 +78,11 @@ class AssignmentSubmissionViewModel(
         responseText: String?,
         selectedFileUri: Uri?
     ) {
-        // 1. Authenticate Student User
-        val studentUid = firebaseAuth.currentUser?.uid
-        if (studentUid.isNullOrBlank()) {
-            _actionState.value = Resource.Error("Authentication error: Must be logged in to submit assignments.")
-            return
-        }
-
-        // 2. Validate Assignment / Course Identifiers
         if (assignmentId.isBlank() || courseCode.isBlank()) {
             _actionState.value = Resource.Error("Invalid submission target: missing assignmentId or courseCode.")
             return
         }
 
-        // 3. Validate Text / File Presence & Status
         val cleanText = responseText?.trim()?.ifBlank { null }
         if (cleanText == null && selectedFileUri == null) {
             _actionState.value = Resource.Error("Submission cannot be empty. Please enter a text response or attach a file.")
@@ -86,17 +95,40 @@ class AssignmentSubmissionViewModel(
             return
         }
 
+        if (isDemoSession()) {
+            val newSub = AssignmentSubmission(
+                submissionId = "sub_${assignmentId}_${DemoCampusData.DEMO_STUDENT_UID}",
+                assignmentId = assignmentId,
+                courseCode = courseCode,
+                studentUid = DemoCampusData.DEMO_STUDENT_UID,
+                studentName = "Demo Student",
+                studentRollNumber = "DEMO001",
+                responseText = cleanText,
+                storagePath = selectedFileUri?.lastPathSegment?.let { "courses/$courseCode/submissions/$assignmentId/demo_file" },
+                submittedAtTimestamp = System.currentTimeMillis(),
+                isLate = dueDateTimestamp != null && System.currentTimeMillis() > dueDateTimestamp,
+                status = SubmissionStatus.SUBMITTED
+            )
+            (DemoCampusData.demoSubmissions as MutableMap)[newSub.submissionId] = newSub
+            _submissionState.value = Resource.Success(newSub)
+            _actionState.value = Resource.Success(Unit)
+            return
+        }
+
+        val studentUid = firebaseAuth.currentUser?.uid
+        if (studentUid.isNullOrBlank()) {
+            _actionState.value = Resource.Error("Authentication error: Must be logged in to submit assignments.")
+            return
+        }
+
         viewModelScope.launch {
             _actionState.value = Resource.Loading
 
-            // 4. Retrieve & Validate Student Identity Snapshot BEFORE File Upload
             val profileResult = publicProfileRepository.getPublicProfile(studentUid)
             val userResult = userRepository.getPrivateAccount(studentUid)
 
             if (profileResult.isFailure || userResult.isFailure) {
-                _actionState.value = Resource.Error(
-                    "Identity verification failed: Unable to fetch profile details. Please try again."
-                )
+                _actionState.value = Resource.Error("Identity verification failed: Unable to fetch profile details.")
                 return@launch
             }
 
@@ -107,9 +139,7 @@ class AssignmentSubmissionViewModel(
             val studentRollNumber = user?.rollNumber?.trim()?.ifBlank { null }
 
             if (studentName == null || studentRollNumber == null) {
-                _actionState.value = Resource.Error(
-                    "Identity verification failed: Missing student name or roll number in profile data. Please complete profile setup before submitting."
-                )
+                _actionState.value = Resource.Error("Identity verification failed: Missing student name or roll number.")
                 return@launch
             }
 
@@ -117,14 +147,11 @@ class AssignmentSubmissionViewModel(
             var fileSizeBytes: Long? = null
             var fileType: String? = null
 
-            // 5. Resolve & Validate File MIME, Extension, and Size (if File Present)
             if (selectedFileUri != null) {
                 try {
                     val resolvedResult = resolveFileDetails(context, selectedFileUri)
                     if (resolvedResult.isFailure) {
-                        _actionState.value = Resource.Error(
-                            resolvedResult.exceptionOrNull()?.message ?: "Failed to validate file."
-                        )
+                        _actionState.value = Resource.Error(resolvedResult.exceptionOrNull()?.message ?: "Failed to validate file.")
                         return@launch
                     }
 
@@ -140,14 +167,12 @@ class AssignmentSubmissionViewModel(
                         return@launch
                     }
 
-                    // 6. Read File Bytes
                     val fileBytes = context.contentResolver.openInputStream(selectedFileUri)?.use { it.readBytes() }
                     if (fileBytes == null || fileBytes.isEmpty()) {
                         _actionState.value = Resource.Error("Failed to read file contents from storage.")
                         return@launch
                     }
 
-                    // 7. Upload File to Storage
                     val uploadResult = storageRepository.uploadSubmissionFile(
                         courseCode = courseCode,
                         assignmentId = assignmentId,
@@ -174,16 +199,9 @@ class AssignmentSubmissionViewModel(
                 }
             }
 
-            // 8. Derive Candidate isLate Value Locally
-            val isLateCandidate = if (dueDateTimestamp != null) {
-                System.currentTimeMillis() > dueDateTimestamp
-            } else {
-                false
-            }
-
-            // 9. Construct AssignmentSubmission Model
+            val isLate = dueDateTimestamp != null && System.currentTimeMillis() > dueDateTimestamp
             val submission = AssignmentSubmission(
-                submissionId = "sub_${assignmentId}_${studentUid}",
+                submissionId = "sub_${assignmentId}_$studentUid",
                 assignmentId = assignmentId,
                 courseCode = courseCode,
                 studentUid = studentUid,
@@ -194,29 +212,22 @@ class AssignmentSubmissionViewModel(
                 fileSizeBytes = fileSizeBytes ?: currentSub?.fileSizeBytes,
                 fileType = fileType ?: currentSub?.fileType,
                 status = SubmissionStatus.SUBMITTED,
-                isLate = isLateCandidate
+                isLate = isLate
             )
 
-            // 10. Firestore Write Metadata
-            val writeResult = if (currentSub != null) {
+            val saveResult = if (currentSub != null) {
                 submissionRepository.updateStudentSubmission(submission)
             } else {
                 submissionRepository.createSubmission(submission)
             }
 
-            writeResult.fold(
+            saveResult.fold(
                 onSuccess = {
                     _actionState.value = Resource.Success(Unit)
                     loadStudentSubmission(assignmentId)
                 },
                 onFailure = { writeError ->
-                    if (uploadedStoragePath != null) {
-                        _actionState.value = Resource.Error(
-                            "Attachment file uploaded successfully, but submission metadata could not be saved to Firestore: ${writeError.message}"
-                        )
-                    } else {
-                        _actionState.value = Resource.Error("Failed to save submission: ${writeError.message}")
-                    }
+                    _actionState.value = Resource.Error("Failed to save submission: ${writeError.message}")
                 }
             )
         }

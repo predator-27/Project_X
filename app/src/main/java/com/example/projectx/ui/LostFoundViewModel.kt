@@ -2,8 +2,13 @@ package com.projectx.app.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.projectx.app.BuildConfig
+import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.data.demo.DemoCampusData
 import com.projectx.app.data.firestore.LostFoundRepository
 import com.projectx.app.model.LostItem
+import com.projectx.app.model.LostItemStatus
+import com.projectx.app.ui.auth.AuthSessionState
 import com.projectx.app.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LostFoundViewModel(
+    private val authRepository: AuthRepository = AuthRepository(),
     private val repository: LostFoundRepository = LostFoundRepository()
 ) : ViewModel() {
 
@@ -36,6 +42,12 @@ class LostFoundViewModel(
         loadBrowseableItems()
     }
 
+    private fun isDemoSession(uid: String? = null): Boolean {
+        val sessionUid = (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid
+        val matchesDemoUid = sessionUid == DemoCampusData.DEMO_STUDENT_UID || uid == DemoCampusData.DEMO_STUDENT_UID
+        return BuildConfig.DEBUG && matchesDemoUid && sessionUid == DemoCampusData.DEMO_STUDENT_UID
+    }
+
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
     }
@@ -43,6 +55,13 @@ class LostFoundViewModel(
     fun loadBrowseableItems() {
         viewModelScope.launch {
             _itemsState.value = Resource.Loading
+            if (isDemoSession()) {
+                val demoList = DemoCampusData.demoLostItems.filter {
+                    it.status == LostItemStatus.REPORTED || it.status == LostItemStatus.CLAIM_SUBMITTED
+                }
+                _itemsState.value = Resource.Success(demoList)
+                return@launch
+            }
             try {
                 val list = repository.getBrowseableItems()
                 _itemsState.value = if (list.isEmpty()) {
@@ -63,6 +82,11 @@ class LostFoundViewModel(
         }
         viewModelScope.launch {
             _myClaimsState.value = Resource.Loading
+            if (isDemoSession(userUid)) {
+                val claims = DemoCampusData.demoLostItems.filter { it.claimantUid == userUid }
+                _myClaimsState.value = Resource.Success(claims)
+                return@launch
+            }
             try {
                 val list = repository.getMyClaims(userUid)
                 _myClaimsState.value = if (list.isEmpty()) {
@@ -83,6 +107,11 @@ class LostFoundViewModel(
         }
         viewModelScope.launch {
             _myReportsState.value = Resource.Loading
+            if (isDemoSession(userUid)) {
+                val reports = DemoCampusData.demoLostItems.filter { it.reporterUid == userUid }
+                _myReportsState.value = Resource.Success(reports)
+                return@launch
+            }
             try {
                 val list = repository.getMyReports(userUid)
                 _myReportsState.value = if (list.isEmpty()) {
@@ -126,6 +155,23 @@ class LostFoundViewModel(
 
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            if (isDemoSession(reporterUid)) {
+                val newLost = LostItem(
+                    itemId = "lost_demo_${System.currentTimeMillis()}",
+                    title = title.trim(),
+                    description = description.trim(),
+                    locationFound = locationFound.trim(),
+                    imageUrl = imageUrl?.ifBlank { null },
+                    reporterUid = reporterUid,
+                    status = LostItemStatus.REPORTED,
+                    createdAt = System.currentTimeMillis()
+                )
+                DemoCampusData.demoLostItems.add(0, newLost)
+                _actionState.value = Resource.Success(Unit)
+                loadBrowseableItems()
+                loadMyReports(reporterUid)
+                return@launch
+            }
             try {
                 repository.reportFoundItem(
                     title = title.trim(),
@@ -156,6 +202,22 @@ class LostFoundViewModel(
 
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            if (isDemoSession(claimantUid)) {
+                val index = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (index != -1) {
+                    DemoCampusData.demoLostItems[index] = DemoCampusData.demoLostItems[index].copy(
+                        claimantUid = claimantUid,
+                        claimNotes = claimNotes.trim(),
+                        claimantPhone = claimantPhone.trim(),
+                        claimTimestamp = System.currentTimeMillis(),
+                        status = LostItemStatus.CLAIM_SUBMITTED
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadBrowseableItems()
+                loadMyClaims(claimantUid)
+                return@launch
+            }
             try {
                 repository.submitClaim(
                     itemId = itemId,
@@ -228,6 +290,18 @@ class LostFoundViewModel(
     fun cancelOwnReport(itemId: String, reporterUid: String) {
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            if (isDemoSession(reporterUid)) {
+                val index = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (index != -1) {
+                    DemoCampusData.demoLostItems[index] = DemoCampusData.demoLostItems[index].copy(
+                        status = LostItemStatus.CANCELLED
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadBrowseableItems()
+                loadMyReports(reporterUid)
+                return@launch
+            }
             try {
                 repository.cancelOwnReport(itemId)
                 _actionState.value = Resource.Success(Unit)

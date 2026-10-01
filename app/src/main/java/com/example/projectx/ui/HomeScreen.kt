@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.R
 import com.projectx.app.components.*
 import com.projectx.app.model.Appointment
+import com.projectx.app.model.AppointmentStatus
 import com.projectx.app.model.TimetableSlot
 import com.projectx.app.model.UniversityAnnouncement
 import com.projectx.app.model.lms.AnnouncementPriority
@@ -68,11 +68,11 @@ fun HomeScreen(
         modifier = modifier
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            // 1. INSTITUTION HEADER
+            // 1. GREETING & STUDENT HEADER
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -84,75 +84,55 @@ fun HomeScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(14.dp),
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Surface(
                             shape = CircleShape,
                             color = Color.White,
-                            modifier = Modifier.size(44.dp)
+                            modifier = Modifier.size(40.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_app_logo),
                                     contentDescription = "Project X Logo",
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(30.dp)
                                 )
                             }
                         }
 
                         Column(modifier = Modifier.weight(1f)) {
-                            val schoolHeader = remember(sessionState) {
-                                ((sessionState as? AuthSessionState.Authenticated)?.publicProfile?.schoolName?.ifBlank { null } ?: "Bennett University").uppercase()
-                            }
-
-                            Text(
-                                text = schoolHeader,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = PrimaryIndigo,
-                                letterSpacing = 0.5.sp
-                            )
-
                             when (val session = sessionState) {
                                 is AuthSessionState.Authenticated -> {
                                     val name = session.publicProfile?.displayName?.ifBlank { null }
                                         ?: session.user.email.substringBefore("@")
                                     val roll = session.user.rollNumber
-                                    val program = session.publicProfile?.program?.ifBlank { null }
-                                    val dept = session.publicProfile?.department?.ifBlank { null }
-                                    val sec = session.publicProfile?.section?.ifBlank { null }
-
-                                    val line1Text = listOfNotNull(name, roll?.let { "($it)" }).joinToString(" ")
-                                    val academicSub = listOfNotNull(program, dept, sec?.let { "Sec $it" }).joinToString(" • ")
-                                        .ifBlank { "Student Portal Active" }
+                                    val schoolHeader = session.publicProfile?.schoolName?.ifBlank { null } ?: "Bennett University"
 
                                     Text(
-                                        text = line1Text,
+                                        text = "Welcome back, $name",
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = HeadingNavy
                                     )
                                     Text(
-                                        text = academicSub,
+                                        text = listOfNotNull(schoolHeader, roll?.let { "($it)" }).joinToString(" • "),
                                         fontSize = 11.sp,
-                                        color = MutedText
-                                    )
-                                }
-                                is AuthSessionState.Loading -> {
-                                    Text(
-                                        text = "Loading profile details...",
-                                        fontSize = 14.sp,
                                         color = MutedText
                                     )
                                 }
                                 else -> {
                                     Text(
-                                        text = currentUser?.email ?: "Authenticated User",
-                                        fontSize = 14.sp,
+                                        text = "Welcome to Project X",
+                                        fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = HeadingNavy
+                                    )
+                                    Text(
+                                        text = "Digital Campus Platform",
+                                        fontSize = 11.sp,
+                                        color = MutedText
                                     )
                                 }
                             }
@@ -161,21 +141,150 @@ fun HomeScreen(
                 }
             }
 
-            // 2. UNIVERSITY ANNOUNCEMENTS & NOTICES
+            // 2. NEXT / TODAY'S CLASS
             item {
-                SectionHeader(title = "University Announcements", icon = Icons.Default.Campaign)
+                SectionHeader(title = "Next Class", icon = Icons.Default.Schedule)
+            }
+
+            when (val resource = timetableState) {
+                is Resource.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    item {
+                        ErrorNoticeCard(
+                            message = resource.message,
+                            onRetry = { academicViewModel.loadTimetable() }
+                        )
+                    }
+                }
+                is Resource.Success -> {
+                    val nextClass = resource.data.sortedBy { it.timeSlot }.firstOrNull()
+                    if (nextClass != null) {
+                        item {
+                            TimetableRowCard(
+                                slot = nextClass,
+                                onMapRouteClick = { onNavigateToTab("campus_map") }
+                            )
+                        }
+                    } else {
+                        item {
+                            EmptyNoticeCard(message = "No classes scheduled for today")
+                        }
+                    }
+                }
+                else -> {
+                    item {
+                        EmptyNoticeCard(message = "No classes scheduled for today")
+                    }
+                }
+            }
+
+            // 3. ATTENDANCE OVERVIEW
+            item {
+                SectionHeader(title = "Attendance Overview", icon = Icons.Default.CheckCircle)
+            }
+
+            when (val resource = attendanceState) {
+                is Resource.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    item {
+                        ErrorNoticeCard(
+                            message = resource.message,
+                            onRetry = { academicViewModel.loadAttendance() }
+                        )
+                    }
+                }
+                is Resource.Success -> {
+                    val list = resource.data
+                    val totalAttended = list.sumOf { it.attendedClasses }
+                    val totalClasses = list.sumOf { it.totalClasses }
+                    val overallPct = if (totalClasses > 0) (totalAttended.toFloat() / totalClasses.toFloat()) * 100f else 0f
+                    val shortageCount = list.count { it.percentage < 75f }
+
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToTab("attendance") },
+                            shape = CardShape,
+                            colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                            border = BorderStroke(1.dp, SurfaceBorder)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Text(
+                                        text = "Overall Attendance",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = HeadingNavy
+                                    )
+                                    Text(
+                                        text = if (shortageCount > 0) "⚠️ $shortageCount subject(s) below 75%" else "$totalAttended / $totalClasses Classes Conducted",
+                                        fontSize = 11.sp,
+                                        color = if (shortageCount > 0) AccentCoral else MutedText,
+                                        fontWeight = if (shortageCount > 0) FontWeight.SemiBold else FontWeight.Normal
+                                    )
+                                }
+
+                                Surface(
+                                    shape = PillShape,
+                                    color = if (overallPct >= 75f) SecondaryEmeraldBg else AccentCoralBg
+                                ) {
+                                    Text(
+                                        text = "%.1f%%".format(overallPct),
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (overallPct >= 75f) SecondaryEmerald else AccentCoral,
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                else -> {
+                    item {
+                        EmptyNoticeCard(message = "No attendance records found.")
+                    }
+                }
+            }
+
+            // 4. ANNOUNCEMENTS
+            item {
+                SectionHeader(title = "Latest Announcement", icon = Icons.Default.Campaign)
             }
 
             when (val resource = announcementState) {
                 is Resource.Loading -> {
                     item {
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                         }
                     }
                 }
@@ -193,154 +302,35 @@ fun HomeScreen(
                     }
                 }
                 is Resource.Success -> {
-                    val recentList = resource.data.take(3)
-                    items(recentList, key = { it.id }) { ann ->
-                        HomeAnnouncementCard(announcement = ann)
-                    }
-                }
-            }
-
-            // 3. TODAY'S TIMETABLE
-            item {
-                SectionHeader(title = "Today's Schedule", icon = Icons.Default.Schedule)
-            }
-
-            when (val resource = timetableState) {
-                is Resource.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                    val latest = resource.data.firstOrNull()
+                    if (latest != null) {
+                        item {
+                            HomeAnnouncementCard(
+                                announcement = latest,
+                                onClick = { onNavigateToTab("messages") }
+                            )
+                        }
+                    } else {
+                        item {
+                            EmptyNoticeCard(message = "No university announcements published")
                         }
                     }
                 }
-                is Resource.Error -> {
-                    item {
-                        ErrorNoticeCard(
-                            message = resource.message,
-                            onRetry = { academicViewModel.loadTimetable() }
-                        )
-                    }
-                }
-                is Resource.Success -> {
-                    items(resource.data, key = { it.id }) { slot ->
-                        TimetableRowCard(
-                            slot = slot,
-                            onMapRouteClick = { onNavigateToTab("campus_map") }
-                        )
-                    }
-                }
-                else -> {
-                    item {
-                        EmptyNoticeCard(message = "No classes scheduled for today")
-                    }
-                }
             }
 
-            // 4. ATTENDANCE OVERVIEW
+            // 5. UPCOMING APPOINTMENT (CHRONOLOGICALLY NEXT ACTIVE CONFIRMED/PENDING APPOINTMENT)
             item {
-                SectionHeader(title = "Attendance Status", icon = Icons.Default.CheckCircle)
-            }
-
-            when (val resource = attendanceState) {
-                is Resource.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                        }
-                    }
-                }
-                is Resource.Error -> {
-                    item {
-                        ErrorNoticeCard(
-                            message = resource.message,
-                            onRetry = { academicViewModel.loadAttendance() }
-                        )
-                    }
-                }
-                is Resource.Success -> {
-                    val list = resource.data
-                    val totalAttended = list.sumOf { it.attendedClasses }
-                    val totalClasses = list.sumOf { it.totalClasses }
-                    val overallPct = if (totalClasses > 0) (totalAttended.toFloat() / totalClasses.toFloat()) * 100f else 0f
-
-                    item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNavigateToTab("attendance") },
-                            shape = CardShape,
-                            colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                            border = BorderStroke(1.dp, SurfaceBorder)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(14.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Overall Attendance",
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = HeadingNavy
-                                    )
-                                    Text(
-                                        text = "$totalAttended / $totalClasses Total Classes Conducted",
-                                        fontSize = 12.sp,
-                                        color = MutedText
-                                    )
-                                }
-
-                                Surface(
-                                    shape = PillShape,
-                                    color = if (overallPct >= 75f) SecondaryEmeraldBg else AccentCoralBg
-                                ) {
-                                    Text(
-                                        text = "%.1f%%".format(overallPct),
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = if (overallPct >= 75f) SecondaryEmerald else AccentCoral,
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                else -> {
-                    item {
-                        EmptyNoticeCard(message = "No attendance records found.")
-                    }
-                }
-            }
-
-            // 5. APPOINTMENTS SHORTCUT
-            item {
-                SectionHeader(title = "Faculty Appointments", icon = Icons.Default.Event)
+                SectionHeader(title = "Next Appointment", icon = Icons.Default.Event)
             }
 
             when (val resource = studentAppointmentsState) {
                 is Resource.Loading -> {
                     item {
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                         }
                     }
                 }
@@ -357,20 +347,27 @@ fun HomeScreen(
                     }
                 }
                 is Resource.Success -> {
-                    val activeAppointments = resource.data.filter { it.status.name != "CANCELLED" }
-                    if (activeAppointments.isEmpty()) {
+                    val nextAppointment = resource.data
+                        .filter { it.status == AppointmentStatus.CONFIRMED || it.status == AppointmentStatus.PENDING }
+                        .sortedWith(compareBy({ it.date }, { it.timeSlot }))
+                        .firstOrNull()
+
+                    if (nextAppointment != null) {
                         item {
-                            EmptyNoticeCard(message = "No upcoming appointments")
+                            HomeAppointmentCard(
+                                appointment = nextAppointment,
+                                onClick = { onNavigateToTab("teachers") }
+                            )
                         }
                     } else {
-                        items(activeAppointments.take(2), key = { it.id }) { appt ->
-                            HomeAppointmentCard(appointment = appt)
+                        item {
+                            EmptyNoticeCard(message = "No upcoming faculty appointments")
                         }
                     }
                 }
                 else -> {
                     item {
-                        EmptyNoticeCard(message = "No upcoming appointments")
+                        EmptyNoticeCard(message = "No upcoming faculty appointments")
                     }
                 }
             }
@@ -381,50 +378,42 @@ fun HomeScreen(
             }
 
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        QuickActionTile(
-                            title = "Faculty Directory",
-                            subtitle = "Find Cabins & Hours",
-                            icon = Icons.Default.Person,
-                            isEnabled = true,
-                            onClick = { onNavigateToTab("teachers") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        QuickActionTile(
-                            title = "Indoor Map",
-                            subtitle = "Block N1 Vector Grid",
-                            icon = Icons.Default.Map,
-                            isEnabled = true,
-                            onClick = { onNavigateToTab("campus_map") },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        QuickActionTile(
-                            title = "Courses & LMS",
-                            subtitle = "Syllabus & Work",
-                            icon = Icons.Default.Book,
-                            isEnabled = true,
-                            onClick = { onNavigateToTab("courses") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        QuickActionTile(
-                            title = "Lost & Found",
-                            subtitle = "Browse & Claim",
-                            icon = Icons.Default.FindInPage,
-                            isEnabled = true,
-                            onClick = { onNavigateToTab("lost_found") },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    QuickActionTile(
+                        title = "Faculty",
+                        subtitle = "Directory",
+                        icon = Icons.Default.Person,
+                        isEnabled = true,
+                        onClick = { onNavigateToTab("teachers") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    QuickActionTile(
+                        title = "Campus Map",
+                        subtitle = "Block N1",
+                        icon = Icons.Default.Map,
+                        isEnabled = true,
+                        onClick = { onNavigateToTab("campus_map") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    QuickActionTile(
+                        title = "Courses",
+                        subtitle = "LMS Portal",
+                        icon = Icons.Default.Book,
+                        isEnabled = true,
+                        onClick = { onNavigateToTab("courses") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    QuickActionTile(
+                        title = "Lost & Found",
+                        subtitle = "Repository",
+                        icon = Icons.Default.FindInPage,
+                        isEnabled = true,
+                        onClick = { onNavigateToTab("lost_found") },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
@@ -432,9 +421,14 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeAnnouncementCard(announcement: UniversityAnnouncement) {
+fun HomeAnnouncementCard(
+    announcement: UniversityAnnouncement,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = CardShape,
         colors = CardDefaults.cardColors(containerColor = SurfaceCard),
         border = BorderStroke(1.dp, SurfaceBorder)
@@ -499,12 +493,12 @@ fun SectionHeader(title: String, icon: ImageVector) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.padding(top = 4.dp)
+        modifier = Modifier.padding(top = 2.dp)
     ) {
-        Icon(icon, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(18.dp))
+        Icon(icon, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(16.dp))
         Text(
             text = title,
-            fontSize = 15.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = HeadingNavy
         )
@@ -538,7 +532,7 @@ fun TimetableRowCard(
                 )
                 Text(
                     text = "${slot.timeSlot} • ${slot.facultyName}",
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = MutedText
                 )
             }
@@ -567,9 +561,14 @@ fun TimetableRowCard(
 }
 
 @Composable
-fun HomeAppointmentCard(appointment: Appointment) {
+fun HomeAppointmentCard(
+    appointment: Appointment,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = CardShape,
         colors = CardDefaults.cardColors(containerColor = SurfaceCard),
         border = BorderStroke(1.dp, SurfaceBorder)
@@ -627,7 +626,7 @@ fun QuickActionTile(
 ) {
     Card(
         modifier = modifier
-            .height(72.dp)
+            .height(60.dp)
             .clickable(enabled = isEnabled) { onClick() },
         shape = CardShape,
         colors = CardDefaults.cardColors(
@@ -638,21 +637,21 @@ fun QuickActionTile(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp),
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Surface(
                 shape = CircleShape,
                 color = if (isEnabled) PrimaryIndigo.copy(alpha = 0.1f) else MutedText.copy(alpha = 0.1f),
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(32.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
                         tint = if (isEnabled) PrimaryIndigo else MutedText,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
@@ -660,7 +659,7 @@ fun QuickActionTile(
             Column {
                 Text(
                     text = title,
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isEnabled) HeadingNavy else MutedText
                 )
@@ -685,7 +684,7 @@ fun EmptyNoticeCard(message: String) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(14.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(

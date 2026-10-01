@@ -79,6 +79,7 @@ val CATEGORIZED_DRAWER_ITEMS = listOf(
     NavDrawerCategory(
         categoryTitle = "SERVICES",
         items = listOf(
+            NavDrawerItem("career_portfolio", "Career & Portfolio", Icons.Default.Work),
             NavDrawerItem("holidays", "Holidays & Calendar", Icons.Default.DateRange),
             NavDrawerItem("leave", "Leave Application", Icons.Default.FlightTakeoff),
             NavDrawerItem("cafeteria", "Cafeteria & Dining", Icons.Default.Restaurant),

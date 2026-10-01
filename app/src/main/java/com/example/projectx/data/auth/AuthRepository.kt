@@ -183,6 +183,36 @@ class AuthRepository(
         _sessionState.value = AuthSessionState.Unauthenticated
     }
 
+    fun enterDemoSession() {
+        if (com.projectx.app.BuildConfig.DEBUG) {
+            val demoUser = User(
+                uid = "demo_student_uid",
+                email = "demo.student@projectx.demo",
+                rollNumber = "DEMO001",
+                role = UserRole.STUDENT,
+                isActive = true
+            )
+
+            val demoPublicProfile = PublicProfile(
+                uid = "demo_student_uid",
+                displayName = "Demo Student",
+                schoolName = "Demo University",
+                program = "Undergraduate Program",
+                department = "Demo Department",
+                specialization = "General",
+                admissionYear = 2025,
+                currentSemester = 3,
+                section = "Demo-A",
+                bio = "Development Demo Student Profile"
+            )
+
+            _sessionState.value = AuthSessionState.Authenticated(
+                user = demoUser,
+                publicProfile = demoPublicProfile
+            )
+        }
+    }
+
     private suspend fun loadSessionForFirebaseUser(firebaseUser: FirebaseUser): AuthSessionState {
         // Check email verification status
         if (!firebaseUser.isEmailVerified) {

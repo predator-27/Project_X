@@ -3,7 +3,6 @@ package com.projectx.app
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
@@ -35,6 +34,8 @@ import com.projectx.app.ui.*
 import com.projectx.app.ui.academics.AcademicViewModel
 import com.projectx.app.ui.academics.CoursesScreen
 import com.projectx.app.ui.auth.*
+import com.projectx.app.ui.career.CareerPortfolioScreen
+import com.projectx.app.ui.career.CareerViewModel
 import com.projectx.app.ui.lms.AssignmentDetailScreen
 import com.projectx.app.ui.lms.CourseDetailScreen
 import kotlinx.coroutines.launch
@@ -94,32 +95,8 @@ fun CampusAppShell(
     var showSplash by rememberSaveable { mutableStateOf(true) }
     var isWebViewActive by rememberSaveable { mutableStateOf(false) }
 
-    var showExitDialog by rememberSaveable { mutableStateOf(false) }
-    var lastBackPressTime by rememberSaveable { mutableLongStateOf(0L) }
-
     LaunchedEffect(Unit) {
         teacherViewModel.checkForAppUpdates(context)
-    }
-
-    // Intercept system back button for double back press to exit
-    BackHandler(enabled = !showSplash) {
-        val currentTime = System.currentTimeMillis()
-        if (showExitDialog || (currentTime - lastBackPressTime < 2000L)) {
-            (context as? Activity)?.finish()
-        } else {
-            lastBackPressTime = currentTime
-            showExitDialog = true
-        }
-    }
-
-    if (showExitDialog) {
-        ExitAppDialog(
-            onDismiss = { showExitDialog = false },
-            onConfirmExit = {
-                showExitDialog = false
-                (context as? Activity)?.finish()
-            }
-        )
     }
 
     if (showSplash) {
@@ -212,7 +189,8 @@ fun StudentCampusShell(
     teacherViewModel: TeacherManagementViewModel,
     aiViewModel: CampusAiViewModel,
     announcementViewModel: AnnouncementViewModel,
-    academicViewModel: AcademicViewModel = viewModel()
+    academicViewModel: AcademicViewModel = viewModel(),
+    careerViewModel: CareerViewModel = viewModel()
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -259,7 +237,7 @@ fun StudentCampusShell(
                             "courses", "attendance", "timetable", "assignments", "exam_schedules", "results", "reports" -> selectedBottomTab = BottomTab.ACADEMICS
                             "teachers", "campus_map", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
                             "messages", "announcements", "community" -> selectedBottomTab = BottomTab.MESSAGES
-                            "profile", "settings" -> selectedBottomTab = BottomTab.PROFILE
+                            "profile", "settings", "career_portfolio" -> selectedBottomTab = BottomTab.PROFILE
                             "ai_assistant" -> {
                                 showAiAssistantSheet = true
                             }
@@ -396,6 +374,12 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 authViewModel = authViewModel
                             )
+                        } else if (activeDrawerModule == "career_portfolio") {
+                            CareerPortfolioScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                careerViewModel = careerViewModel,
+                                authViewModel = authViewModel
+                            )
                         } else if (activeDrawerModule == "messages" || activeDrawerModule == "announcements") {
                             MessagesScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
@@ -404,7 +388,11 @@ fun StudentCampusShell(
                             )
                         } else if (activeDrawerModule == "profile") {
                             ProfileScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                onNavigateToCareer = {
+                                    selectedBottomTab = BottomTab.PROFILE
+                                    activeDrawerModule = "career_portfolio"
+                                }
                             )
                         } else {
                             HomeScreen(
@@ -441,6 +429,10 @@ fun StudentCampusShell(
                                         "lost_found" -> {
                                             selectedBottomTab = BottomTab.CAMPUS
                                             activeDrawerModule = "lost_found"
+                                        }
+                                        "career_portfolio" -> {
+                                            selectedBottomTab = BottomTab.PROFILE
+                                            activeDrawerModule = "career_portfolio"
                                         }
                                         "messages" -> {
                                             selectedBottomTab = BottomTab.MESSAGES
@@ -535,9 +527,21 @@ fun StudentCampusShell(
                         }
                     }
                     BottomTab.PROFILE -> {
-                        ProfileScreen(
-                            onMenuClick = { coroutineScope.launch { drawerState.open() } }
-                        )
+                        if (activeDrawerModule == "career_portfolio") {
+                            CareerPortfolioScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                careerViewModel = careerViewModel,
+                                authViewModel = authViewModel
+                            )
+                        } else {
+                            ProfileScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                onNavigateToCareer = {
+                                    selectedBottomTab = BottomTab.PROFILE
+                                    activeDrawerModule = "career_portfolio"
+                                }
+                            )
+                        }
                     }
                 }
 

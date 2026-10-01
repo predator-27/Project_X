@@ -284,6 +284,190 @@ service cloud.firestore {
       allow delete: if (isCollegeAdmin() || isSuperAdmin()) && isActiveVerifiedBennettUser();
     }
 
+    // --- 10. CAREER & PORTFOLIO (PRIVATE STUDENT DATA) ---
+
+    // Certifications (/career_certifications/{certificationId})
+    match /career_certifications/{certificationId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly([
+          'certificationId', 'ownerUid', 'name', 'issuingOrganization', 'issueDate',
+          'expiryDate', 'credentialId', 'credentialUrl', 'category', 'skills',
+          'description', 'certificateStoragePath', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.certificationId == certificationId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.certificationId == resource.data.certificationId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name', 'issuingOrganization', 'issueDate', 'expiryDate', 'credentialId',
+          'credentialUrl', 'category', 'skills', 'description', 'certificateStoragePath', 'updatedAt'
+        ]);
+
+      allow delete: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+    }
+
+    // Projects (/career_projects/{projectId})
+    match /career_projects/{projectId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly([
+          'projectId', 'ownerUid', 'projectName', 'description', 'technologies',
+          'skills', 'projectUrl', 'githubUrl', 'startDate', 'endDate', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.projectId == projectId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.projectId == resource.data.projectId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'projectName', 'description', 'technologies', 'skills', 'projectUrl',
+          'githubUrl', 'startDate', 'endDate', 'updatedAt'
+        ]);
+
+      allow delete: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+    }
+
+    // Skills (/career_skills/{skillId})
+    match /career_skills/{skillId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly([
+          'skillId', 'ownerUid', 'name', 'category', 'proficiency', 'createdAt'
+        ])
+        && request.resource.data.skillId == skillId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.skillId == resource.data.skillId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name', 'category', 'proficiency'
+        ]);
+
+      allow delete: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+    }
+
+    // Achievements (/career_achievements/{achievementId})
+    match /career_achievements/{achievementId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly([
+          'achievementId', 'ownerUid', 'title', 'description', 'date',
+          'issuingOrganization', 'documentStoragePath', 'createdAt'
+        ])
+        && request.resource.data.achievementId == achievementId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.achievementId == resource.data.achievementId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'title', 'description', 'date', 'issuingOrganization', 'documentStoragePath'
+        ]);
+
+      allow delete: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+    }
+
+    // Portfolio Vault (/career_portfolio_vault/{fileId})
+    match /career_portfolio_vault/{fileId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly([
+          'fileId', 'ownerUid', 'fileName', 'fileType', 'category',
+          'storagePath', 'fileSizeBytes', 'uploadedAt'
+        ])
+        && request.resource.data.fileId == fileId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.uploadedAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.fileId == resource.data.fileId
+        && request.resource.data.uploadedAt == resource.data.uploadedAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'fileName', 'fileType', 'category'
+        ]);
+
+      allow delete: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+    }
+
+    // CV Profiles (/career_cv_profiles/{cvId})
+    match /career_cv_profiles/{cvId} {
+      allow read: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+
+      allow create: if isActiveVerifiedBennettUser()
+        && request.resource.data.keys().hasOnly([
+          'cvId', 'ownerUid', 'title', 'selectedCertificationIds', 'selectedProjectIds',
+          'selectedSkillIds', 'selectedAchievementIds', 'personalSummary', 'targetRole',
+          'selectedTemplate', 'updatedAt'
+        ])
+        && request.resource.data.cvId == cvId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if isActiveVerifiedBennettUser()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.cvId == resource.data.cvId
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'title', 'selectedCertificationIds', 'selectedProjectIds', 'selectedSkillIds',
+          'selectedAchievementIds', 'personalSummary', 'targetRole', 'selectedTemplate', 'updatedAt'
+        ]);
+
+      allow delete: if isActiveVerifiedBennettUser() && (
+        resource.data.ownerUid == request.auth.uid || isSuperAdmin()
+      );
+    }
+
     // --- DEFAULT DENY ALL UNMATCHED PATHS ---
     match /{document=**} {
       allow read, write: if false;

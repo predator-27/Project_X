@@ -2,9 +2,13 @@ package com.projectx.app.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.projectx.app.BuildConfig
+import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.data.demo.DemoCampusData
 import com.projectx.app.data.firestore.FacultyRepository
 import com.projectx.app.model.Teacher
 import com.projectx.app.model.TeacherStatus
+import com.projectx.app.ui.auth.AuthSessionState
 import com.projectx.app.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FacultyViewModel(
+    private val authRepository: AuthRepository = AuthRepository(),
     private val facultyRepository: FacultyRepository = FacultyRepository()
 ) : ViewModel() {
 
@@ -34,9 +39,18 @@ class FacultyViewModel(
         loadFacultyDirectory()
     }
 
+    private fun isDemoSession(): Boolean {
+        return BuildConfig.DEBUG &&
+                (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid == DemoCampusData.DEMO_STUDENT_UID
+    }
+
     fun loadFacultyDirectory() {
         viewModelScope.launch {
             _facultyListState.value = Resource.Loading
+            if (isDemoSession()) {
+                _facultyListState.value = Resource.Success(DemoCampusData.demoFaculty)
+                return@launch
+            }
             facultyRepository.getFacultyDirectory().fold(
                 onSuccess = { list ->
                     _facultyListState.value = if (list.isEmpty()) Resource.Empty else Resource.Success(list)

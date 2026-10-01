@@ -95,6 +95,11 @@ class AuthViewModel(
         }
     }
 
+    fun enterDemoSession() {
+        authRepository.enterDemoSession()
+        _errorMessage.value = null
+    }
+
     fun clearErrorMessage() {
         _errorMessage.value = null
     }

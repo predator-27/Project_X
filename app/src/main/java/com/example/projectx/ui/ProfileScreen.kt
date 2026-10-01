@@ -1,7 +1,12 @@
 package com.projectx.app.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +20,7 @@ import com.projectx.app.theme.*
 @Composable
 fun ProfileScreen(
     onMenuClick: () -> Unit,
+    onNavigateToCareer: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var currentStep by remember { mutableStateOf(0) } // 0..3
@@ -65,6 +71,20 @@ fun ProfileScreen(
                             text = if (isSubmitted) "Pending Approval" else "Active Student",
                             tone = if (isSubmitted) StatusTone.WARNING else StatusTone.SUCCESS
                         )
+                    }
+
+                    if (onNavigateToCareer != null) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Button(
+                            onClick = onNavigateToCareer,
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Work, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Build CV & Career Portfolio", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
