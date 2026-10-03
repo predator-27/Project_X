@@ -602,7 +602,7 @@ object DemoCampusData {
             endDate = "2026-09-23",
             reason = "Family function & festival holiday at hometown",
             status = "APPROVED",
-            approvedBy = "Warden Dr. K. Sharma",
+            approvedBy = "Demo Warden Dr. K. Sharma",
             appliedAt = BASE_TIME - ONE_DAY * 10
         ),
         HostelLeavePass(
@@ -613,7 +613,7 @@ object DemoCampusData {
             endDate = "2026-09-18",
             reason = "Medical checkup & prescription at City Health Center",
             status = "APPROVED",
-            approvedBy = "Assistant Warden R. Verma",
+            approvedBy = "Demo Assistant Warden R. Verma",
             appliedAt = BASE_TIME - ONE_DAY * 4
         ),
         HostelLeavePass(

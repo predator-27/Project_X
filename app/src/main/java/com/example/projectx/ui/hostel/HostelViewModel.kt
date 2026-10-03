@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class HostelViewModel(
     private val authRepository: AuthRepository = AuthRepository()
@@ -113,8 +115,37 @@ class HostelViewModel(
     }
 
     fun applyLeavePass(leaveType: String, startDate: String, endDate: String, reason: String) {
-        if (startDate.isBlank() || endDate.isBlank() || reason.isBlank()) {
+        val cleanStart = startDate.trim()
+        val cleanEnd = endDate.trim()
+        val cleanReason = reason.trim()
+
+        if (cleanStart.isBlank() || cleanEnd.isBlank() || cleanReason.isBlank()) {
             _actionState.value = Resource.Error("Please fill in start date, end date, and reason for leave.")
+            return
+        }
+
+        val dateRegex = Regex("^\\d{4}-\\d{2}-\\d{2}$")
+        if (!dateRegex.matches(cleanStart) || !dateRegex.matches(cleanEnd)) {
+            _actionState.value = Resource.Error("Please enter dates in YYYY-MM-DD format.")
+            return
+        }
+
+        try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply { isLenient = false }
+            val startParsed = sdf.parse(cleanStart)
+            val endParsed = sdf.parse(cleanEnd)
+
+            if (startParsed == null || endParsed == null) {
+                _actionState.value = Resource.Error("Please enter dates in YYYY-MM-DD format.")
+                return
+            }
+
+            if (endParsed.before(startParsed)) {
+                _actionState.value = Resource.Error("End date cannot be earlier than start date.")
+                return
+            }
+        } catch (e: Exception) {
+            _actionState.value = Resource.Error("Please enter dates in YYYY-MM-DD format.")
             return
         }
 
@@ -128,9 +159,9 @@ class HostelViewModel(
                 leaveId = nextLeaveId,
                 studentUid = DemoCampusData.DEMO_STUDENT_UID,
                 leaveType = leaveType,
-                startDate = startDate.trim(),
-                endDate = endDate.trim(),
-                reason = reason.trim(),
+                startDate = cleanStart,
+                endDate = cleanEnd,
+                reason = cleanReason,
                 status = "SUBMITTED",
                 approvedBy = "Pending Warden Review",
                 appliedAt = 1789900800000L

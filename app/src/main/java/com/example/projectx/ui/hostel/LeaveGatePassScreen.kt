@@ -49,7 +49,9 @@ fun LeaveGatePassScreen(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(14.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
         ) {
             // Demo Label Banner
             item {
