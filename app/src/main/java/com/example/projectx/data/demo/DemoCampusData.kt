@@ -2,6 +2,7 @@ package com.projectx.app.data.demo
 
 import com.projectx.app.model.*
 import com.projectx.app.model.career.*
+import com.projectx.app.model.hostel.*
 import com.projectx.app.model.lms.*
 
 object DemoCampusData {
@@ -542,5 +543,89 @@ object DemoCampusData {
         targetRole = "Software Engineer / Android Architect",
         selectedTemplate = "Classic",
         updatedAt = BASE_TIME - ONE_DAY * 2
+    )
+
+    // --- DEMO HOSTELLER DATASET ---
+    val demoDiningMeals = listOf(
+        DiningMeal(
+            mealId = "meal_1",
+            mealType = "Breakfast",
+            timeRange = "07:30 AM - 09:30 AM",
+            menuItems = listOf("Masala Dosa", "Sambar & Coconut Chutney", "Boiled Eggs", "Tea / Coffee", "Fresh Banana"),
+            calories = "450 kcal",
+            location = "Central Mess — Ground Floor"
+        ),
+        DiningMeal(
+            mealId = "meal_2",
+            mealType = "Lunch",
+            timeRange = "12:30 PM - 02:30 PM",
+            menuItems = listOf("Paneer Butter Masala", "Dal Makhani", "Jeera Rice", "Butter Roti", "Salad & Green Curd"),
+            calories = "680 kcal",
+            location = "Central Mess — Ground Floor"
+        ),
+        DiningMeal(
+            mealId = "meal_3",
+            mealType = "Snacks",
+            timeRange = "05:00 PM - 06:00 PM",
+            menuItems = listOf("Samosa & Mint Chutney", "Assorted Biscuits", "Hot Masala Tea"),
+            calories = "320 kcal",
+            location = "Central Mess — Ground Floor"
+        ),
+        DiningMeal(
+            mealId = "meal_4",
+            mealType = "Dinner",
+            timeRange = "07:30 PM - 09:30 PM",
+            menuItems = listOf("Kadhai Chicken / Shahi Paneer", "Yellow Dal Tadka", "Steamed Basmati Rice", "Phulka", "Gulab Jamun"),
+            calories = "720 kcal",
+            location = "Central Mess — Ground Floor"
+        )
+    )
+
+    var demoDiningQrToken = "DEMO-QR-BENNETT-88219-ACTIVE"
+
+    var demoRoomPartnerRequest = RoomPartnerRequest(
+        requestId = "room_demo_1",
+        studentUid = DEMO_STUDENT_UID,
+        partnerRollNo = "E26CSEU0099",
+        partnerName = "Alex Rivera",
+        roomType = "Triple Sharing",
+        status = "REQUEST_SENT",
+        submittedAt = BASE_TIME - ONE_DAY * 5
+    )
+
+    val demoLeavePasses = mutableListOf(
+        HostelLeavePass(
+            leaveId = "leave_demo_1",
+            studentUid = DEMO_STUDENT_UID,
+            leaveType = "Home Leave",
+            startDate = "2026-09-20",
+            endDate = "2026-09-23",
+            reason = "Family function & festival holiday at hometown",
+            status = "APPROVED",
+            approvedBy = "Warden Dr. K. Sharma",
+            appliedAt = BASE_TIME - ONE_DAY * 10
+        ),
+        HostelLeavePass(
+            leaveId = "leave_demo_2",
+            studentUid = DEMO_STUDENT_UID,
+            leaveType = "Local Gate Pass",
+            startDate = "2026-09-18",
+            endDate = "2026-09-18",
+            reason = "Medical checkup & prescription at City Health Center",
+            status = "APPROVED",
+            approvedBy = "Assistant Warden R. Verma",
+            appliedAt = BASE_TIME - ONE_DAY * 4
+        ),
+        HostelLeavePass(
+            leaveId = "leave_demo_3",
+            studentUid = DEMO_STUDENT_UID,
+            leaveType = "Emergency Leave",
+            startDate = "2026-09-10",
+            endDate = "2026-09-12",
+            reason = "Personal urgent errand",
+            status = "REJECTED",
+            approvedBy = "Warden Office",
+            appliedAt = BASE_TIME - ONE_DAY * 15
+        )
     )
 }

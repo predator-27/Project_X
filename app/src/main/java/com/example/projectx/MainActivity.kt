@@ -1,6 +1,5 @@
 package com.projectx.app
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,6 +36,10 @@ import com.projectx.app.ui.academics.CoursesScreen
 import com.projectx.app.ui.auth.*
 import com.projectx.app.ui.career.CareerPortfolioScreen
 import com.projectx.app.ui.career.CareerViewModel
+import com.projectx.app.ui.hostel.CafeteriaDiningScreen
+import com.projectx.app.ui.hostel.HostelViewModel
+import com.projectx.app.ui.hostel.LeaveGatePassScreen
+import com.projectx.app.ui.hostel.RoomPartnerScreen
 import com.projectx.app.ui.lms.AssignmentDetailScreen
 import com.projectx.app.ui.lms.CourseDetailScreen
 import kotlinx.coroutines.launch
@@ -187,7 +190,8 @@ fun StudentCampusShell(
     aiViewModel: CampusAiViewModel,
     announcementViewModel: AnnouncementViewModel,
     academicViewModel: AcademicViewModel = viewModel(),
-    careerViewModel: CareerViewModel = viewModel()
+    careerViewModel: CareerViewModel = viewModel(),
+    hostelViewModel: HostelViewModel = viewModel()
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -234,7 +238,7 @@ fun StudentCampusShell(
                             "courses", "attendance", "timetable", "assignments", "exam_schedules", "results", "reports" -> selectedBottomTab = BottomTab.ACADEMICS
                             "teachers", "campus_map", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
                             "messages", "announcements", "community" -> selectedBottomTab = BottomTab.MESSAGES
-                            "profile", "settings", "career_portfolio" -> selectedBottomTab = BottomTab.PROFILE
+                            "profile", "settings", "career_portfolio", "cafeteria", "leave", "room_partner" -> selectedBottomTab = BottomTab.PROFILE
                             "ai_assistant" -> {
                                 showAiAssistantSheet = true
                             }
@@ -376,6 +380,21 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 careerViewModel = careerViewModel,
                                 authViewModel = authViewModel
+                            )
+                        } else if (activeDrawerModule == "cafeteria") {
+                            CafeteriaDiningScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                hostelViewModel = hostelViewModel
+                            )
+                        } else if (activeDrawerModule == "leave") {
+                            LeaveGatePassScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                hostelViewModel = hostelViewModel
+                            )
+                        } else if (activeDrawerModule == "room_partner") {
+                            RoomPartnerScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                hostelViewModel = hostelViewModel
                             )
                         } else if (activeDrawerModule == "messages" || activeDrawerModule == "announcements") {
                             MessagesScreen(
@@ -529,6 +548,21 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 careerViewModel = careerViewModel,
                                 authViewModel = authViewModel
+                            )
+                        } else if (activeDrawerModule == "cafeteria") {
+                            CafeteriaDiningScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                hostelViewModel = hostelViewModel
+                            )
+                        } else if (activeDrawerModule == "leave") {
+                            LeaveGatePassScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                hostelViewModel = hostelViewModel
+                            )
+                        } else if (activeDrawerModule == "room_partner") {
+                            RoomPartnerScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                hostelViewModel = hostelViewModel
                             )
                         } else {
                             ProfileScreen(

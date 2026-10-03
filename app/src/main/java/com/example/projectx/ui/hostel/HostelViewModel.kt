@@ -1,0 +1,147 @@
+package com.projectx.app.ui.hostel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.projectx.app.BuildConfig
+import com.projectx.app.data.auth.AuthRepository
+import com.projectx.app.data.demo.DemoCampusData
+import com.projectx.app.model.hostel.*
+import com.projectx.app.ui.auth.AuthSessionState
+import com.projectx.app.util.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class HostelViewModel(
+    private val authRepository: AuthRepository = AuthRepository()
+) : ViewModel() {
+
+    private val _mealsState = MutableStateFlow<Resource<List<DiningMeal>>>(Resource.Loading)
+    val mealsState: StateFlow<Resource<List<DiningMeal>>> = _mealsState.asStateFlow()
+
+    private val _diningQrTokenState = MutableStateFlow(DemoCampusData.demoDiningQrToken)
+    val diningQrTokenState: StateFlow<String> = _diningQrTokenState.asStateFlow()
+
+    private val _roomPartnerState = MutableStateFlow<Resource<RoomPartnerRequest>>(Resource.Loading)
+    val roomPartnerState: StateFlow<Resource<RoomPartnerRequest>> = _roomPartnerState.asStateFlow()
+
+    private val _leavePassesState = MutableStateFlow<Resource<List<HostelLeavePass>>>(Resource.Loading)
+    val leavePassesState: StateFlow<Resource<List<HostelLeavePass>>> = _leavePassesState.asStateFlow()
+
+    private val _actionState = MutableStateFlow<Resource<Unit>>(Resource.Empty)
+    val actionState: StateFlow<Resource<Unit>> = _actionState.asStateFlow()
+
+    init {
+        loadHostelData()
+    }
+
+    private fun isDemoSession(): Boolean {
+        val sessionUid = (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid
+        return BuildConfig.DEBUG && sessionUid == DemoCampusData.DEMO_STUDENT_UID
+    }
+
+    fun loadHostelData() {
+        loadMeals()
+        loadRoomPartnerRequest()
+        loadLeavePasses()
+    }
+
+    fun loadMeals() {
+        viewModelScope.launch {
+            _mealsState.value = Resource.Loading
+            if (isDemoSession()) {
+                _mealsState.value = Resource.Success(DemoCampusData.demoDiningMeals)
+                _diningQrTokenState.value = DemoCampusData.demoDiningQrToken
+                return@launch
+            }
+            _mealsState.value = Resource.Success(DemoCampusData.demoDiningMeals)
+        }
+    }
+
+    fun regenerateDiningQr() {
+        viewModelScope.launch {
+            val currentHash = DemoCampusData.demoDiningQrToken.hashCode()
+            val tokenNum = (Math.abs(currentHash) % 89999) + 10000
+            val newToken = "DEMO-QR-BENNETT-$tokenNum-REFRESHED"
+            DemoCampusData.demoDiningQrToken = newToken
+            _diningQrTokenState.value = newToken
+            _actionState.value = Resource.Success(Unit)
+        }
+    }
+
+    fun loadRoomPartnerRequest() {
+        viewModelScope.launch {
+            _roomPartnerState.value = Resource.Loading
+            if (isDemoSession()) {
+                _roomPartnerState.value = Resource.Success(DemoCampusData.demoRoomPartnerRequest)
+                return@launch
+            }
+            _roomPartnerState.value = Resource.Success(DemoCampusData.demoRoomPartnerRequest)
+        }
+    }
+
+    fun selectRoomTypeAndPartner(roomType: String, partnerRollNo: String?, partnerName: String?) {
+        viewModelScope.launch {
+            _actionState.value = Resource.Loading
+            val currentIdx = DemoCampusData.demoRoomPartnerRequest.requestId.removePrefix("room_demo_").toIntOrNull() ?: 1
+            val nextReqId = "room_demo_${currentIdx + 1}"
+            val newReq = RoomPartnerRequest(
+                requestId = nextReqId,
+                studentUid = DemoCampusData.DEMO_STUDENT_UID,
+                partnerRollNo = partnerRollNo?.trim()?.ifBlank { null },
+                partnerName = partnerName?.trim()?.ifBlank { null },
+                roomType = roomType,
+                status = if (partnerRollNo.isNullOrBlank()) "NO_REQUEST" else "REQUEST_SENT",
+                submittedAt = 1789900800000L
+            )
+            DemoCampusData.demoRoomPartnerRequest = newReq
+            _roomPartnerState.value = Resource.Success(newReq)
+            _actionState.value = Resource.Success(Unit)
+        }
+    }
+
+    fun loadLeavePasses() {
+        viewModelScope.launch {
+            _leavePassesState.value = Resource.Loading
+            if (isDemoSession()) {
+                _leavePassesState.value = Resource.Success(DemoCampusData.demoLeavePasses.toList())
+                return@launch
+            }
+            _leavePassesState.value = Resource.Success(DemoCampusData.demoLeavePasses.toList())
+        }
+    }
+
+    fun applyLeavePass(leaveType: String, startDate: String, endDate: String, reason: String) {
+        if (startDate.isBlank() || endDate.isBlank() || reason.isBlank()) {
+            _actionState.value = Resource.Error("Please fill in start date, end date, and reason for leave.")
+            return
+        }
+
+        viewModelScope.launch {
+            _actionState.value = Resource.Loading
+            val maxIndex = DemoCampusData.demoLeavePasses
+                .mapNotNull { it.leaveId.removePrefix("leave_demo_").toIntOrNull() }
+                .maxOrNull() ?: 0
+            val nextLeaveId = "leave_demo_${maxIndex + 1}"
+            val newPass = HostelLeavePass(
+                leaveId = nextLeaveId,
+                studentUid = DemoCampusData.DEMO_STUDENT_UID,
+                leaveType = leaveType,
+                startDate = startDate.trim(),
+                endDate = endDate.trim(),
+                reason = reason.trim(),
+                status = "SUBMITTED",
+                approvedBy = "Pending Warden Review",
+                appliedAt = 1789900800000L
+            )
+            DemoCampusData.demoLeavePasses.add(0, newPass)
+            _actionState.value = Resource.Success(Unit)
+            loadLeavePasses()
+        }
+    }
+
+    fun resetActionState() {
+        _actionState.value = Resource.Empty
+    }
+}
