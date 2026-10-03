@@ -29,6 +29,7 @@ import com.projectx.app.components.SideNavDrawerContent
 import com.projectx.app.map.MapScreen
 import com.projectx.app.model.UserRole
 import com.projectx.app.theme.CampusTheme
+import com.projectx.app.theme.CampusThemeState
 import com.projectx.app.theme.CampusTokens
 import com.projectx.app.ui.*
 import com.projectx.app.ui.academics.AcademicViewModel
@@ -59,6 +60,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CampusThemeState.init(this)
         setContent {
             CampusTheme {
                 AmbientBackground {
@@ -92,18 +94,13 @@ fun CampusAppShell(
 ) {
     val sessionState by authViewModel.sessionState.collectAsState()
     val context = LocalContext.current
-    var showSplash by rememberSaveable { mutableStateOf(true) }
     var isWebViewActive by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         teacherViewModel.checkForAppUpdates(context)
     }
 
-    if (showSplash) {
-        SplashScreen(
-            onFinished = { showSplash = false }
-        )
-    } else if (isWebViewActive) {
+    if (isWebViewActive) {
         WebViewScreen(viewModel = teacherViewModel)
     } else {
         when (val session = sessionState) {

@@ -1,46 +1,42 @@
 package com.projectx.app.ui
 
-import android.media.MediaPlayer
-import android.net.Uri
-import android.widget.VideoView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.projectx.app.R
-import kotlinx.coroutines.delay
 
 private val SplashBackground = Color(0xFF0A100A)
+private val BrandNameColor   = Color(0xFFE8F0D8)
+private val TaglineColor     = Color(0xFF7A8870)
 
 /**
- * Opening Intro Video Splash Screen.
+ * Optional Project X Brand Pose Composable.
  *
- * Plays R.raw.splash_animation immediately on app launch preserving aspect ratio
- * (aspect-fit) without stretching or cropping, and transitions into the app/auth flow
- * upon completion.
+ * Non-blocking brand pose component available for manual preview or fallback.
  */
 @Composable
 fun SplashScreen(
-    videoTimeoutMs: Long = 12_000L,
     onFinished: () -> Unit,
 ) {
-    var completed by remember { mutableStateOf(false) }
-
-    fun done() {
-        if (!completed) {
-            completed = true
-            onFinished()
-        }
-    }
-
-    // Fallback safety timeout in case video decoder stalls
     LaunchedEffect(Unit) {
-        delay(videoTimeoutMs)
-        done()
+        onFinished()
     }
 
     Box(
@@ -49,27 +45,32 @@ fun SplashScreen(
             .background(SplashBackground),
         contentAlignment = Alignment.Center,
     ) {
-        AndroidView(
-            factory = { ctx ->
-                VideoView(ctx).apply {
-                    setVideoURI(
-                        Uri.parse("android.resource://${ctx.packageName}/${R.raw.splash_animation}")
-                    )
-                    setOnPreparedListener { mp ->
-                        mp.setVolume(0f, 0f)
-                        mp.isLooping = false
-                        // Aspect-fit scaling: preserves aspect ratio without cropping or stretching
-                        mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT)
-                        start()
-                    }
-                    setOnCompletionListener { done() }
-                    setOnErrorListener { _, _, _ ->
-                        done()
-                        true
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_app_logo),
+                contentDescription = "Project X",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(120.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Project X",
+                color = BrandNameColor,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Digital Campus Platform",
+                color = TaglineColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 1.2.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

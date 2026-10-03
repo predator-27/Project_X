@@ -1,5 +1,6 @@
 package com.projectx.app.theme
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -92,9 +93,21 @@ enum class CampusThemePreset(
 }
 
 object CampusThemeState {
-    // Default = Frosted Midnight. Splash lands straight into the same navy tone.
     private val _currentTheme = MutableStateFlow(CampusThemePreset.FROSTED_MIDNIGHT)
     val currentTheme: StateFlow<CampusThemePreset> = _currentTheme.asStateFlow()
+
+    fun init(context: Context) {
+        val prefs = context.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
+        val savedName = prefs.getString("selected_theme", CampusThemePreset.FROSTED_MIDNIGHT.name)
+        val theme = CampusThemePreset.entries.find { it.name == savedName } ?: CampusThemePreset.FROSTED_MIDNIGHT
+        _currentTheme.value = theme
+    }
+
+    fun setTheme(context: Context, theme: CampusThemePreset) {
+        _currentTheme.value = theme
+        val prefs = context.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putString("selected_theme", theme.name).apply()
+    }
 
     fun setTheme(theme: CampusThemePreset) {
         _currentTheme.value = theme

@@ -1,5 +1,6 @@
 package com.projectx.app.ui.auth
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projectx.app.data.auth.AuthRepository
@@ -98,6 +99,23 @@ class AuthViewModel(
     fun enterDemoSession() {
         authRepository.enterDemoSession()
         _errorMessage.value = null
+    }
+
+    fun enterFacultyDemoSession() {
+        authRepository.enterFacultyDemoSession()
+        _errorMessage.value = null
+    }
+
+    fun signInWithMicrosoft(activity: Activity) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            val state = authRepository.signInWithMicrosoft(activity)
+            if (state is AuthSessionState.Error) {
+                _errorMessage.value = state.message
+            }
+            _isLoading.value = false
+        }
     }
 
     fun clearErrorMessage() {

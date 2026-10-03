@@ -1,17 +1,23 @@
 package com.projectx.app.ui
 
+import android.app.Activity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.BugReport
@@ -26,19 +32,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.projectx.app.BuildConfig
 import com.projectx.app.R
 import com.projectx.app.ui.auth.AuthViewModel
 import com.projectx.app.util.AuthValidation
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
@@ -69,6 +79,12 @@ fun LoginScreen(
         )
     )
 
+    val scrollState = rememberScrollState()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val activity = remember(context) { context as? Activity }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background
@@ -77,9 +93,11 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .imePadding()
+                .verticalScroll(scrollState)
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             // Header Gradient Banner Card
             Card(
@@ -266,11 +284,44 @@ fun LoginScreen(
                                     color = MaterialTheme.colorScheme.primary
                                 )
 
-                                Text(
-                                    text = "Requires a valid Bennett University student email (@bennett.edu.in)",
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                // Microsoft Single Tenant OAuth Login Button
+                                Button(
+                                    onClick = {
+                                        activity?.let { authViewModel.signInWithMicrosoft(it) }
+                                    },
+                                    enabled = !isLoading && activity != null,
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A4EF)),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp)
+                                ) {
+                                    if (isLoading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(Icons.Default.Language, contentDescription = null, modifier = Modifier.size(18.dp))
+                                            Text("Continue with Microsoft (@bennett.edu.in)", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+                                    Text("or sign in with password", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+                                }
 
                                 OutlinedTextField(
                                     value = email,
@@ -282,7 +333,14 @@ fun LoginScreen(
                                     isError = emailError != null,
                                     supportingText = emailError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
                                     shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .bringIntoViewRequester(bringIntoViewRequester)
+                                        .onFocusEvent {
+                                            if (it.isFocused) {
+                                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                                            }
+                                        }
                                 )
 
                                 OutlinedTextField(
@@ -296,7 +354,14 @@ fun LoginScreen(
                                     supportingText = passwordError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
                                     visualTransformation = PasswordVisualTransformation(),
                                     shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .bringIntoViewRequester(bringIntoViewRequester)
+                                        .onFocusEvent {
+                                            if (it.isFocused) {
+                                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                                            }
+                                        }
                                 )
 
                                 Button(
@@ -337,11 +402,44 @@ fun LoginScreen(
                                     color = MaterialTheme.colorScheme.primary
                                 )
 
-                                Text(
-                                    text = "Enter your official Bennett University faculty email & credentials",
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                // Microsoft Single Tenant OAuth Login Button for Faculty
+                                Button(
+                                    onClick = {
+                                        activity?.let { authViewModel.signInWithMicrosoft(it) }
+                                    },
+                                    enabled = !isLoading && activity != null,
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A4EF)),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp)
+                                ) {
+                                    if (isLoading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(Icons.Default.Language, contentDescription = null, modifier = Modifier.size(18.dp))
+                                            Text("Continue with Microsoft (@bennett.edu.in)", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+                                    Text("or sign in with password", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+                                }
 
                                 OutlinedTextField(
                                     value = email,
@@ -353,7 +451,14 @@ fun LoginScreen(
                                     isError = emailError != null,
                                     supportingText = emailError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
                                     shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .bringIntoViewRequester(bringIntoViewRequester)
+                                        .onFocusEvent {
+                                            if (it.isFocused) {
+                                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                                            }
+                                        }
                                 )
 
                                 OutlinedTextField(
@@ -367,7 +472,14 @@ fun LoginScreen(
                                     supportingText = passwordError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
                                     visualTransformation = PasswordVisualTransformation(),
                                     shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .bringIntoViewRequester(bringIntoViewRequester)
+                                        .onFocusEvent {
+                                            if (it.isFocused) {
+                                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                                            }
+                                        }
                                 )
 
                                 Button(
@@ -436,7 +548,14 @@ fun LoginScreen(
                                     isError = emailError != null,
                                     supportingText = emailError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
                                     shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .bringIntoViewRequester(bringIntoViewRequester)
+                                        .onFocusEvent {
+                                            if (it.isFocused) {
+                                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                                            }
+                                        }
                                 )
 
                                 OutlinedTextField(
@@ -450,7 +569,14 @@ fun LoginScreen(
                                     supportingText = phoneError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                                     shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .bringIntoViewRequester(bringIntoViewRequester)
+                                        .onFocusEvent {
+                                            if (it.isFocused) {
+                                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                                            }
+                                        }
                                 )
 
                                 OutlinedTextField(
@@ -464,7 +590,14 @@ fun LoginScreen(
                                     supportingText = passwordError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
                                     visualTransformation = PasswordVisualTransformation(),
                                     shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .bringIntoViewRequester(bringIntoViewRequester)
+                                        .onFocusEvent {
+                                            if (it.isFocused) {
+                                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                                            }
+                                        }
                                 )
 
                                 // Password requirements checklist
@@ -543,31 +676,61 @@ fun LoginScreen(
                 }
             }
 
-            if (com.projectx.app.BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Spacer(modifier = Modifier.height(4.dp))
-                OutlinedButton(
-                    onClick = { authViewModel.enterDemoSession() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.BugReport,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "⚡ Demo Student Mode (Debug Only)",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        fontWeight = FontWeight.Bold
-                    )
+                if (selectedTabIndex == 1) {
+                    // Faculty Tab Demo Button
+                    OutlinedButton(
+                        onClick = { authViewModel.enterFacultyDemoSession() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(44.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.BugReport,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "⚡ Demo Faculty Mode (Debug Only)",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else {
+                    // Student / Default Tab Demo Button
+                    OutlinedButton(
+                        onClick = { authViewModel.enterDemoSession() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(44.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.BugReport,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "⚡ Demo Student Mode (Debug Only)",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
+
+            // Bottom clearance spacer for soft keyboard scrolling
+            Spacer(modifier = Modifier.height(120.dp))
         }
     }
 }

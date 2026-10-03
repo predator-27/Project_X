@@ -1,11 +1,13 @@
 package com.projectx.app.data.auth
 
+import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.OAuthProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,6 +96,32 @@ class FirebaseAuthRepository(
             Result.failure(Exception("Password does not meet security requirements: Must contain at least 8 characters, 1 capital letter, 1 number, and 1 special character."))
         } catch (e: Exception) {
             val errorMsg = e.localizedMessage ?: "Registration failed. Please check your network connection."
+            Result.failure(Exception(errorMsg))
+        }
+    }
+
+    suspend fun signInWithMicrosoft(activity: Activity): Result<FirebaseUser> = withContext(Dispatchers.IO) {
+        try {
+            val provider = OAuthProvider.newBuilder("microsoft.com")
+                .addCustomParameter("tenant", "<TENANT_ID>")
+                .build()
+
+            val pendingResult = firebaseAuth.pendingAuthResult
+            if (pendingResult != null) {
+                val authResult = pendingResult.await()
+                val user = authResult.user ?: return@withContext Result.failure(IllegalStateException("Microsoft Authentication failed: null user."))
+                _currentUser.value = user
+                _isAuthenticated.value = true
+                return@withContext Result.success(user)
+            }
+
+            val authResult = firebaseAuth.startActivityForSignInWithProvider(activity, provider).await()
+            val user = authResult.user ?: return@withContext Result.failure(IllegalStateException("Microsoft Authentication failed: null user."))
+            _currentUser.value = user
+            _isAuthenticated.value = true
+            Result.success(user)
+        } catch (e: Exception) {
+            val errorMsg = e.localizedMessage ?: "Microsoft Sign-In was cancelled or failed."
             Result.failure(Exception(errorMsg))
         }
     }

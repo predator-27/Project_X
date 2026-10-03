@@ -1,5 +1,6 @@
 package com.projectx.app.data.auth
 
+import android.app.Activity
 import com.projectx.app.data.firestore.PublicProfileRepository
 import com.projectx.app.data.firestore.UserRepository
 import com.projectx.app.model.AcademicProfile
@@ -8,6 +9,7 @@ import com.projectx.app.model.User
 import com.projectx.app.model.UserRole
 import com.projectx.app.ui.auth.AuthSessionState
 import com.google.firebase.auth.FirebaseUser
+import com.projectx.app.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -211,6 +213,51 @@ class AuthRepository(
                 publicProfile = demoPublicProfile
             )
         }
+    }
+
+    fun enterFacultyDemoSession() {
+        if (BuildConfig.DEBUG) {
+            val demoFacultyUser = User(
+                uid = "demo_faculty_uid",
+                email = "demo.faculty@projectx.demo",
+                rollNumber = "FAC001",
+                role = UserRole.FACULTY,
+                isActive = true
+            )
+
+            val demoFacultyProfile = PublicProfile(
+                uid = "demo_faculty_uid",
+                displayName = "Dr. Demo Professor",
+                schoolName = "Demo University",
+                program = "Computer Science Department",
+                department = "Computer Science",
+                specialization = "Artificial Intelligence",
+                admissionYear = 2020,
+                currentSemester = 1,
+                section = "Faculty-A",
+                bio = "Development Demo Faculty Profile"
+            )
+
+            _sessionState.value = AuthSessionState.Authenticated(
+                user = demoFacultyUser,
+                publicProfile = demoFacultyProfile
+            )
+        }
+    }
+
+    suspend fun signInWithMicrosoft(activity: Activity): AuthSessionState = withContext(Dispatchers.IO) {
+        _sessionState.value = AuthSessionState.Loading
+
+        val authResult = firebaseAuthRepo.signInWithMicrosoft(activity)
+        val firebaseUser = authResult.getOrElse { error ->
+            val errorState = AuthSessionState.Error(error.message ?: "Microsoft Authentication failed.")
+            _sessionState.value = errorState
+            return@withContext errorState
+        }
+
+        val state = loadSessionForFirebaseUser(firebaseUser)
+        _sessionState.value = state
+        state
     }
 
     private suspend fun loadSessionForFirebaseUser(firebaseUser: FirebaseUser): AuthSessionState {
