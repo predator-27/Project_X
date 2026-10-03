@@ -95,21 +95,26 @@ enum class CampusThemePreset(
 object CampusThemeState {
     private val _currentTheme = MutableStateFlow(CampusThemePreset.FROSTED_MIDNIGHT)
     val currentTheme: StateFlow<CampusThemePreset> = _currentTheme.asStateFlow()
+    private var appContext: Context? = null
 
     fun init(context: Context) {
+        appContext = context.applicationContext
         val prefs = context.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
         val savedName = prefs.getString("selected_theme", CampusThemePreset.FROSTED_MIDNIGHT.name)
         val theme = CampusThemePreset.entries.find { it.name == savedName } ?: CampusThemePreset.FROSTED_MIDNIGHT
         _currentTheme.value = theme
     }
 
-    fun setTheme(context: Context, theme: CampusThemePreset) {
-        _currentTheme.value = theme
-        val prefs = context.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putString("selected_theme", theme.name).apply()
-    }
-
     fun setTheme(theme: CampusThemePreset) {
         _currentTheme.value = theme
+        appContext?.let { ctx ->
+            val prefs = ctx.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putString("selected_theme", theme.name).apply()
+        }
+    }
+
+    fun setTheme(context: Context, theme: CampusThemePreset) {
+        appContext = context.applicationContext
+        setTheme(theme)
     }
 }
