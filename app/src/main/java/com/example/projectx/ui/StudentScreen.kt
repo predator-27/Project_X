@@ -26,10 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.projectx.app.components.StatusPill
+import com.projectx.app.components.StatusTone
 import com.projectx.app.map.MapViewModel
 import com.projectx.app.model.Appointment
 import com.projectx.app.model.AppointmentStatus
 import com.projectx.app.model.Teacher
+import com.projectx.app.model.TeacherStatus
 import com.projectx.app.ui.auth.AuthSessionState
 import com.projectx.app.ui.auth.AuthViewModel
 import com.projectx.app.util.Resource
@@ -452,7 +455,15 @@ fun TeacherCard(
                     }
                 }
 
-                StatusBadge(status = teacher.status)
+                StatusPill(
+                    text = teacher.status.name.replace("_", " "),
+                    tone = when (teacher.status) {
+                        TeacherStatus.AT_DESK -> StatusTone.SUCCESS
+                        TeacherStatus.IN_CLASS -> StatusTone.WARNING
+                        TeacherStatus.BUSY -> StatusTone.DANGER
+                        else -> StatusTone.NEUTRAL
+                    }
+                )
             }
 
             HorizontalDivider()
@@ -583,7 +594,15 @@ fun StudentAppointmentCard(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
-                AppointmentStatusBadge(status = appointment.status)
+                StatusPill(
+                    text = appointment.status.name,
+                    tone = when (appointment.status) {
+                        AppointmentStatus.CONFIRMED -> StatusTone.SUCCESS
+                        AppointmentStatus.PENDING -> StatusTone.WARNING
+                        AppointmentStatus.REJECTED, AppointmentStatus.CANCELLED -> StatusTone.DANGER
+                        else -> StatusTone.NEUTRAL
+                    }
+                )
             }
 
             Text(

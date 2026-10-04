@@ -2,6 +2,7 @@ package com.projectx.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,9 +11,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
@@ -21,33 +26,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.projectx.app.components.*
 import com.projectx.app.model.Appointment
 import com.projectx.app.model.AppointmentStatus
 import com.projectx.app.model.Teacher
 import com.projectx.app.model.TeacherStatus
+import com.projectx.app.theme.*
 import com.projectx.app.ui.auth.AuthViewModel
 import com.projectx.app.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 
+data class FacultyClassSchedule(
+    val id: String,
+    val courseCode: String,
+    val courseName: String,
+    val programSemester: String,
+    val timeSlot: String,
+    val roomCode: String,
+    val isCurrent: Boolean = false
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminTeacherScreen(
+    onMenuClick: () -> Unit = {},
     facultyViewModel: FacultyViewModel = viewModel(),
     appointmentViewModel: AppointmentViewModel = viewModel(),
     authViewModel: AuthViewModel? = null,
     modifier: Modifier = Modifier
 ) {
-    val currentFacultyUid = remember { FirebaseAuth.getInstance().currentUser?.uid ?: "" }
+    val currentFacultyUid = remember { FirebaseAuth.getInstance().currentUser?.uid ?: "demo_faculty_uid" }
 
     val activeFacultyResource by facultyViewModel.activeFacultyProfile.collectAsState()
     val facultyAppointmentsResource by appointmentViewModel.facultyAppointmentsState.collectAsState()
 
     var showSavedSnackbar by remember { mutableStateOf(false) }
+
+    val todaySchedule = remember {
+        listOf(
+            FacultyClassSchedule("fs_1", "CS201", "Data Structures & Algorithms", "B.Tech CSE • Sem 5 • Sec-A", "09:25 AM - 10:25 AM", "seat_c304", true),
+            FacultyClassSchedule("fs_2", "CS202L", "Database Management Systems Lab", "B.Tech CSE • Sem 5 • Sec-A1", "10:30 AM - 12:30 PM", "seat_lab102", false),
+            FacultyClassSchedule("fs_3", "CS203", "Web Technologies & Frameworks", "B.Tech SE • Sem 5 • Sec-A", "02:00 PM - 03:00 PM", "seat_c305", false)
+        )
+    }
 
     LaunchedEffect(currentFacultyUid) {
         if (currentFacultyUid.isNotBlank()) {
@@ -60,12 +85,18 @@ fun AdminTeacherScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("👨‍🏫 Teacher Admin Dashboard", fontWeight = FontWeight.Bold) },
+                title = { Text("👨‍🏫 Faculty Portal & Admin", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu"
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = {
-                        if (authViewModel != null) {
-                            authViewModel.signOut()
-                        }
+                        authViewModel?.signOut()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
@@ -89,7 +120,7 @@ fun AdminTeacherScreen(
                     },
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text("Faculty settings updated in Firestore!")
+                    Text("Faculty settings updated successfully!")
                 }
             }
         }
@@ -101,47 +132,151 @@ fun AdminTeacherScreen(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Header
+            // Demo Label Banner
             item {
-                when (val teacherResource = activeFacultyResource) {
-                    is Resource.Success -> {
-                        val teacher = teacherResource.data
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "⚡ DEMO FACULTY PORTAL — FOR DEVELOPMENT PREVIEW ONLY",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                    )
+                }
+            }
+
+            // Faculty Header Card
+            item {
+                val teacher = (activeFacultyResource as? Resource.Success)?.data
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                    border = BorderStroke(1.dp, SurfaceBorder)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Welcome, ${teacher?.name ?: "Dr. Sarah Jenkins"}",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = HeadingNavy
+                            )
+
+                            StatusPill(
+                                text = (teacher?.status ?: TeacherStatus.AT_DESK).name.replace("_", " "),
+                                tone = when (teacher?.status) {
+                                    TeacherStatus.AT_DESK -> StatusTone.SUCCESS
+                                    TeacherStatus.IN_CLASS -> StatusTone.WARNING
+                                    TeacherStatus.BUSY -> StatusTone.DANGER
+                                    else -> StatusTone.NEUTRAL
+                                }
+                            )
+                        }
+
                         Text(
-                            text = "Welcome, ${teacher?.name ?: "Faculty Member"}",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "${teacher?.title ?: ""} • ${teacher?.department ?: ""}",
+                            text = "${teacher?.title ?: "Professor"} • ${teacher?.department ?: "Computer Science"}",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = PrimaryIndigo,
+                            fontWeight = FontWeight.SemiBold
                         )
-                    }
-                    else -> {
+
                         Text(
-                            text = "Faculty Desk Portal",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            text = "Desk Location: ${teacher?.deskNumber ?: "seat_c304"} • Office Hours: ${teacher?.timings ?: "Mon, Wed, Fri: 11:00 AM - 01:00 PM"}",
+                            fontSize = 11.sp,
+                            color = MutedText
                         )
                     }
                 }
             }
 
-            // Status Control Card
+            // Today's Schedule Section (Camu Reference Layout)
             item {
-                when (val teacherResource = activeFacultyResource) {
-                    is Resource.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
+                Text("Today's Teaching Schedule", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+            }
+
+            items(todaySchedule, key = { it.id }) { slot ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = CardShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (slot.isCurrent) InfoBannerBg else SurfaceCard
+                    ),
+                    border = BorderStroke(1.dp, if (slot.isCurrent) PrimaryIndigo else SurfaceBorder)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = PrimaryIndigo.copy(alpha = 0.1f)
+                            ) {
+                                Text(
+                                    text = slot.courseCode,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PrimaryIndigo,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+
+                            if (slot.isCurrent) {
+                                StatusPill(text = "Current Class", tone = StatusTone.SUCCESS)
+                            }
+                        }
+
+                        Text(
+                            text = slot.courseName,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HeadingNavy
+                        )
+
+                        HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Icon(Icons.Default.Schedule, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(14.dp))
+                                Text(slot.timeSlot, fontSize = 11.sp, color = BodyText, fontWeight = FontWeight.Medium)
+                            }
+
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Icon(Icons.Default.LocationOn, contentDescription = null, tint = MutedText, modifier = Modifier.size(14.dp))
+                                Text("${slot.roomCode} • ${slot.programSemester}", fontSize = 11.sp, color = MutedText)
+                            }
                         }
                     }
+                }
+            }
+
+            // Faculty Desk Presence Control
+            item {
+                Text("Presence & Desk Availability Control", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+            }
+
+            item {
+                when (val teacherResource = activeFacultyResource) {
                     is Resource.Success -> {
                         val teacher = teacherResource.data
                         if (teacher != null) {
@@ -159,135 +294,61 @@ fun AdminTeacherScreen(
                                     showSavedSnackbar = true
                                 }
                             )
-                        } else {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text(
-                                    text = "Faculty profile document missing in Firestore (/faculty_profiles/$currentFacultyUid). Please contact College Admin.",
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(14.dp)
-                                )
-                            }
-                        }
-                    }
-                    is Resource.Error -> {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(
-                                text = teacherResource.message,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                fontSize = 12.sp,
-                                modifier = Modifier.padding(14.dp)
-                            )
                         }
                     }
                     else -> {}
                 }
             }
 
-            // Student Appointments Section
+            // Student Appointment Requests
             val apptCount = (facultyAppointmentsResource as? Resource.Success)?.data?.size ?: 0
             item {
-                Text(
-                    text = "Student Appointment Requests ($apptCount)",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Student Appointment Requests ($apptCount)", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
             }
 
             when (val apptResource = facultyAppointmentsResource) {
                 is Resource.Loading -> {
                     item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = PrimaryIndigo)
                         }
                     }
                 }
                 is Resource.Empty -> {
                     item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "No appointment requests for your faculty account.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
+                        EmptyStateCard(title = "No pending appointment requests for your faculty account.")
                     }
                 }
-                is Resource.Error -> {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(
-                                text = apptResource.message,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                fontSize = 12.sp,
-                                modifier = Modifier.padding(14.dp)
+                is Resource.Success -> {
+                    val appts = apptResource.data
+                    if (appts.isEmpty()) {
+                        item { EmptyStateCard(title = "No pending appointment requests for your faculty account.") }
+                    } else {
+                        items(appts, key = { it.id }) { appointment ->
+                            FacultyAppointmentCard(
+                                appointment = appointment,
+                                onConfirm = {
+                                    appointmentViewModel.updateAppointmentStatus(
+                                        appointmentId = appointment.id,
+                                        newStatus = AppointmentStatus.CONFIRMED,
+                                        facultyUid = currentFacultyUid
+                                    )
+                                    showSavedSnackbar = true
+                                },
+                                onReject = {
+                                    appointmentViewModel.updateAppointmentStatus(
+                                        appointmentId = appointment.id,
+                                        newStatus = AppointmentStatus.REJECTED,
+                                        facultyUid = currentFacultyUid
+                                    )
+                                    showSavedSnackbar = true
+                                }
                             )
                         }
                     }
                 }
-                is Resource.Success -> {
-                    items(apptResource.data, key = { it.id }) { appointment ->
-                        AppointmentRequestCard(
-                            appointment = appointment,
-                            onAccept = {
-                                appointmentViewModel.updateAppointmentStatus(
-                                    appointmentId = appointment.id,
-                                    newStatus = AppointmentStatus.CONFIRMED,
-                                    facultyUid = currentFacultyUid
-                                )
-                            },
-                            onReject = {
-                                appointmentViewModel.updateAppointmentStatus(
-                                    appointmentId = appointment.id,
-                                    newStatus = AppointmentStatus.REJECTED,
-                                    facultyUid = currentFacultyUid
-                                )
-                            },
-                            onComplete = {
-                                appointmentViewModel.updateAppointmentStatus(
-                                    appointmentId = appointment.id,
-                                    newStatus = AppointmentStatus.COMPLETED,
-                                    facultyUid = currentFacultyUid
-                                )
-                            },
-                            onCancel = {
-                                appointmentViewModel.updateAppointmentStatus(
-                                    appointmentId = appointment.id,
-                                    newStatus = AppointmentStatus.CANCELLED,
-                                    facultyUid = currentFacultyUid
-                                )
-                            }
-                        )
-                    }
+                else -> {
+                    item { EmptyStateCard(title = "No pending appointment requests for your faculty account.") }
                 }
             }
         }
@@ -301,294 +362,160 @@ fun FacultyPresenceCard(
     onTimingsSave: (String) -> Unit,
     onBioSave: (String) -> Unit
 ) {
-    var editableTimings by remember(teacher.timings) { mutableStateOf(teacher.timings) }
-    var editableBio by remember(teacher.bio) { mutableStateOf(teacher.bio) }
+    var editableTimings by remember(teacher) { mutableStateOf(teacher.timings) }
+    var editableBio by remember(teacher) { mutableStateOf(teacher.bio) }
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(14.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        border = BorderStroke(1.dp, SurfaceBorder)
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Real-time Presence Status",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                StatusBadge(status = teacher.status)
-            }
+            Text("Update Live Availability", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
 
-            HorizontalDivider()
-
-            // Status Toggles
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 TeacherStatus.entries.forEach { status ->
                     val isSelected = teacher.status == status
-                    val animatedBg by animateColorAsState(
-                        targetValue = if (isSelected) getStatusColor(status) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        label = "bgAnimation"
+                    val statusColor by animateColorAsState(
+                        if (isSelected) PrimaryIndigo else SurfaceBorder,
+                        label = "statusColor"
                     )
 
-                    Button(
-                        onClick = { onStatusChange(status) },
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = animatedBg,
-                            contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
-                        ),
-                        shape = RoundedCornerShape(8.dp)
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSelected) PrimaryIndigo.copy(alpha = 0.15f) else Color.Transparent,
+                        border = BorderStroke(1.dp, statusColor),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(8.dp))
                     ) {
-                        Text(
-                            text = status.label.split(" ").first(),
-                            fontSize = 11.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                        )
+                        TextButton(
+                            onClick = { onStatusChange(status) },
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = status.name.replace("_", " "),
+                                fontSize = 10.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isSelected) PrimaryIndigo else MutedText
+                            )
+                        }
                     }
                 }
             }
 
-            HorizontalDivider()
-
-            // Desk Location (Read-Only for Faculty; Admin controlled)
-            OutlinedTextField(
-                value = teacher.deskNumber.ifBlank { "Unassigned Desk" },
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Desk Location (College Admin Managed)") },
-                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
-                singleLine = true,
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Timings Input
             OutlinedTextField(
                 value = editableTimings,
                 onValueChange = { editableTimings = it },
-                label = { Text("Available Office Hours / Timings") },
-                leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
-                placeholder = { Text("e.g. Mon-Fri: 10:00 AM - 01:00 PM") },
-                trailingIcon = {
-                    IconButton(onClick = { onTimingsSave(editableTimings) }) {
-                        Icon(Icons.Default.Save, contentDescription = "Save Office Hours")
-                    }
-                },
+                label = { Text("Office Hours / Consultation Timings") },
                 singleLine = true,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Bio Input
-            OutlinedTextField(
-                value = editableBio,
-                onValueChange = { editableBio = it },
-                label = { Text("Faculty Bio / Discussion Focus") },
-                placeholder = { Text("Specializes in AI and Distributed Systems mentorship.") },
-                trailingIcon = {
-                    IconButton(onClick = { onBioSave(editableBio) }) {
-                        Icon(Icons.Default.Save, contentDescription = "Save Bio")
-                    }
-                },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Button(
+                    onClick = { onTimingsSave(editableTimings) },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Save Timings", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }
 
 @Composable
-fun AppointmentRequestCard(
+fun FacultyAppointmentCard(
     appointment: Appointment,
-    onAccept: () -> Unit,
-    onReject: () -> Unit,
-    onComplete: () -> Unit,
-    onCancel: () -> Unit
+    onConfirm: () -> Unit,
+    onReject: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        border = BorderStroke(1.dp, SurfaceBorder)
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column {
-                    Text(
-                        text = appointment.studentName,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = appointment.studentEmail,
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                AppointmentStatusBadge(status = appointment.status)
-            }
-
-            HorizontalDivider()
-
-            Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "📅 ${appointment.date} @ ${appointment.timeSlot}",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
+                    text = appointment.studentName,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HeadingNavy
+                )
+
+                StatusPill(
+                    text = appointment.status.name,
+                    tone = when (appointment.status.name) {
+                        "CONFIRMED" -> StatusTone.SUCCESS
+                        "PENDING" -> StatusTone.WARNING
+                        "REJECTED" -> StatusTone.DANGER
+                        else -> StatusTone.NEUTRAL
+                    }
                 )
             }
 
             Text(
-                text = "Purpose: ${appointment.purpose}",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            // Actions for PENDING
-            AnimatedVisibility(visible = appointment.status == AppointmentStatus.PENDING) {
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onReject,
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Reject", fontSize = 11.sp)
-                    }
-
-                    Button(
-                        onClick = onAccept,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Accept", fontSize = 11.sp)
-                    }
-                }
-            }
-
-            // Actions for CONFIRMED
-            AnimatedVisibility(visible = appointment.status == AppointmentStatus.CONFIRMED) {
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onCancel,
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text("Cancel", fontSize = 11.sp)
-                    }
-
-                    Button(
-                        onClick = onComplete,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0)),
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Mark Completed", fontSize = 11.sp)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun StatusBadge(status: TeacherStatus) {
-    Surface(
-        color = getStatusColor(status).copy(alpha = 0.15f),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(7.dp)
-                    .clip(CircleShape)
-                    .background(getStatusColor(status))
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = status.label,
+                text = "📅 ${appointment.date} @ ${appointment.timeSlot}",
                 fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = getStatusColor(status)
+                color = BodyText,
+                fontWeight = FontWeight.Medium
             )
+
+            Text(
+                text = "Topic: ${appointment.purpose}",
+                fontSize = 11.sp,
+                color = MutedText
+            )
+
+            if (appointment.status == AppointmentStatus.PENDING) {
+                HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onReject) {
+                        Icon(Icons.Default.Cancel, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Reject", fontSize = 11.sp, color = MaterialTheme.colorScheme.error)
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = onConfirm,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SecondaryEmerald),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Confirm", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
-    }
-}
-
-@Composable
-fun AppointmentStatusBadge(status: AppointmentStatus) {
-    val color = when (status) {
-        AppointmentStatus.CONFIRMED -> Color(0xFF2E7D32)
-        AppointmentStatus.PENDING -> Color(0xFFE65100)
-        AppointmentStatus.REJECTED -> Color(0xFFC62828)
-        AppointmentStatus.COMPLETED -> Color(0xFF1565C0)
-        AppointmentStatus.CANCELLED -> Color(0xFF616161)
-    }
-
-    Surface(
-        color = color.copy(alpha = 0.15f),
-        shape = RoundedCornerShape(10.dp)
-    ) {
-        Text(
-            text = status.label,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            color = color,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-        )
-    }
-}
-
-fun getStatusColor(status: TeacherStatus): Color {
-    return when (status) {
-        TeacherStatus.AT_DESK -> Color(0xFF2E7D32) // Green
-        TeacherStatus.BUSY -> Color(0xFFE65100)    // Orange
-        TeacherStatus.IN_CLASS -> Color(0xFFC62828)  // Red
-        TeacherStatus.AWAY -> Color(0xFF616161)      // Gray
     }
 }
