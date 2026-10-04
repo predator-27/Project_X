@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Save
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.components.*
 import com.projectx.app.data.demo.DemoCampusData
+import com.projectx.app.feature.campusmap.CampusMapScreen
 import com.projectx.app.model.Appointment
 import com.projectx.app.model.AppointmentStatus
 import com.projectx.app.model.Course
@@ -56,6 +58,7 @@ fun AdminTeacherScreen(
     val facultyAppointmentsResource by appointmentViewModel.facultyAppointmentsState.collectAsState()
 
     var showSavedSnackbar by remember { mutableStateOf(false) }
+    var showNavigation by remember { mutableStateOf(false) }
 
     val todaySchedule = DemoCampusData.demoFacultySchedule
     val myClasses = DemoCampusData.demoFacultyClasses
@@ -65,6 +68,11 @@ fun AdminTeacherScreen(
             facultyViewModel.loadActiveFacultyProfile(currentFacultyUid)
             appointmentViewModel.loadFacultyAppointments(currentFacultyUid)
         }
+    }
+
+    if (showNavigation) {
+        CampusMapScreen(onClose = { showNavigation = false })
+        return
     }
 
     Scaffold(
@@ -81,6 +89,13 @@ fun AdminTeacherScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showNavigation = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Explore,
+                            contentDescription = "Navigation",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = {
                         authViewModel?.signOut()
                     }) {

@@ -64,6 +64,7 @@ val CATEGORIZED_DRAWER_ITEMS = listOf(
         items = listOf(
             NavDrawerItem("teachers", "Faculty Directory", Icons.Default.PersonSearch),
             NavDrawerItem("campus_map", "Campus Map & Indoor Nav", Icons.Default.Map),
+            NavDrawerItem("navigation", "Navigation (N1 live)", Icons.Default.Explore),
             NavDrawerItem("appointments", "Faculty Appointments", Icons.Default.CalendarMonth),
             NavDrawerItem("lost_found", "Lost & Found Portal", Icons.Default.FindInPage)
         )

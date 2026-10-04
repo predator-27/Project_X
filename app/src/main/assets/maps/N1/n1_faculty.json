@@ -1,0 +1,150 @@
+{
+  "schema": "campus-map/faculty@1",
+  "mapId": "N1",
+  "fields": {
+    "seat": "must match a seat id from n1_map.json, e.g. N1-CUB-024 / N1-WS-52 / N1-MC-001",
+    "status": "available | busy | away"
+  },
+  "faculty": [
+    {
+      "seat": "N1-WS-52",
+      "name": "Dr. Ananya Rao",
+      "designation": "Associate Professor",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Computer Networks",
+        "Network Security"
+      ],
+      "status": "available",
+      "hours": "Mon–Fri, 10:00–16:00",
+      "email": "ananya.rao@example.edu"
+    },
+    {
+      "seat": "N1-CUB-024",
+      "name": "Prof. Rohit Mehra",
+      "designation": "Assistant Professor",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Machine Learning",
+        "Python Programming"
+      ],
+      "status": "busy",
+      "hours": "Mon–Thu, 11:00–17:00",
+      "email": "rohit.mehra@example.edu"
+    },
+    {
+      "seat": "N1-MC-001",
+      "name": "Dr. Kavya Iyer",
+      "designation": "Professor and Head of Department",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Operating Systems"
+      ],
+      "status": "available",
+      "hours": "Mon–Fri, 09:30–13:00"
+    },
+    {
+      "seat": "N1-WS-7",
+      "name": "Dr. Arjun Nair",
+      "designation": "Assistant Professor",
+      "department": "Electronics & Communication",
+      "subjects": [
+        "Digital Electronics",
+        "VLSI Design"
+      ],
+      "status": "available",
+      "email": "arjun.nair@example.edu"
+    },
+    {
+      "seat": "N1-CUB-012",
+      "name": "Dr. Meera Kulkarni",
+      "designation": "Associate Professor",
+      "department": "Mathematics",
+      "subjects": [
+        "Engineering Mathematics",
+        "Probability & Statistics"
+      ],
+      "status": "busy",
+      "hours": "Tue–Sat, 10:00–15:00"
+    },
+    {
+      "seat": "N1-WS-75",
+      "name": "Prof. Sameer Khan",
+      "designation": "Assistant Professor",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Cyber Security",
+        "Ethical Hacking"
+      ],
+      "status": "available",
+      "email": "sameer.khan@example.edu"
+    },
+    {
+      "seat": "N1-CUB-002",
+      "name": "Dr. Priya Sharma",
+      "designation": "Assistant Professor",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Database Management Systems"
+      ],
+      "status": "available",
+      "hours": "Mon–Fri, 12:00–17:00"
+    },
+    {
+      "seat": "N1-MC-002",
+      "name": "Dr. Vikram Joshi",
+      "designation": "Professor",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Compiler Design",
+        "Theory of Computation"
+      ],
+      "status": "busy"
+    },
+    {
+      "seat": "N1-CUB-018",
+      "name": "Dr. Neha Gupta",
+      "designation": "Assistant Professor",
+      "department": "AI & Data Science",
+      "subjects": [
+        "Deep Learning",
+        "Computer Vision"
+      ],
+      "status": "available",
+      "email": "neha.gupta@example.edu"
+    },
+    {
+      "seat": "N1-WS-30",
+      "name": "Prof. Aditya Verma",
+      "designation": "Assistant Professor",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Cloud Computing",
+        "DevOps"
+      ],
+      "status": "away"
+    },
+    {
+      "seat": "N1-CUB-033",
+      "name": "Dr. Sneha Patil",
+      "designation": "Assistant Professor",
+      "department": "Information Technology",
+      "subjects": [
+        "Data Structures",
+        "Algorithms"
+      ],
+      "status": "available",
+      "hours": "Mon–Fri, 10:00–14:00"
+    },
+    {
+      "seat": "N1-CUB-015",
+      "name": "Dr. Karan Malhotra",
+      "designation": "Associate Professor",
+      "department": "Computer Science & Engineering",
+      "subjects": [
+        "Software Engineering"
+      ],
+      "status": "available"
+    }
+  ]
+}

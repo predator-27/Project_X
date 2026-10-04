@@ -1,0 +1,2607 @@
+{
+  "schema": "campus-map/search@1",
+  "mapId": "N1",
+  "entries": [
+    {
+      "id": "N1-CUB-017",
+      "type": "CUBICLE",
+      "label": "CUB 017",
+      "cell": {
+        "x": 11,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 3
+      },
+      "distanceFromEntranceM": 28.1,
+      "person": null,
+      "terms": [
+        "017",
+        "cub 017",
+        "n1-cub-017"
+      ]
+    },
+    {
+      "id": "N1-CUB-018",
+      "type": "CUBICLE",
+      "label": "CUB 018",
+      "cell": {
+        "x": 18,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 18,
+        "y": 3
+      },
+      "distanceFromEntranceM": 26.8,
+      "person": {
+        "name": "Dr. Neha Gupta",
+        "designation": "Assistant Professor",
+        "department": "AI & Data Science",
+        "subjects": [
+          "Deep Learning",
+          "Computer Vision"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "018",
+        "ai & data science",
+        "computer vision",
+        "cub 018",
+        "deep learning",
+        "dr. neha gupta",
+        "gupta",
+        "n1-cub-018",
+        "neha"
+      ]
+    },
+    {
+      "id": "N1-CUB-019",
+      "type": "CUBICLE",
+      "label": "CUB 019",
+      "cell": {
+        "x": 26,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 26,
+        "y": 3
+      },
+      "distanceFromEntranceM": 25.1,
+      "person": null,
+      "terms": [
+        "019",
+        "cub 019",
+        "n1-cub-019"
+      ]
+    },
+    {
+      "id": "N1-MC-002",
+      "type": "CABIN",
+      "label": "Master cabin 002",
+      "cell": {
+        "x": 80,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 80,
+        "y": 3
+      },
+      "distanceFromEntranceM": 21.6,
+      "person": {
+        "name": "Dr. Vikram Joshi",
+        "designation": "Professor",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Compiler Design",
+          "Theory of Computation"
+        ],
+        "status": "busy"
+      },
+      "terms": [
+        "002",
+        "cabin 002",
+        "compiler design",
+        "computer science & engineering",
+        "dr. vikram joshi",
+        "joshi",
+        "master cabin 002",
+        "n1-mc-002",
+        "theory of computation",
+        "vikram"
+      ]
+    },
+    {
+      "id": "N1-MC-001",
+      "type": "CABIN",
+      "label": "Master cabin 001",
+      "cell": {
+        "x": 80,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 80,
+        "y": 93
+      },
+      "distanceFromEntranceM": 3.8,
+      "person": {
+        "name": "Dr. Kavya Iyer",
+        "designation": "Professor and Head of Department",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Operating Systems"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "001",
+        "cabin 001",
+        "computer science & engineering",
+        "dr. kavya iyer",
+        "iyer",
+        "kavya",
+        "master cabin 001",
+        "n1-mc-001",
+        "operating systems"
+      ]
+    },
+    {
+      "id": "N1-CUB-016",
+      "type": "CUBICLE",
+      "label": "CUB 016",
+      "cell": {
+        "x": 7,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 12
+      },
+      "distanceFromEntranceM": 26.9,
+      "person": null,
+      "terms": [
+        "016",
+        "cub 016",
+        "n1-cub-016"
+      ]
+    },
+    {
+      "id": "N1-CUB-015",
+      "type": "CUBICLE",
+      "label": "CUB 015",
+      "cell": {
+        "x": 14,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 12
+      },
+      "distanceFromEntranceM": 26.0,
+      "person": {
+        "name": "Dr. Karan Malhotra",
+        "designation": "Associate Professor",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Software Engineering"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "015",
+        "computer science & engineering",
+        "cub 015",
+        "dr. karan malhotra",
+        "karan",
+        "malhotra",
+        "n1-cub-015",
+        "software engineering"
+      ]
+    },
+    {
+      "id": "N1-CUB-014",
+      "type": "CUBICLE",
+      "label": "CUB 014",
+      "cell": {
+        "x": 7,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 19
+      },
+      "distanceFromEntranceM": 25.5,
+      "person": null,
+      "terms": [
+        "014",
+        "cub 014",
+        "n1-cub-014"
+      ]
+    },
+    {
+      "id": "N1-CUB-013",
+      "type": "CUBICLE",
+      "label": "CUB 013",
+      "cell": {
+        "x": 14,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 19
+      },
+      "distanceFromEntranceM": 24.5,
+      "person": null,
+      "terms": [
+        "013",
+        "cub 013",
+        "n1-cub-013"
+      ]
+    },
+    {
+      "id": "N1-CUB-012",
+      "type": "CUBICLE",
+      "label": "CUB 012",
+      "cell": {
+        "x": 11,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 26
+      },
+      "distanceFromEntranceM": 23.2,
+      "person": {
+        "name": "Dr. Meera Kulkarni",
+        "designation": "Associate Professor",
+        "department": "Mathematics",
+        "subjects": [
+          "Engineering Mathematics",
+          "Probability & Statistics"
+        ],
+        "status": "busy"
+      },
+      "terms": [
+        "012",
+        "cub 012",
+        "dr. meera kulkarni",
+        "engineering mathematics",
+        "kulkarni",
+        "mathematics",
+        "meera",
+        "n1-cub-012",
+        "probability & statistics"
+      ]
+    },
+    {
+      "id": "N1-CUB-011",
+      "type": "CUBICLE",
+      "label": "CUB 011",
+      "cell": {
+        "x": 11,
+        "y": 36
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 33
+      },
+      "distanceFromEntranceM": 21.8,
+      "person": null,
+      "terms": [
+        "011",
+        "cub 011",
+        "n1-cub-011"
+      ]
+    },
+    {
+      "id": "N1-CUB-010",
+      "type": "CUBICLE",
+      "label": "CUB 010",
+      "cell": {
+        "x": 11,
+        "y": 43
+      },
+      "approachCell": {
+        "x": 11,
+        "y": 40
+      },
+      "distanceFromEntranceM": 20.4,
+      "person": null,
+      "terms": [
+        "010",
+        "cub 010",
+        "n1-cub-010"
+      ]
+    },
+    {
+      "id": "N1-CUB-008",
+      "type": "CUBICLE",
+      "label": "CUB 008",
+      "cell": {
+        "x": 7,
+        "y": 50
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 47
+      },
+      "distanceFromEntranceM": 19.7,
+      "person": null,
+      "terms": [
+        "008",
+        "cub 008",
+        "n1-cub-008"
+      ]
+    },
+    {
+      "id": "N1-CUB-009",
+      "type": "CUBICLE",
+      "label": "CUB 009",
+      "cell": {
+        "x": 14,
+        "y": 50
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 47
+      },
+      "distanceFromEntranceM": 18.9,
+      "person": null,
+      "terms": [
+        "009",
+        "cub 009",
+        "n1-cub-009"
+      ]
+    },
+    {
+      "id": "N1-CUB-006",
+      "type": "CUBICLE",
+      "label": "CUB 006",
+      "cell": {
+        "x": 7,
+        "y": 57
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 54
+      },
+      "distanceFromEntranceM": 18.3,
+      "person": null,
+      "terms": [
+        "006",
+        "cub 006",
+        "n1-cub-006"
+      ]
+    },
+    {
+      "id": "N1-CUB-007",
+      "type": "CUBICLE",
+      "label": "CUB 007",
+      "cell": {
+        "x": 14,
+        "y": 57
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 54
+      },
+      "distanceFromEntranceM": 17.4,
+      "person": null,
+      "terms": [
+        "007",
+        "cub 007",
+        "n1-cub-007"
+      ]
+    },
+    {
+      "id": "N1-CUB-004",
+      "type": "CUBICLE",
+      "label": "CUB 004",
+      "cell": {
+        "x": 7,
+        "y": 64
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 61
+      },
+      "distanceFromEntranceM": 16.8,
+      "person": null,
+      "terms": [
+        "004",
+        "cub 004",
+        "n1-cub-004"
+      ]
+    },
+    {
+      "id": "N1-CUB-005",
+      "type": "CUBICLE",
+      "label": "CUB 005",
+      "cell": {
+        "x": 14,
+        "y": 64
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 61
+      },
+      "distanceFromEntranceM": 16.1,
+      "person": null,
+      "terms": [
+        "005",
+        "cub 005",
+        "n1-cub-005"
+      ]
+    },
+    {
+      "id": "N1-CUB-003",
+      "type": "CUBICLE",
+      "label": "CUB 003",
+      "cell": {
+        "x": 7,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 7,
+        "y": 93
+      },
+      "distanceFromEntranceM": 12.0,
+      "person": null,
+      "terms": [
+        "003",
+        "cub 003",
+        "n1-cub-003"
+      ]
+    },
+    {
+      "id": "N1-CUB-002",
+      "type": "CUBICLE",
+      "label": "CUB 002",
+      "cell": {
+        "x": 14,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 14,
+        "y": 93
+      },
+      "distanceFromEntranceM": 10.5,
+      "person": {
+        "name": "Dr. Priya Sharma",
+        "designation": "Assistant Professor",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Database Management Systems"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "002",
+        "computer science & engineering",
+        "cub 002",
+        "database management systems",
+        "dr. priya sharma",
+        "n1-cub-002",
+        "priya",
+        "sharma"
+      ]
+    },
+    {
+      "id": "N1-CUB-001",
+      "type": "CUBICLE",
+      "label": "CUB 001",
+      "cell": {
+        "x": 22,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 22,
+        "y": 93
+      },
+      "distanceFromEntranceM": 8.8,
+      "person": null,
+      "terms": [
+        "001",
+        "cub 001",
+        "n1-cub-001"
+      ]
+    },
+    {
+      "id": "N1-WS-78",
+      "type": "WORKSTATION",
+      "label": "WS 78",
+      "cell": {
+        "x": 24,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 12
+      },
+      "distanceFromEntranceM": 24.4,
+      "person": null,
+      "terms": [
+        "78",
+        "n1-ws-78",
+        "ws 78"
+      ]
+    },
+    {
+      "id": "N1-WS-77",
+      "type": "WORKSTATION",
+      "label": "WS 77",
+      "cell": {
+        "x": 31,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 12
+      },
+      "distanceFromEntranceM": 23.0,
+      "person": null,
+      "terms": [
+        "77",
+        "n1-ws-77",
+        "ws 77"
+      ]
+    },
+    {
+      "id": "N1-WS-76",
+      "type": "WORKSTATION",
+      "label": "WS 76",
+      "cell": {
+        "x": 38,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 12
+      },
+      "distanceFromEntranceM": 21.8,
+      "person": null,
+      "terms": [
+        "76",
+        "n1-ws-76",
+        "ws 76"
+      ]
+    },
+    {
+      "id": "N1-WS-75",
+      "type": "WORKSTATION",
+      "label": "WS 75",
+      "cell": {
+        "x": 45,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 12
+      },
+      "distanceFromEntranceM": 20.5,
+      "person": {
+        "name": "Prof. Sameer Khan",
+        "designation": "Assistant Professor",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Cyber Security",
+          "Ethical Hacking"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "75",
+        "computer science & engineering",
+        "cyber security",
+        "ethical hacking",
+        "khan",
+        "n1-ws-75",
+        "prof",
+        "prof. sameer khan",
+        "sameer",
+        "ws 75"
+      ]
+    },
+    {
+      "id": "N1-WS-74",
+      "type": "WORKSTATION",
+      "label": "WS 74",
+      "cell": {
+        "x": 51,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 12
+      },
+      "distanceFromEntranceM": 19.3,
+      "person": null,
+      "terms": [
+        "74",
+        "n1-ws-74",
+        "ws 74"
+      ]
+    },
+    {
+      "id": "N1-WS-73",
+      "type": "WORKSTATION",
+      "label": "WS 73",
+      "cell": {
+        "x": 58,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 12
+      },
+      "distanceFromEntranceM": 18.5,
+      "person": null,
+      "terms": [
+        "73",
+        "n1-ws-73",
+        "ws 73"
+      ]
+    },
+    {
+      "id": "N1-WS-72",
+      "type": "WORKSTATION",
+      "label": "WS 72",
+      "cell": {
+        "x": 24,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 20
+      },
+      "distanceFromEntranceM": 23.2,
+      "person": null,
+      "terms": [
+        "72",
+        "n1-ws-72",
+        "ws 72"
+      ]
+    },
+    {
+      "id": "N1-WS-71",
+      "type": "WORKSTATION",
+      "label": "WS 71",
+      "cell": {
+        "x": 31,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 20
+      },
+      "distanceFromEntranceM": 21.9,
+      "person": null,
+      "terms": [
+        "71",
+        "n1-ws-71",
+        "ws 71"
+      ]
+    },
+    {
+      "id": "N1-WS-70",
+      "type": "WORKSTATION",
+      "label": "WS 70",
+      "cell": {
+        "x": 38,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 20
+      },
+      "distanceFromEntranceM": 19.5,
+      "person": null,
+      "terms": [
+        "70",
+        "n1-ws-70",
+        "ws 70"
+      ]
+    },
+    {
+      "id": "N1-WS-69",
+      "type": "WORKSTATION",
+      "label": "WS 69",
+      "cell": {
+        "x": 45,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 20
+      },
+      "distanceFromEntranceM": 18.2,
+      "person": null,
+      "terms": [
+        "69",
+        "n1-ws-69",
+        "ws 69"
+      ]
+    },
+    {
+      "id": "N1-WS-68",
+      "type": "WORKSTATION",
+      "label": "WS 68",
+      "cell": {
+        "x": 51,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 20
+      },
+      "distanceFromEntranceM": 18.2,
+      "person": null,
+      "terms": [
+        "68",
+        "n1-ws-68",
+        "ws 68"
+      ]
+    },
+    {
+      "id": "N1-WS-67",
+      "type": "WORKSTATION",
+      "label": "WS 67",
+      "cell": {
+        "x": 58,
+        "y": 20
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 20
+      },
+      "distanceFromEntranceM": 16.8,
+      "person": null,
+      "terms": [
+        "67",
+        "n1-ws-67",
+        "ws 67"
+      ]
+    },
+    {
+      "id": "N1-WS-66",
+      "type": "WORKSTATION",
+      "label": "WS 66",
+      "cell": {
+        "x": 24,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 24
+      },
+      "distanceFromEntranceM": 21.9,
+      "person": null,
+      "terms": [
+        "66",
+        "n1-ws-66",
+        "ws 66"
+      ]
+    },
+    {
+      "id": "N1-WS-65",
+      "type": "WORKSTATION",
+      "label": "WS 65",
+      "cell": {
+        "x": 31,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 24
+      },
+      "distanceFromEntranceM": 20.5,
+      "person": null,
+      "terms": [
+        "65",
+        "n1-ws-65",
+        "ws 65"
+      ]
+    },
+    {
+      "id": "N1-WS-64",
+      "type": "WORKSTATION",
+      "label": "WS 64",
+      "cell": {
+        "x": 38,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 24
+      },
+      "distanceFromEntranceM": 19.3,
+      "person": null,
+      "terms": [
+        "64",
+        "n1-ws-64",
+        "ws 64"
+      ]
+    },
+    {
+      "id": "N1-WS-63",
+      "type": "WORKSTATION",
+      "label": "WS 63",
+      "cell": {
+        "x": 45,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 24
+      },
+      "distanceFromEntranceM": 18.0,
+      "person": null,
+      "terms": [
+        "63",
+        "n1-ws-63",
+        "ws 63"
+      ]
+    },
+    {
+      "id": "N1-WS-62",
+      "type": "WORKSTATION",
+      "label": "WS 62",
+      "cell": {
+        "x": 51,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 24
+      },
+      "distanceFromEntranceM": 16.8,
+      "person": null,
+      "terms": [
+        "62",
+        "n1-ws-62",
+        "ws 62"
+      ]
+    },
+    {
+      "id": "N1-WS-61",
+      "type": "WORKSTATION",
+      "label": "WS 61",
+      "cell": {
+        "x": 58,
+        "y": 27
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 24
+      },
+      "distanceFromEntranceM": 16.0,
+      "person": null,
+      "terms": [
+        "61",
+        "n1-ws-61",
+        "ws 61"
+      ]
+    },
+    {
+      "id": "N1-WS-60",
+      "type": "WORKSTATION",
+      "label": "WS 60",
+      "cell": {
+        "x": 24,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 32
+      },
+      "distanceFromEntranceM": 20.7,
+      "person": null,
+      "terms": [
+        "60",
+        "n1-ws-60",
+        "ws 60"
+      ]
+    },
+    {
+      "id": "N1-WS-59",
+      "type": "WORKSTATION",
+      "label": "WS 59",
+      "cell": {
+        "x": 31,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 32
+      },
+      "distanceFromEntranceM": 19.3,
+      "person": null,
+      "terms": [
+        "59",
+        "n1-ws-59",
+        "ws 59"
+      ]
+    },
+    {
+      "id": "N1-WS-58",
+      "type": "WORKSTATION",
+      "label": "WS 58",
+      "cell": {
+        "x": 38,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 32
+      },
+      "distanceFromEntranceM": 17.0,
+      "person": null,
+      "terms": [
+        "58",
+        "n1-ws-58",
+        "ws 58"
+      ]
+    },
+    {
+      "id": "N1-WS-57",
+      "type": "WORKSTATION",
+      "label": "WS 57",
+      "cell": {
+        "x": 45,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 32
+      },
+      "distanceFromEntranceM": 15.7,
+      "person": null,
+      "terms": [
+        "57",
+        "n1-ws-57",
+        "ws 57"
+      ]
+    },
+    {
+      "id": "N1-WS-56",
+      "type": "WORKSTATION",
+      "label": "WS 56",
+      "cell": {
+        "x": 51,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 32
+      },
+      "distanceFromEntranceM": 15.7,
+      "person": null,
+      "terms": [
+        "56",
+        "n1-ws-56",
+        "ws 56"
+      ]
+    },
+    {
+      "id": "N1-WS-55",
+      "type": "WORKSTATION",
+      "label": "WS 55",
+      "cell": {
+        "x": 58,
+        "y": 32
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 32
+      },
+      "distanceFromEntranceM": 14.3,
+      "person": null,
+      "terms": [
+        "55",
+        "n1-ws-55",
+        "ws 55"
+      ]
+    },
+    {
+      "id": "N1-WS-54",
+      "type": "WORKSTATION",
+      "label": "WS 54",
+      "cell": {
+        "x": 24,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 36
+      },
+      "distanceFromEntranceM": 19.3,
+      "person": null,
+      "terms": [
+        "54",
+        "n1-ws-54",
+        "ws 54"
+      ]
+    },
+    {
+      "id": "N1-WS-53",
+      "type": "WORKSTATION",
+      "label": "WS 53",
+      "cell": {
+        "x": 31,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 36
+      },
+      "distanceFromEntranceM": 18.0,
+      "person": null,
+      "terms": [
+        "53",
+        "n1-ws-53",
+        "ws 53"
+      ]
+    },
+    {
+      "id": "N1-WS-52",
+      "type": "WORKSTATION",
+      "label": "WS 52",
+      "cell": {
+        "x": 38,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 36
+      },
+      "distanceFromEntranceM": 16.8,
+      "person": {
+        "name": "Dr. Ananya Rao",
+        "designation": "Associate Professor",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Computer Networks",
+          "Network Security"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "52",
+        "ananya",
+        "computer networks",
+        "computer science & engineering",
+        "dr. ananya rao",
+        "n1-ws-52",
+        "network security",
+        "rao",
+        "ws 52"
+      ]
+    },
+    {
+      "id": "N1-WS-51",
+      "type": "WORKSTATION",
+      "label": "WS 51",
+      "cell": {
+        "x": 45,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 36
+      },
+      "distanceFromEntranceM": 15.4,
+      "person": null,
+      "terms": [
+        "51",
+        "n1-ws-51",
+        "ws 51"
+      ]
+    },
+    {
+      "id": "N1-WS-50",
+      "type": "WORKSTATION",
+      "label": "WS 50",
+      "cell": {
+        "x": 51,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 36
+      },
+      "distanceFromEntranceM": 14.3,
+      "person": null,
+      "terms": [
+        "50",
+        "n1-ws-50",
+        "ws 50"
+      ]
+    },
+    {
+      "id": "N1-WS-49",
+      "type": "WORKSTATION",
+      "label": "WS 49",
+      "cell": {
+        "x": 58,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 36
+      },
+      "distanceFromEntranceM": 13.5,
+      "person": null,
+      "terms": [
+        "49",
+        "n1-ws-49",
+        "ws 49"
+      ]
+    },
+    {
+      "id": "N1-WS-48",
+      "type": "WORKSTATION",
+      "label": "WS 48",
+      "cell": {
+        "x": 24,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 44
+      },
+      "distanceFromEntranceM": 18.3,
+      "person": null,
+      "terms": [
+        "48",
+        "n1-ws-48",
+        "ws 48"
+      ]
+    },
+    {
+      "id": "N1-WS-47",
+      "type": "WORKSTATION",
+      "label": "WS 47",
+      "cell": {
+        "x": 31,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 44
+      },
+      "distanceFromEntranceM": 16.8,
+      "person": null,
+      "terms": [
+        "47",
+        "n1-ws-47",
+        "ws 47"
+      ]
+    },
+    {
+      "id": "N1-WS-46",
+      "type": "WORKSTATION",
+      "label": "WS 46",
+      "cell": {
+        "x": 38,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 44
+      },
+      "distanceFromEntranceM": 14.5,
+      "person": null,
+      "terms": [
+        "46",
+        "n1-ws-46",
+        "ws 46"
+      ]
+    },
+    {
+      "id": "N1-WS-45",
+      "type": "WORKSTATION",
+      "label": "WS 45",
+      "cell": {
+        "x": 45,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 44
+      },
+      "distanceFromEntranceM": 13.1,
+      "person": null,
+      "terms": [
+        "45",
+        "n1-ws-45",
+        "ws 45"
+      ]
+    },
+    {
+      "id": "N1-WS-44",
+      "type": "WORKSTATION",
+      "label": "WS 44",
+      "cell": {
+        "x": 51,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 44
+      },
+      "distanceFromEntranceM": 13.1,
+      "person": null,
+      "terms": [
+        "44",
+        "n1-ws-44",
+        "ws 44"
+      ]
+    },
+    {
+      "id": "N1-WS-43",
+      "type": "WORKSTATION",
+      "label": "WS 43",
+      "cell": {
+        "x": 58,
+        "y": 44
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 44
+      },
+      "distanceFromEntranceM": 11.8,
+      "person": null,
+      "terms": [
+        "43",
+        "n1-ws-43",
+        "ws 43"
+      ]
+    },
+    {
+      "id": "N1-WS-42",
+      "type": "WORKSTATION",
+      "label": "WS 42",
+      "cell": {
+        "x": 24,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 48
+      },
+      "distanceFromEntranceM": 17.0,
+      "person": null,
+      "terms": [
+        "42",
+        "n1-ws-42",
+        "ws 42"
+      ]
+    },
+    {
+      "id": "N1-WS-41",
+      "type": "WORKSTATION",
+      "label": "WS 41",
+      "cell": {
+        "x": 31,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 48
+      },
+      "distanceFromEntranceM": 15.5,
+      "person": null,
+      "terms": [
+        "41",
+        "n1-ws-41",
+        "ws 41"
+      ]
+    },
+    {
+      "id": "N1-WS-40",
+      "type": "WORKSTATION",
+      "label": "WS 40",
+      "cell": {
+        "x": 38,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 48
+      },
+      "distanceFromEntranceM": 14.3,
+      "person": null,
+      "terms": [
+        "40",
+        "n1-ws-40",
+        "ws 40"
+      ]
+    },
+    {
+      "id": "N1-WS-39",
+      "type": "WORKSTATION",
+      "label": "WS 39",
+      "cell": {
+        "x": 45,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 48
+      },
+      "distanceFromEntranceM": 12.9,
+      "person": null,
+      "terms": [
+        "39",
+        "n1-ws-39",
+        "ws 39"
+      ]
+    },
+    {
+      "id": "N1-WS-38",
+      "type": "WORKSTATION",
+      "label": "WS 38",
+      "cell": {
+        "x": 51,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 48
+      },
+      "distanceFromEntranceM": 11.8,
+      "person": null,
+      "terms": [
+        "38",
+        "n1-ws-38",
+        "ws 38"
+      ]
+    },
+    {
+      "id": "N1-WS-37",
+      "type": "WORKSTATION",
+      "label": "WS 37",
+      "cell": {
+        "x": 58,
+        "y": 51
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 48
+      },
+      "distanceFromEntranceM": 11.0,
+      "person": null,
+      "terms": [
+        "37",
+        "n1-ws-37",
+        "ws 37"
+      ]
+    },
+    {
+      "id": "N1-WS-36",
+      "type": "WORKSTATION",
+      "label": "WS 36",
+      "cell": {
+        "x": 24,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 56
+      },
+      "distanceFromEntranceM": 15.9,
+      "person": null,
+      "terms": [
+        "36",
+        "n1-ws-36",
+        "ws 36"
+      ]
+    },
+    {
+      "id": "N1-WS-35",
+      "type": "WORKSTATION",
+      "label": "WS 35",
+      "cell": {
+        "x": 31,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 56
+      },
+      "distanceFromEntranceM": 14.5,
+      "person": null,
+      "terms": [
+        "35",
+        "n1-ws-35",
+        "ws 35"
+      ]
+    },
+    {
+      "id": "N1-WS-34",
+      "type": "WORKSTATION",
+      "label": "WS 34",
+      "cell": {
+        "x": 38,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 56
+      },
+      "distanceFromEntranceM": 12.0,
+      "person": null,
+      "terms": [
+        "34",
+        "n1-ws-34",
+        "ws 34"
+      ]
+    },
+    {
+      "id": "N1-WS-33",
+      "type": "WORKSTATION",
+      "label": "WS 33",
+      "cell": {
+        "x": 45,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 56
+      },
+      "distanceFromEntranceM": 10.6,
+      "person": null,
+      "terms": [
+        "33",
+        "n1-ws-33",
+        "ws 33"
+      ]
+    },
+    {
+      "id": "N1-WS-32",
+      "type": "WORKSTATION",
+      "label": "WS 32",
+      "cell": {
+        "x": 51,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 56
+      },
+      "distanceFromEntranceM": 10.6,
+      "person": null,
+      "terms": [
+        "32",
+        "n1-ws-32",
+        "ws 32"
+      ]
+    },
+    {
+      "id": "N1-WS-31",
+      "type": "WORKSTATION",
+      "label": "WS 31",
+      "cell": {
+        "x": 58,
+        "y": 56
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 56
+      },
+      "distanceFromEntranceM": 9.3,
+      "person": null,
+      "terms": [
+        "31",
+        "n1-ws-31",
+        "ws 31"
+      ]
+    },
+    {
+      "id": "N1-WS-30",
+      "type": "WORKSTATION",
+      "label": "WS 30",
+      "cell": {
+        "x": 24,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 60
+      },
+      "distanceFromEntranceM": 14.6,
+      "person": {
+        "name": "Prof. Aditya Verma",
+        "designation": "Assistant Professor",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Cloud Computing",
+          "DevOps"
+        ],
+        "status": "away"
+      },
+      "terms": [
+        "30",
+        "aditya",
+        "cloud computing",
+        "computer science & engineering",
+        "devops",
+        "n1-ws-30",
+        "prof",
+        "prof. aditya verma",
+        "verma",
+        "ws 30"
+      ]
+    },
+    {
+      "id": "N1-WS-29",
+      "type": "WORKSTATION",
+      "label": "WS 29",
+      "cell": {
+        "x": 31,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 60
+      },
+      "distanceFromEntranceM": 13.1,
+      "person": null,
+      "terms": [
+        "29",
+        "n1-ws-29",
+        "ws 29"
+      ]
+    },
+    {
+      "id": "N1-WS-28",
+      "type": "WORKSTATION",
+      "label": "WS 28",
+      "cell": {
+        "x": 38,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 60
+      },
+      "distanceFromEntranceM": 11.8,
+      "person": null,
+      "terms": [
+        "28",
+        "n1-ws-28",
+        "ws 28"
+      ]
+    },
+    {
+      "id": "N1-WS-27",
+      "type": "WORKSTATION",
+      "label": "WS 27",
+      "cell": {
+        "x": 45,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 60
+      },
+      "distanceFromEntranceM": 10.4,
+      "person": null,
+      "terms": [
+        "27",
+        "n1-ws-27",
+        "ws 27"
+      ]
+    },
+    {
+      "id": "N1-WS-26",
+      "type": "WORKSTATION",
+      "label": "WS 26",
+      "cell": {
+        "x": 51,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 60
+      },
+      "distanceFromEntranceM": 9.3,
+      "person": null,
+      "terms": [
+        "26",
+        "n1-ws-26",
+        "ws 26"
+      ]
+    },
+    {
+      "id": "N1-WS-25",
+      "type": "WORKSTATION",
+      "label": "WS 25",
+      "cell": {
+        "x": 58,
+        "y": 63
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 60
+      },
+      "distanceFromEntranceM": 8.4,
+      "person": null,
+      "terms": [
+        "25",
+        "n1-ws-25",
+        "ws 25"
+      ]
+    },
+    {
+      "id": "N1-WS-24",
+      "type": "WORKSTATION",
+      "label": "WS 24",
+      "cell": {
+        "x": 24,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 68
+      },
+      "distanceFromEntranceM": 13.5,
+      "person": null,
+      "terms": [
+        "24",
+        "n1-ws-24",
+        "ws 24"
+      ]
+    },
+    {
+      "id": "N1-WS-23",
+      "type": "WORKSTATION",
+      "label": "WS 23",
+      "cell": {
+        "x": 31,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 68
+      },
+      "distanceFromEntranceM": 12.1,
+      "person": null,
+      "terms": [
+        "23",
+        "n1-ws-23",
+        "ws 23"
+      ]
+    },
+    {
+      "id": "N1-WS-22",
+      "type": "WORKSTATION",
+      "label": "WS 22",
+      "cell": {
+        "x": 38,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 68
+      },
+      "distanceFromEntranceM": 9.5,
+      "person": null,
+      "terms": [
+        "22",
+        "n1-ws-22",
+        "ws 22"
+      ]
+    },
+    {
+      "id": "N1-WS-21",
+      "type": "WORKSTATION",
+      "label": "WS 21",
+      "cell": {
+        "x": 45,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 68
+      },
+      "distanceFromEntranceM": 8.1,
+      "person": null,
+      "terms": [
+        "21",
+        "n1-ws-21",
+        "ws 21"
+      ]
+    },
+    {
+      "id": "N1-WS-20",
+      "type": "WORKSTATION",
+      "label": "WS 20",
+      "cell": {
+        "x": 51,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 68
+      },
+      "distanceFromEntranceM": 8.1,
+      "person": null,
+      "terms": [
+        "20",
+        "n1-ws-20",
+        "ws 20"
+      ]
+    },
+    {
+      "id": "N1-WS-19",
+      "type": "WORKSTATION",
+      "label": "WS 19",
+      "cell": {
+        "x": 58,
+        "y": 68
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 68
+      },
+      "distanceFromEntranceM": 6.8,
+      "person": null,
+      "terms": [
+        "19",
+        "n1-ws-19",
+        "ws 19"
+      ]
+    },
+    {
+      "id": "N1-WS-18",
+      "type": "WORKSTATION",
+      "label": "WS 18",
+      "cell": {
+        "x": 24,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 72
+      },
+      "distanceFromEntranceM": 12.2,
+      "person": null,
+      "terms": [
+        "18",
+        "n1-ws-18",
+        "ws 18"
+      ]
+    },
+    {
+      "id": "N1-WS-17",
+      "type": "WORKSTATION",
+      "label": "WS 17",
+      "cell": {
+        "x": 31,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 72
+      },
+      "distanceFromEntranceM": 10.7,
+      "person": null,
+      "terms": [
+        "17",
+        "n1-ws-17",
+        "ws 17"
+      ]
+    },
+    {
+      "id": "N1-WS-16",
+      "type": "WORKSTATION",
+      "label": "WS 16",
+      "cell": {
+        "x": 38,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 72
+      },
+      "distanceFromEntranceM": 9.4,
+      "person": null,
+      "terms": [
+        "16",
+        "n1-ws-16",
+        "ws 16"
+      ]
+    },
+    {
+      "id": "N1-WS-15",
+      "type": "WORKSTATION",
+      "label": "WS 15",
+      "cell": {
+        "x": 45,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 72
+      },
+      "distanceFromEntranceM": 7.9,
+      "person": null,
+      "terms": [
+        "15",
+        "n1-ws-15",
+        "ws 15"
+      ]
+    },
+    {
+      "id": "N1-WS-14",
+      "type": "WORKSTATION",
+      "label": "WS 14",
+      "cell": {
+        "x": 51,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 72
+      },
+      "distanceFromEntranceM": 6.8,
+      "person": null,
+      "terms": [
+        "14",
+        "n1-ws-14",
+        "ws 14"
+      ]
+    },
+    {
+      "id": "N1-WS-13",
+      "type": "WORKSTATION",
+      "label": "WS 13",
+      "cell": {
+        "x": 58,
+        "y": 75
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 72
+      },
+      "distanceFromEntranceM": 5.9,
+      "person": null,
+      "terms": [
+        "13",
+        "n1-ws-13",
+        "ws 13"
+      ]
+    },
+    {
+      "id": "N1-WS-12",
+      "type": "WORKSTATION",
+      "label": "WS 12",
+      "cell": {
+        "x": 24,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 21,
+        "y": 80
+      },
+      "distanceFromEntranceM": 11.1,
+      "person": null,
+      "terms": [
+        "12",
+        "n1-ws-12",
+        "ws 12"
+      ]
+    },
+    {
+      "id": "N1-WS-11",
+      "type": "WORKSTATION",
+      "label": "WS 11",
+      "cell": {
+        "x": 31,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 28,
+        "y": 80
+      },
+      "distanceFromEntranceM": 9.7,
+      "person": null,
+      "terms": [
+        "11",
+        "n1-ws-11",
+        "ws 11"
+      ]
+    },
+    {
+      "id": "N1-WS-10",
+      "type": "WORKSTATION",
+      "label": "WS 10",
+      "cell": {
+        "x": 38,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 41,
+        "y": 80
+      },
+      "distanceFromEntranceM": 7.1,
+      "person": null,
+      "terms": [
+        "10",
+        "n1-ws-10",
+        "ws 10"
+      ]
+    },
+    {
+      "id": "N1-WS-9",
+      "type": "WORKSTATION",
+      "label": "WS 9",
+      "cell": {
+        "x": 45,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 80
+      },
+      "distanceFromEntranceM": 5.6,
+      "person": null,
+      "terms": [
+        "9",
+        "n1-ws-9",
+        "ws 9"
+      ]
+    },
+    {
+      "id": "N1-WS-8",
+      "type": "WORKSTATION",
+      "label": "WS 8",
+      "cell": {
+        "x": 51,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 48,
+        "y": 80
+      },
+      "distanceFromEntranceM": 5.6,
+      "person": null,
+      "terms": [
+        "8",
+        "n1-ws-8",
+        "ws 8"
+      ]
+    },
+    {
+      "id": "N1-WS-7",
+      "type": "WORKSTATION",
+      "label": "WS 7",
+      "cell": {
+        "x": 58,
+        "y": 80
+      },
+      "approachCell": {
+        "x": 55,
+        "y": 80
+      },
+      "distanceFromEntranceM": 4.3,
+      "person": {
+        "name": "Dr. Arjun Nair",
+        "designation": "Assistant Professor",
+        "department": "Electronics & Communication",
+        "subjects": [
+          "Digital Electronics",
+          "VLSI Design"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "7",
+        "arjun",
+        "digital electronics",
+        "dr. arjun nair",
+        "electronics & communication",
+        "n1-ws-7",
+        "nair",
+        "vlsi design",
+        "ws 7"
+      ]
+    },
+    {
+      "id": "N1-WS-6",
+      "type": "WORKSTATION",
+      "label": "WS 6",
+      "cell": {
+        "x": 24,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 24,
+        "y": 84
+      },
+      "distanceFromEntranceM": 9.8,
+      "person": null,
+      "terms": [
+        "6",
+        "n1-ws-6",
+        "ws 6"
+      ]
+    },
+    {
+      "id": "N1-WS-5",
+      "type": "WORKSTATION",
+      "label": "WS 5",
+      "cell": {
+        "x": 31,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 31,
+        "y": 84
+      },
+      "distanceFromEntranceM": 8.3,
+      "person": null,
+      "terms": [
+        "5",
+        "n1-ws-5",
+        "ws 5"
+      ]
+    },
+    {
+      "id": "N1-WS-4",
+      "type": "WORKSTATION",
+      "label": "WS 4",
+      "cell": {
+        "x": 38,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 38,
+        "y": 84
+      },
+      "distanceFromEntranceM": 7.0,
+      "person": null,
+      "terms": [
+        "4",
+        "n1-ws-4",
+        "ws 4"
+      ]
+    },
+    {
+      "id": "N1-WS-3",
+      "type": "WORKSTATION",
+      "label": "WS 3",
+      "cell": {
+        "x": 45,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 45,
+        "y": 84
+      },
+      "distanceFromEntranceM": 5.5,
+      "person": null,
+      "terms": [
+        "3",
+        "n1-ws-3",
+        "ws 3"
+      ]
+    },
+    {
+      "id": "N1-WS-2",
+      "type": "WORKSTATION",
+      "label": "WS 2",
+      "cell": {
+        "x": 51,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 51,
+        "y": 84
+      },
+      "distanceFromEntranceM": 4.3,
+      "person": null,
+      "terms": [
+        "2",
+        "n1-ws-2",
+        "ws 2"
+      ]
+    },
+    {
+      "id": "N1-WS-1",
+      "type": "WORKSTATION",
+      "label": "WS 1",
+      "cell": {
+        "x": 58,
+        "y": 87
+      },
+      "approachCell": {
+        "x": 58,
+        "y": 84
+      },
+      "distanceFromEntranceM": 3.4,
+      "person": null,
+      "terms": [
+        "1",
+        "n1-ws-1",
+        "ws 1"
+      ]
+    },
+    {
+      "id": "N1-CUB-020",
+      "type": "CUBICLE",
+      "label": "CUB 020",
+      "cell": {
+        "x": 68,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 12
+      },
+      "distanceFromEntranceM": 18.5,
+      "person": null,
+      "terms": [
+        "020",
+        "cub 020",
+        "n1-cub-020"
+      ]
+    },
+    {
+      "id": "N1-CUB-021",
+      "type": "CUBICLE",
+      "label": "CUB 021",
+      "cell": {
+        "x": 76,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 12
+      },
+      "distanceFromEntranceM": 19.2,
+      "person": null,
+      "terms": [
+        "021",
+        "cub 021",
+        "n1-cub-021"
+      ]
+    },
+    {
+      "id": "N1-CUB-022",
+      "type": "CUBICLE",
+      "label": "CUB 022",
+      "cell": {
+        "x": 83,
+        "y": 15
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 12
+      },
+      "distanceFromEntranceM": 19.8,
+      "person": null,
+      "terms": [
+        "022",
+        "cub 022",
+        "n1-cub-022"
+      ]
+    },
+    {
+      "id": "N1-CUB-023",
+      "type": "CUBICLE",
+      "label": "CUB 023",
+      "cell": {
+        "x": 68,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 19
+      },
+      "distanceFromEntranceM": 17.0,
+      "person": null,
+      "terms": [
+        "023",
+        "cub 023",
+        "n1-cub-023"
+      ]
+    },
+    {
+      "id": "N1-CUB-024",
+      "type": "CUBICLE",
+      "label": "CUB 024",
+      "cell": {
+        "x": 76,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 19
+      },
+      "distanceFromEntranceM": 17.7,
+      "person": {
+        "name": "Prof. Rohit Mehra",
+        "designation": "Assistant Professor",
+        "department": "Computer Science & Engineering",
+        "subjects": [
+          "Machine Learning",
+          "Python Programming"
+        ],
+        "status": "busy"
+      },
+      "terms": [
+        "024",
+        "computer science & engineering",
+        "cub 024",
+        "machine learning",
+        "mehra",
+        "n1-cub-024",
+        "prof",
+        "prof. rohit mehra",
+        "python programming",
+        "rohit"
+      ]
+    },
+    {
+      "id": "N1-CUB-027",
+      "type": "CUBICLE",
+      "label": "CUB 027",
+      "cell": {
+        "x": 83,
+        "y": 22
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 19
+      },
+      "distanceFromEntranceM": 18.3,
+      "person": null,
+      "terms": [
+        "027",
+        "cub 027",
+        "n1-cub-027"
+      ]
+    },
+    {
+      "id": "N1-CUB-026",
+      "type": "CUBICLE",
+      "label": "CUB 026",
+      "cell": {
+        "x": 68,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 26
+      },
+      "distanceFromEntranceM": 15.6,
+      "person": null,
+      "terms": [
+        "026",
+        "cub 026",
+        "n1-cub-026"
+      ]
+    },
+    {
+      "id": "N1-CUB-025",
+      "type": "CUBICLE",
+      "label": "CUB 025",
+      "cell": {
+        "x": 76,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 26
+      },
+      "distanceFromEntranceM": 16.2,
+      "person": null,
+      "terms": [
+        "025",
+        "cub 025",
+        "n1-cub-025"
+      ]
+    },
+    {
+      "id": "N1-CUB-028",
+      "type": "CUBICLE",
+      "label": "CUB 028",
+      "cell": {
+        "x": 83,
+        "y": 29
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 26
+      },
+      "distanceFromEntranceM": 16.9,
+      "person": null,
+      "terms": [
+        "028",
+        "cub 028",
+        "n1-cub-028"
+      ]
+    },
+    {
+      "id": "N1-CUB-029",
+      "type": "CUBICLE",
+      "label": "CUB 029",
+      "cell": {
+        "x": 72,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 72,
+        "y": 36
+      },
+      "distanceFromEntranceM": 13.8,
+      "person": null,
+      "terms": [
+        "029",
+        "cub 029",
+        "n1-cub-029"
+      ]
+    },
+    {
+      "id": "N1-CUB-031",
+      "type": "CUBICLE",
+      "label": "CUB 031",
+      "cell": {
+        "x": 83,
+        "y": 39
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 36
+      },
+      "distanceFromEntranceM": 14.8,
+      "person": null,
+      "terms": [
+        "031",
+        "cub 031",
+        "n1-cub-031"
+      ]
+    },
+    {
+      "id": "N1-CUB-030",
+      "type": "CUBICLE",
+      "label": "CUB 030",
+      "cell": {
+        "x": 68,
+        "y": 46
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 43
+      },
+      "distanceFromEntranceM": 12.0,
+      "person": null,
+      "terms": [
+        "030",
+        "cub 030",
+        "n1-cub-030"
+      ]
+    },
+    {
+      "id": "N1-CUB-032",
+      "type": "CUBICLE",
+      "label": "CUB 032",
+      "cell": {
+        "x": 76,
+        "y": 46
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 43
+      },
+      "distanceFromEntranceM": 12.7,
+      "person": null,
+      "terms": [
+        "032",
+        "cub 032",
+        "n1-cub-032"
+      ]
+    },
+    {
+      "id": "N1-CUB-033",
+      "type": "CUBICLE",
+      "label": "CUB 033",
+      "cell": {
+        "x": 83,
+        "y": 46
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 43
+      },
+      "distanceFromEntranceM": 13.3,
+      "person": {
+        "name": "Dr. Sneha Patil",
+        "designation": "Assistant Professor",
+        "department": "Information Technology",
+        "subjects": [
+          "Data Structures",
+          "Algorithms"
+        ],
+        "status": "available"
+      },
+      "terms": [
+        "033",
+        "algorithms",
+        "cub 033",
+        "data structures",
+        "dr. sneha patil",
+        "information technology",
+        "n1-cub-033",
+        "patil",
+        "sneha"
+      ]
+    },
+    {
+      "id": "N1-CUB-034",
+      "type": "CUBICLE",
+      "label": "CUB 034",
+      "cell": {
+        "x": 68,
+        "y": 53
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 50
+      },
+      "distanceFromEntranceM": 10.5,
+      "person": null,
+      "terms": [
+        "034",
+        "cub 034",
+        "n1-cub-034"
+      ]
+    },
+    {
+      "id": "N1-CUB-035",
+      "type": "CUBICLE",
+      "label": "CUB 035",
+      "cell": {
+        "x": 76,
+        "y": 53
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 50
+      },
+      "distanceFromEntranceM": 11.2,
+      "person": null,
+      "terms": [
+        "035",
+        "cub 035",
+        "n1-cub-035"
+      ]
+    },
+    {
+      "id": "N1-CUB-036",
+      "type": "CUBICLE",
+      "label": "CUB 036",
+      "cell": {
+        "x": 83,
+        "y": 53
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 50
+      },
+      "distanceFromEntranceM": 11.8,
+      "person": null,
+      "terms": [
+        "036",
+        "cub 036",
+        "n1-cub-036"
+      ]
+    },
+    {
+      "id": "N1-CUB-039",
+      "type": "CUBICLE",
+      "label": "CUB 039",
+      "cell": {
+        "x": 68,
+        "y": 60
+      },
+      "approachCell": {
+        "x": 68,
+        "y": 57
+      },
+      "distanceFromEntranceM": 9.1,
+      "person": null,
+      "terms": [
+        "039",
+        "cub 039",
+        "n1-cub-039"
+      ]
+    },
+    {
+      "id": "N1-CUB-038",
+      "type": "CUBICLE",
+      "label": "CUB 038",
+      "cell": {
+        "x": 76,
+        "y": 60
+      },
+      "approachCell": {
+        "x": 76,
+        "y": 57
+      },
+      "distanceFromEntranceM": 9.8,
+      "person": null,
+      "terms": [
+        "038",
+        "cub 038",
+        "n1-cub-038"
+      ]
+    },
+    {
+      "id": "N1-CUB-037",
+      "type": "CUBICLE",
+      "label": "CUB 037",
+      "cell": {
+        "x": 83,
+        "y": 60
+      },
+      "approachCell": {
+        "x": 83,
+        "y": 57
+      },
+      "distanceFromEntranceM": 10.4,
+      "person": null,
+      "terms": [
+        "037",
+        "cub 037",
+        "n1-cub-037"
+      ]
+    },
+    {
+      "id": "N1-A01",
+      "type": "EXIT",
+      "label": "Exit",
+      "cell": {
+        "x": 63,
+        "y": 6
+      },
+      "approachCell": {
+        "x": 63,
+        "y": 6
+      },
+      "distanceFromEntranceM": 18.8,
+      "person": null,
+      "terms": [
+        "exit",
+        "n1-a01",
+        "nikas",
+        "way out"
+      ]
+    },
+    {
+      "id": "N1-A02",
+      "type": "ENTRANCE",
+      "label": "Entrance",
+      "cell": {
+        "x": 63,
+        "y": 96
+      },
+      "approachCell": {
+        "x": 63,
+        "y": 96
+      },
+      "distanceFromEntranceM": 0.0,
+      "person": null,
+      "terms": [
+        "entrance",
+        "n1-a02",
+        "nikas",
+        "way out"
+      ]
+    }
+  ]
+}
