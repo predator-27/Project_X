@@ -51,9 +51,11 @@ class CareerViewModel(
         loadAllCareerData()
     }
 
-    private fun isDemoSession(): Boolean {
+    private fun isDemoSession(uid: String = getCurrentUid()): Boolean {
         val sessionUid = (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid
-        return BuildConfig.DEBUG && sessionUid == DemoCampusData.DEMO_STUDENT_UID
+        return BuildConfig.DEBUG && (
+            uid == DemoCampusData.DEMO_STUDENT_UID || sessionUid == DemoCampusData.DEMO_STUDENT_UID
+        )
     }
 
     private fun getNextDemoCertId(): String {
@@ -92,8 +94,7 @@ class CareerViewModel(
     }
 
     fun loadAllCareerData() {
-        val currentUid = getCurrentUid()
-        if (currentUid.isBlank()) return
+        val currentUid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
 
         loadCertifications(currentUid)
         loadProjects(currentUid)
@@ -113,7 +114,7 @@ class CareerViewModel(
     fun loadCertifications(uid: String = getCurrentUid()) {
         viewModelScope.launch {
             _certificationsState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 _certificationsState.value = Resource.Success(DemoCampusData.demoCertifications.toList())
                 return@launch
             }
@@ -125,10 +126,10 @@ class CareerViewModel(
     }
 
     fun addCertification(certification: Certification) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 val newCert = certification.copy(
                     certificationId = getNextDemoCertId(),
                     ownerUid = DemoCampusData.DEMO_STUDENT_UID,
@@ -151,10 +152,10 @@ class CareerViewModel(
     }
 
     fun deleteCertification(certId: String) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 DemoCampusData.demoCertifications.removeAll { it.certificationId == certId }
                 _actionState.value = Resource.Success(Unit)
                 loadCertifications(uid)
@@ -174,7 +175,7 @@ class CareerViewModel(
     fun loadProjects(uid: String = getCurrentUid()) {
         viewModelScope.launch {
             _projectsState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 _projectsState.value = Resource.Success(DemoCampusData.demoProjects.toList())
                 return@launch
             }
@@ -186,10 +187,10 @@ class CareerViewModel(
     }
 
     fun addProject(project: ProjectItem) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 val newProj = project.copy(
                     projectId = getNextDemoProjId(),
                     ownerUid = DemoCampusData.DEMO_STUDENT_UID,
@@ -212,10 +213,10 @@ class CareerViewModel(
     }
 
     fun deleteProject(projectId: String) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 DemoCampusData.demoProjects.removeAll { it.projectId == projectId }
                 _actionState.value = Resource.Success(Unit)
                 loadProjects(uid)
@@ -235,7 +236,7 @@ class CareerViewModel(
     fun loadSkills(uid: String = getCurrentUid()) {
         viewModelScope.launch {
             _skillsState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 _skillsState.value = Resource.Success(DemoCampusData.demoSkills.toList())
                 return@launch
             }
@@ -247,10 +248,10 @@ class CareerViewModel(
     }
 
     fun addSkill(skill: SkillItem) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 val newSkill = skill.copy(
                     skillId = getNextDemoSkillId(),
                     ownerUid = DemoCampusData.DEMO_STUDENT_UID,
@@ -272,10 +273,10 @@ class CareerViewModel(
     }
 
     fun deleteSkill(skillId: String) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 DemoCampusData.demoSkills.removeAll { it.skillId == skillId }
                 _actionState.value = Resource.Success(Unit)
                 loadSkills(uid)
@@ -295,7 +296,7 @@ class CareerViewModel(
     fun loadAchievements(uid: String = getCurrentUid()) {
         viewModelScope.launch {
             _achievementsState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 _achievementsState.value = Resource.Success(DemoCampusData.demoAchievements.toList())
                 return@launch
             }
@@ -307,10 +308,10 @@ class CareerViewModel(
     }
 
     fun addAchievement(achievement: Achievement) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 val newAch = achievement.copy(
                     achievementId = getNextDemoAchievementId(),
                     ownerUid = DemoCampusData.DEMO_STUDENT_UID,
@@ -332,10 +333,10 @@ class CareerViewModel(
     }
 
     fun deleteAchievement(achievementId: String) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 DemoCampusData.demoAchievements.removeAll { it.achievementId == achievementId }
                 _actionState.value = Resource.Success(Unit)
                 loadAchievements(uid)
@@ -355,7 +356,7 @@ class CareerViewModel(
     fun loadPortfolioFiles(uid: String = getCurrentUid()) {
         viewModelScope.launch {
             _portfolioFilesState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 _portfolioFilesState.value = Resource.Success(DemoCampusData.demoPortfolioFiles.toList())
                 return@launch
             }
@@ -371,12 +372,11 @@ class CareerViewModel(
         selectedUri: Uri,
         category: String
     ) {
-        val uid = getCurrentUid()
-        if (uid.isBlank()) return
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
 
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 val demoFile = PortfolioFile(
                     fileId = getNextDemoVaultId(),
                     ownerUid = DemoCampusData.DEMO_STUDENT_UID,
@@ -454,10 +454,10 @@ class CareerViewModel(
     }
 
     fun deletePortfolioFile(fileId: String, storagePath: String) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 DemoCampusData.demoPortfolioFiles.removeAll { it.fileId == fileId }
                 _actionState.value = Resource.Success(Unit)
                 loadPortfolioFiles(uid)
@@ -479,7 +479,7 @@ class CareerViewModel(
     fun loadCvProfile(uid: String = getCurrentUid()) {
         viewModelScope.launch {
             _cvProfileState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 _cvProfileState.value = Resource.Success(DemoCampusData.demoCvProfile)
                 return@launch
             }
@@ -491,10 +491,10 @@ class CareerViewModel(
     }
 
     fun saveCvProfile(cvProfile: CvProfile) {
-        val uid = getCurrentUid()
+        val uid = getCurrentUid().ifBlank { DemoCampusData.DEMO_STUDENT_UID }
         viewModelScope.launch {
             _actionState.value = Resource.Loading
-            if (isDemoSession()) {
+            if (isDemoSession(uid)) {
                 DemoCampusData.demoCvProfile = cvProfile
                 _cvProfileState.value = Resource.Success(cvProfile)
                 _actionState.value = Resource.Success(Unit)
