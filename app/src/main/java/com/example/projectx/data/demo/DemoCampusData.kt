@@ -632,6 +632,76 @@ object DemoCampusData {
         )
     )
 
+    // --- DEMO FACULTY SCHEDULE & ASSIGNED CLASSES ---
+    val demoFacultySchedule = listOf(
+        TimetableSlot(
+            id = "fs_1",
+            courseName = "Data Structures & Algorithms",
+            courseCode = "CS201",
+            section = "B.Tech CSE • Sem 5 • Sec-A",
+            timeSlot = "09:25 AM - 10:25 AM",
+            durationMins = 60,
+            facultyName = "Dr. Sarah Jenkins",
+            roomCode = "seat_c304",
+            type = "Lecture"
+        ),
+        TimetableSlot(
+            id = "fs_2",
+            courseName = "Database Management Systems Lab",
+            courseCode = "CS202L",
+            section = "B.Tech CSE • Sem 5 • Sec-A1",
+            timeSlot = "10:30 AM - 12:30 PM",
+            durationMins = 120,
+            facultyName = "Prof. David Miller",
+            roomCode = "seat_lab102",
+            type = "Lab"
+        ),
+        TimetableSlot(
+            id = "fs_3",
+            courseName = "Web Technologies & Frameworks",
+            courseCode = "CS203",
+            section = "B.Tech SE • Sem 5 • Sec-A",
+            timeSlot = "02:00 PM - 03:00 PM",
+            durationMins = 60,
+            facultyName = "Dr. Emily Carter",
+            roomCode = "seat_c305",
+            type = "Lecture"
+        )
+    )
+
+    val demoFacultyClasses = listOf(
+        Course(
+            courseCode = "CS201",
+            courseName = "Data Structures & Algorithms",
+            credits = 4,
+            facultyName = "Dr. Sarah Jenkins",
+            department = "Computer Science",
+            schoolName = "Demo University",
+            semester = 5,
+            section = "Sec-A"
+        ),
+        Course(
+            courseCode = "CS202",
+            courseName = "Database Management Systems",
+            credits = 4,
+            facultyName = "Prof. David Miller",
+            department = "Computer Science",
+            schoolName = "Demo University",
+            semester = 5,
+            section = "Sec-A"
+        ),
+        Course(
+            courseCode = "CS203",
+            courseName = "Web Technologies & Frameworks",
+            credits = 3,
+            facultyName = "Dr. Emily Carter",
+            department = "Software Engineering",
+            schoolName = "Demo University",
+            semester = 5,
+            section = "Sec-A"
+        )
+    )
+
     var demoRoomPartnerRequest = RoomPartnerRequest(
         requestId = "room_demo_1",
         studentUid = DEMO_STUDENT_UID,
