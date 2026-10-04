@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -41,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,6 +81,13 @@ fun CampusMapScreen(
                 onExit = viewModel::routeToExit,
                 onClose = onClose,
             )
+        }
+        if (state is CampusMapUiState.Loaded) {
+            BlockHeader(
+                campus = (state as CampusMapUiState.Loaded).campus,
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 72.dp),
+            )
+            MapLegendStrip(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 76.dp))
         }
     }
 }
@@ -251,3 +260,79 @@ private fun SearchRow(entry: SearchEntry, onClick: () -> Unit) {
     }
 }
 
+@Composable
+private fun BlockHeader(
+    campus: com.projectx.app.navmap.model.CampusMap,
+    modifier: Modifier = Modifier,
+) {
+    val stats = buildString {
+        val counts = campus.vector.seatCounts
+        append(counts.cub).append(" CUBICLES · ")
+        append(counts.ws).append(" WORKSTATIONS · ")
+        append(counts.cab).append(" MASTER CABINS · ")
+        append(campus.vector.aisles.size).append(" AISLES")
+    }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier,
+    ) {
+        Text(
+            text = "BLOCK ${campus.vector.id}",
+            color = MapTheme.UserRim,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.ExtraBold,
+            fontFamily = FontFamily.Monospace,
+        )
+        Text(
+            text = stats,
+            color = Color(0xBB7FD4FF),
+            fontSize = 9.sp,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily.Monospace,
+        )
+    }
+}
+
+@Composable
+private fun MapLegendStrip(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.fillMaxWidth(0.95f),
+        color = Color(0xC00D0F1F),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+                LegendSwatch(MapTheme.Cubicle, "CUB")
+                LegendSwatch(MapTheme.Workstation, "WS")
+                LegendSwatch(MapTheme.Cabin, "CABIN")
+                LegendDot(MapTheme.PowerBall, "QR")
+                LegendDot(MapTheme.StatusAvailable, "AVAIL")
+                LegendDot(MapTheme.StatusBusy, "BUSY")
+                LegendDot(MapTheme.StatusAway, "AWAY")
+            }
+        }
+    }
+}
+
+@Composable
+private fun LegendSwatch(color: Color, label: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Surface(
+            color = Color.Transparent,
+            shape = RoundedCornerShape(3.dp),
+            border = androidx.compose.foundation.BorderStroke(1.5.dp, color),
+            modifier = Modifier.width(14.dp).height(10.dp),
+        ) {}
+        Spacer(Modifier.width(4.dp))
+        Text(label, color = Color(0xCCFFFFFF), fontSize = 9.sp, fontFamily = FontFamily.Monospace)
+    }
+}
+
+@Composable
+private fun LegendDot(color: Color, label: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Surface(color = color, shape = CircleShape, modifier = Modifier.width(8.dp).height(8.dp)) {}
+        Spacer(Modifier.width(4.dp))
+        Text(label, color = Color(0xCCFFFFFF), fontSize = 9.sp, fontFamily = FontFamily.Monospace)
+    }
+}

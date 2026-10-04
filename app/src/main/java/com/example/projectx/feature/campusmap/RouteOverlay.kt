@@ -42,8 +42,6 @@ fun DrawScope.drawRouteOverlay(
         }
     }
 
-    drawSeatStatusPips(campus, transform)
-
     destinationPoiId?.let { id ->
         val poi = campus.grid.poiById[id] ?: return@let
         val person = campus.facultyBySeat[poi.id]
@@ -60,22 +58,6 @@ private fun DrawScope.drawRoutePath(route: Route, t: MapTransform, color: Color)
         val b = t.cellCenterScreen(pts[i + 1].r, pts[i + 1].c)
         drawLine(color.copy(alpha = 0.25f), a, b, strokeWidth = 10f)
         drawLine(color, a, b, strokeWidth = 2.4f)
-    }
-}
-
-/** Small translucent dot top-right of occupied seats: green/orange/grey. */
-private fun DrawScope.drawSeatStatusPips(campus: CampusMap, t: MapTransform) {
-    val radius = t.cellPixels * 0.42f
-    campus.vector.seats.forEach { seat ->
-        val faculty = campus.facultyBySeat[seat.id] ?: return@forEach
-        val color = when (faculty.status?.lowercase()) {
-            "available" -> MapTheme.StatusAvailable
-            "busy" -> MapTheme.StatusBusy
-            "away" -> MapTheme.StatusAway
-            else -> return@forEach
-        }
-        val anchor = t.unitToScreen(seat.x + seat.w, seat.y)
-        drawCircle(color = color.copy(alpha = 0.45f), radius = radius, center = anchor)
     }
 }
 
