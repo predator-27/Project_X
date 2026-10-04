@@ -19,11 +19,11 @@ class HostelViewModel(
     private val authRepository: AuthRepository = AuthRepository()
 ) : ViewModel() {
 
+    private val _selectedDateState = MutableStateFlow("2026-10-04")
+    val selectedDateState: StateFlow<String> = _selectedDateState.asStateFlow()
+
     private val _mealsState = MutableStateFlow<Resource<List<DiningMeal>>>(Resource.Loading)
     val mealsState: StateFlow<Resource<List<DiningMeal>>> = _mealsState.asStateFlow()
-
-    private val _diningQrTokenState = MutableStateFlow(DemoCampusData.demoDiningQrToken)
-    val diningQrTokenState: StateFlow<String> = _diningQrTokenState.asStateFlow()
 
     private val _roomPartnerState = MutableStateFlow<Resource<RoomPartnerRequest>>(Resource.Loading)
     val roomPartnerState: StateFlow<Resource<RoomPartnerRequest>> = _roomPartnerState.asStateFlow()
@@ -49,26 +49,16 @@ class HostelViewModel(
         loadLeavePasses()
     }
 
-    fun loadMeals() {
-        viewModelScope.launch {
-            _mealsState.value = Resource.Loading
-            if (isDemoSession()) {
-                _mealsState.value = Resource.Success(DemoCampusData.demoDiningMeals)
-                _diningQrTokenState.value = DemoCampusData.demoDiningQrToken
-                return@launch
-            }
-            _mealsState.value = Resource.Success(DemoCampusData.demoDiningMeals)
-        }
+    fun setSelectedDate(date: String) {
+        _selectedDateState.value = date
+        loadMeals(date)
     }
 
-    fun regenerateDiningQr() {
+    fun loadMeals(date: String = _selectedDateState.value) {
         viewModelScope.launch {
-            val currentHash = DemoCampusData.demoDiningQrToken.hashCode()
-            val tokenNum = (Math.abs(currentHash) % 89999) + 10000
-            val newToken = "DEMO-QR-BENNETT-$tokenNum-REFRESHED"
-            DemoCampusData.demoDiningQrToken = newToken
-            _diningQrTokenState.value = newToken
-            _actionState.value = Resource.Success(Unit)
+            _mealsState.value = Resource.Loading
+            val filteredMeals = DemoCampusData.demoDiningMeals.filter { it.date == date }
+            _mealsState.value = Resource.Success(filteredMeals)
         }
     }
 

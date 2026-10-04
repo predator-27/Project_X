@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.*
@@ -34,11 +33,12 @@ fun CafeteriaDiningScreen(
     modifier: Modifier = Modifier
 ) {
     val mealsState by hostelViewModel.mealsState.collectAsState()
-    val qrToken by hostelViewModel.diningQrTokenState.collectAsState()
+    val selectedDate by hostelViewModel.selectedDateState.collectAsState()
 
     var selectedMealFilter by remember { mutableStateOf("All") }
-    var showQrDialog by remember { mutableStateOf(false) }
+    var selectedMealForQr by remember { mutableStateOf<DiningMeal?>(null) }
 
+    val dateOptions = listOf("2026-10-04" to "Today • Oct 04", "2026-10-05" to "Tomorrow • Oct 05")
     val filterOptions = listOf("All", "Breakfast", "Lunch", "Snacks", "Dinner")
 
     AppScaffold(
@@ -91,27 +91,29 @@ fun CafeteriaDiningScreen(
                             Text("Central Mess — Ground Floor", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
                         }
 
-                        StatusPill(text = "Active Mess Pass", tone = StatusTone.SUCCESS)
+                        StatusPill(text = "Daily Meal QRs", tone = StatusTone.NEUTRAL)
                     }
 
                     Text(
-                        text = "Scan your reusable dining QR code at the entrance scanner to record meal entry.",
+                        text = "Each meal generates its own unique QR pass for the selected date. Click on any meal to display its specific entrance QR code.",
                         fontSize = 12.sp,
                         color = BodyText
                     )
+                }
+            }
 
-                    Spacer(modifier = Modifier.height(2.dp))
-
-                    Button(
-                        onClick = { showQrDialog = true },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                        modifier = Modifier.fillMaxWidth().height(44.dp)
-                    ) {
-                        Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Show My Reusable Dining QR Code", fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
+            // Date Selector Chips
+            Text("Select Dining Date", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                dateOptions.forEach { (dateVal, dateLabel) ->
+                    FilterChip(
+                        selected = selectedDate == dateVal,
+                        onClick = { hostelViewModel.setSelectedDate(dateVal) },
+                        label = { Text(dateLabel, fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                    )
                 }
             }
 
@@ -129,7 +131,7 @@ fun CafeteriaDiningScreen(
                 }
             }
 
-            Text("Today's Dining Schedule & Menu", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+            Text("Dining Schedule & Menu ($selectedDate)", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
 
             when (val resource = mealsState) {
                 is Resource.Loading -> {
@@ -146,7 +148,7 @@ fun CafeteriaDiningScreen(
                     }
 
                     if (filteredMeals.isEmpty()) {
-                        EmptyStateCard(title = "No menu available for $selectedMealFilter.")
+                        EmptyStateCard(title = "No menu available for $selectedMealFilter on $selectedDate.")
                     } else {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -154,7 +156,10 @@ fun CafeteriaDiningScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(filteredMeals, key = { it.mealId }) { meal ->
-                                MealCard(meal = meal)
+                                MealCard(
+                                    meal = meal,
+                                    onShowQrClick = { selectedMealForQr = meal }
+                                )
                             }
                         }
                     }
@@ -163,17 +168,17 @@ fun CafeteriaDiningScreen(
             }
         }
 
-        // Reusable QR Code Dialog
-        if (showQrDialog) {
+        // Meal-Specific QR Code Dialog
+        selectedMealForQr?.let { meal ->
             AlertDialog(
-                onDismissRequest = { showQrDialog = false },
+                onDismissRequest = { selectedMealForQr = null },
                 title = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(Icons.Default.QrCode2, contentDescription = null, tint = PrimaryIndigo)
-                        Text("Reusable Dining QR Pass", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("${meal.mealType} QR Pass (${meal.date})", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 },
                 text = {
@@ -202,8 +207,8 @@ fun CafeteriaDiningScreen(
                                     drawRect(darkColor, Offset(size.width - cellSize * 2, 0f), Size(cellSize * 2, cellSize * 2))
                                     drawRect(darkColor, Offset(0f, size.height - cellSize * 2), Size(cellSize * 2, cellSize * 2))
 
-                                    // Render Inner Data Grid Pattern derived from qrToken hash
-                                    val tokenHash = qrToken.hashCode()
+                                    // Render Inner Data Grid Pattern derived from meal.qrToken hash
+                                    val tokenHash = meal.qrToken.hashCode()
                                     for (r in 0..6) {
                                         for (c in 0..6) {
                                             if ((r < 2 && c < 2) || (r < 2 && c > 4) || (r > 4 && c < 2)) continue
@@ -222,31 +227,21 @@ fun CafeteriaDiningScreen(
                         }
 
                         Text(
-                            text = "Token: $qrToken",
+                            text = "Token: ${meal.qrToken}",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = PrimaryIndigo
                         )
 
                         Text(
-                            text = "Scan this QR pass at the mess scanner counter to claim your meal.",
+                            text = "Scan this specific ${meal.mealType} QR pass at the mess scanner counter during ${meal.timeRange} on ${meal.date}.",
                             fontSize = 11.sp,
                             color = MutedText
                         )
-
-                        OutlinedButton(
-                            onClick = { hostelViewModel.regenerateDiningQr() },
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(Icons.Default.Autorenew, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Regenerate My Reusable QR Code", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        }
                     }
                 },
                 confirmButton = {
-                    TextButton(onClick = { showQrDialog = false }) {
+                    TextButton(onClick = { selectedMealForQr = null }) {
                         Text("Close", fontWeight = FontWeight.Bold)
                     }
                 }
@@ -256,7 +251,10 @@ fun CafeteriaDiningScreen(
 }
 
 @Composable
-fun MealCard(meal: DiningMeal) {
+fun MealCard(
+    meal: DiningMeal,
+    onShowQrClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = CardShape,
@@ -309,6 +307,19 @@ fun MealCard(meal: DiningMeal) {
                 fontSize = 12.sp,
                 color = BodyText
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Button(
+                onClick = onShowQrClick,
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
+                modifier = Modifier.fillMaxWidth().height(40.dp)
+            ) {
+                Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("View ${meal.mealType} QR Pass", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }

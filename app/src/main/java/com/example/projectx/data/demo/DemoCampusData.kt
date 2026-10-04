@@ -547,41 +547,90 @@ object DemoCampusData {
 
     // --- DEMO HOSTELLER DATASET ---
     val demoDiningMeals = listOf(
+        // Date 1: 2026-10-04
         DiningMeal(
-            mealId = "meal_1",
+            mealId = "meal_1004_bf",
+            date = "2026-10-04",
             mealType = "Breakfast",
             timeRange = "07:30 AM - 09:30 AM",
             menuItems = listOf("Masala Dosa", "Sambar & Coconut Chutney", "Boiled Eggs", "Tea / Coffee", "Fresh Banana"),
             calories = "450 kcal",
-            location = "Central Mess — Ground Floor"
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261004-BF-7718"
         ),
         DiningMeal(
-            mealId = "meal_2",
+            mealId = "meal_1004_lu",
+            date = "2026-10-04",
             mealType = "Lunch",
             timeRange = "12:30 PM - 02:30 PM",
             menuItems = listOf("Paneer Butter Masala", "Dal Makhani", "Jeera Rice", "Butter Roti", "Salad & Green Curd"),
             calories = "680 kcal",
-            location = "Central Mess — Ground Floor"
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261004-LU-9924"
         ),
         DiningMeal(
-            mealId = "meal_3",
+            mealId = "meal_1004_sn",
+            date = "2026-10-04",
             mealType = "Snacks",
             timeRange = "05:00 PM - 06:00 PM",
             menuItems = listOf("Samosa & Mint Chutney", "Assorted Biscuits", "Hot Masala Tea"),
             calories = "320 kcal",
-            location = "Central Mess — Ground Floor"
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261004-SN-1033"
         ),
         DiningMeal(
-            mealId = "meal_4",
+            mealId = "meal_1004_dn",
+            date = "2026-10-04",
             mealType = "Dinner",
             timeRange = "07:30 PM - 09:30 PM",
             menuItems = listOf("Kadhai Chicken / Shahi Paneer", "Yellow Dal Tadka", "Steamed Basmati Rice", "Phulka", "Gulab Jamun"),
             calories = "720 kcal",
-            location = "Central Mess — Ground Floor"
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261004-DN-4401"
+        ),
+
+        // Date 2: 2026-10-05
+        DiningMeal(
+            mealId = "meal_1005_bf",
+            date = "2026-10-05",
+            mealType = "Breakfast",
+            timeRange = "07:30 AM - 09:30 AM",
+            menuItems = listOf("Aloo Paratha", "Butter & Curd", "Sprouted Moong", "Tea / Coffee", "Apple"),
+            calories = "480 kcal",
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261005-BF-8812"
+        ),
+        DiningMeal(
+            mealId = "meal_1005_lu",
+            date = "2026-10-05",
+            mealType = "Lunch",
+            timeRange = "12:30 PM - 02:30 PM",
+            menuItems = listOf("Rajma Masala", "Aloo Gobi", "Steamed Rice", "Tandoori Roti", "Boondi Raita"),
+            calories = "650 kcal",
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261005-LU-3341"
+        ),
+        DiningMeal(
+            mealId = "meal_1005_sn",
+            date = "2026-10-05",
+            mealType = "Snacks",
+            timeRange = "05:00 PM - 06:00 PM",
+            menuItems = listOf("Veg Bread Pakora", "Sweet Milk Tea", "Mathri"),
+            calories = "310 kcal",
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261005-SN-5590"
+        ),
+        DiningMeal(
+            mealId = "meal_1005_dn",
+            date = "2026-10-05",
+            mealType = "Dinner",
+            timeRange = "07:30 PM - 09:30 PM",
+            menuItems = listOf("Butter Chicken / Malai Kofta", "Mix Veg", "Jeera Rice", "Naan / Phulka", "Rasgulla"),
+            calories = "750 kcal",
+            location = "Central Mess — Ground Floor",
+            qrToken = "BENNETT-QR-20261005-DN-6682"
         )
     )
-
-    var demoDiningQrToken = "DEMO-QR-BENNETT-88219-ACTIVE"
 
     var demoRoomPartnerRequest = RoomPartnerRequest(
         requestId = "room_demo_1",
