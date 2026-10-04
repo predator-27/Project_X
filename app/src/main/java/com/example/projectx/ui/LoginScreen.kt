@@ -723,7 +723,7 @@ private fun DemoUserTypePicker(onPick: (UserRole) -> Unit) {
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "⚡ Demo as ${selected.label} (Debug Only)",
+                text = "⚡ Begin the demo as ${selected.label}",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.tertiary,
                 fontWeight = FontWeight.Bold,

@@ -15,8 +15,8 @@ android {
         applicationId = "com.projectx.app"
         minSdk = 30
         targetSdk = 37
-        versionCode = 9
-        versionName = "1.6.0"
+        versionCode = 10
+        versionName = "1.7.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -66,11 +66,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.firebase.ai)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.camera.camera2)
-    implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
-    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.play.services.code.scanner)
     implementation("androidx.compose.material:material-icons-extended")
     implementation("io.coil-kt:coil-compose:2.6.0")
     testImplementation(libs.junit)

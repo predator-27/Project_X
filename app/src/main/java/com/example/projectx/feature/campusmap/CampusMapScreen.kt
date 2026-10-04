@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -93,7 +94,7 @@ private fun LoadedBody(
     onExit: () -> Unit,
     onClose: (() -> Unit)?,
 ) {
-    var showScanner by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     var query by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -135,7 +136,13 @@ private fun LoadedBody(
                 )
                 Spacer(Modifier.width(8.dp))
                 FilledIconButton(
-                    onClick = { showScanner = true },
+                    onClick = {
+                        QrScanLauncher.scan(
+                            context = context,
+                            onPayload = onPayload,
+                            onError = { /* banner surfaces via VM when payload is passed; errors handled by VM */ },
+                        )
+                    },
                     colors = IconButtonDefaults.filledIconButtonColors(containerColor = MapTheme.UserRim),
                 ) {
                     Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan QR", tint = Color.Black)
@@ -220,16 +227,6 @@ private fun LoadedBody(
             }
         }
 
-        if (showScanner) {
-            QrScanScreen(
-                onPayload = { payload ->
-                    showScanner = false
-                    onPayload(payload)
-                },
-                onCancel = { showScanner = false },
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
     }
 }
 
