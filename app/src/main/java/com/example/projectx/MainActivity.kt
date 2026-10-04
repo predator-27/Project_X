@@ -2,6 +2,7 @@ package com.projectx.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
@@ -96,13 +97,42 @@ fun CampusAppShell(
 ) {
     val sessionState by authViewModel.sessionState.collectAsState()
     val context = LocalContext.current
+    var showSplash by rememberSaveable { mutableStateOf(true) }
     var isWebViewActive by rememberSaveable { mutableStateOf(false) }
+
+    var showExitDialog by rememberSaveable { mutableStateOf(false) }
+    var lastBackPressTime by rememberSaveable { mutableLongStateOf(0L) }
 
     LaunchedEffect(Unit) {
         teacherViewModel.checkForAppUpdates(context)
     }
 
-    if (isWebViewActive) {
+    // Intercept system back button for double back press to exit
+    BackHandler(enabled = !showSplash) {
+        val currentTime = System.currentTimeMillis()
+        if (showExitDialog || (currentTime - lastBackPressTime < 2000L)) {
+            (context as? Activity)?.finish()
+        } else {
+            lastBackPressTime = currentTime
+            showExitDialog = true
+        }
+    }
+
+    if (showExitDialog) {
+        ExitAppDialog(
+            onDismiss = { showExitDialog = false },
+            onConfirmExit = {
+                showExitDialog = false
+                (context as? Activity)?.finish()
+            }
+        )
+    }
+
+    if (showSplash) {
+        SplashScreen(
+            onFinished = { showSplash = false }
+        )
+    } else if (isWebViewActive) {
         WebViewScreen(viewModel = teacherViewModel)
     } else {
         when (val session = sessionState) {

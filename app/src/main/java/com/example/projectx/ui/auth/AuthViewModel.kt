@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projectx.app.data.auth.AuthRepository
 import com.projectx.app.model.AcademicProfile
+import com.projectx.app.model.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -96,13 +97,8 @@ class AuthViewModel(
         }
     }
 
-    fun enterDemoSession() {
-        authRepository.enterDemoSession()
-        _errorMessage.value = null
-    }
-
-    fun enterFacultyDemoSession() {
-        authRepository.enterFacultyDemoSession()
+    fun enterDemoSession(role: UserRole = UserRole.STUDENT) {
+        authRepository.enterDemoSession(role)
         _errorMessage.value = null
     }
 

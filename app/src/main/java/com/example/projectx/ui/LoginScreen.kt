@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Email
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projectx.app.BuildConfig
 import com.projectx.app.R
+import com.projectx.app.model.UserRole
 import com.projectx.app.ui.auth.AuthViewModel
 import com.projectx.app.util.AuthValidation
 import kotlinx.coroutines.launch
@@ -678,59 +680,77 @@ fun LoginScreen(
 
             if (BuildConfig.DEBUG) {
                 Spacer(modifier = Modifier.height(4.dp))
-                if (selectedTabIndex == 1) {
-                    // Faculty Tab Demo Button
-                    OutlinedButton(
-                        onClick = { authViewModel.enterFacultyDemoSession() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(44.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.BugReport,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "⚡ Demo Faculty Mode (Debug Only)",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.tertiary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                } else {
-                    // Student / Default Tab Demo Button
-                    OutlinedButton(
-                        onClick = { authViewModel.enterDemoSession() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(44.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.BugReport,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "⚡ Demo Student Mode (Debug Only)",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.tertiary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                DemoUserTypePicker(
+                    onPick = { role -> authViewModel.enterDemoSession(role) }
+                )
             }
 
             // Bottom clearance spacer for soft keyboard scrolling
             Spacer(modifier = Modifier.height(120.dp))
+        }
+    }
+}
+
+private data class DemoRoleOption(val role: UserRole, val label: String)
+
+private val DEMO_ROLE_OPTIONS = listOf(
+    DemoRoleOption(UserRole.STUDENT, "Student"),
+    DemoRoleOption(UserRole.FACULTY, "Faculty"),
+    DemoRoleOption(UserRole.LOST_FOUND_STAFF, "Lost & Found Staff"),
+    DemoRoleOption(UserRole.COLLEGE_ADMIN, "College Admin"),
+    DemoRoleOption(UserRole.SUPER_ADMIN, "Super Admin")
+)
+
+@Composable
+private fun DemoUserTypePicker(onPick: (UserRole) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var selected by remember { mutableStateOf(DEMO_ROLE_OPTIONS.first()) }
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            onClick = { expanded = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
+        ) {
+            Icon(
+                imageVector = Icons.Default.BugReport,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "⚡ Demo as ${selected.label} (Debug Only)",
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.tertiary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            DEMO_ROLE_OPTIONS.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.label) },
+                    onClick = {
+                        selected = option
+                        expanded = false
+                        onPick(option.role)
+                    }
+                )
+            }
         }
     }
 }

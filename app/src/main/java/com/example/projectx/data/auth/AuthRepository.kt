@@ -185,64 +185,98 @@ class AuthRepository(
         _sessionState.value = AuthSessionState.Unauthenticated
     }
 
-    fun enterDemoSession() {
-        if (com.projectx.app.BuildConfig.DEBUG) {
-            val demoUser = User(
-                uid = "demo_student_uid",
-                email = "demo.student@projectx.demo",
-                rollNumber = "DEMO001",
-                role = UserRole.STUDENT,
-                isActive = true
-            )
+    fun enterDemoSession(role: UserRole = UserRole.STUDENT) {
+        if (!BuildConfig.DEBUG) return
 
-            val demoPublicProfile = PublicProfile(
-                uid = "demo_student_uid",
-                displayName = "Demo Student",
-                schoolName = "Demo University",
-                program = "Undergraduate Program",
-                department = "Demo Department",
-                specialization = "General",
-                admissionYear = 2025,
-                currentSemester = 3,
-                section = "Demo-A",
-                bio = "Development Demo Student Profile"
-            )
-
-            _sessionState.value = AuthSessionState.Authenticated(
-                user = demoUser,
-                publicProfile = demoPublicProfile
-            )
-        }
+        val (user, profile) = buildDemoIdentity(role)
+        _sessionState.value = AuthSessionState.Authenticated(
+            user = user,
+            publicProfile = profile
+        )
     }
 
-    fun enterFacultyDemoSession() {
-        if (BuildConfig.DEBUG) {
-            val demoFacultyUser = User(
-                uid = "demo_faculty_uid",
-                email = "demo.faculty@projectx.demo",
-                rollNumber = "FAC001",
-                role = UserRole.FACULTY,
-                isActive = true
-            )
-
-            val demoFacultyProfile = PublicProfile(
-                uid = "demo_faculty_uid",
-                displayName = "Dr. Demo Professor",
-                schoolName = "Demo University",
-                program = "Computer Science Department",
-                department = "Computer Science",
-                specialization = "Artificial Intelligence",
-                admissionYear = 2020,
-                currentSemester = 1,
-                section = "Faculty-A",
-                bio = "Development Demo Faculty Profile"
-            )
-
-            _sessionState.value = AuthSessionState.Authenticated(
-                user = demoFacultyUser,
-                publicProfile = demoFacultyProfile
-            )
-        }
+    private fun buildDemoIdentity(role: UserRole): Pair<User, PublicProfile> = when (role) {
+        UserRole.STUDENT -> User(
+            uid = "demo_student_uid",
+            email = "demo.student@projectx.demo",
+            rollNumber = "DEMO001",
+            role = UserRole.STUDENT,
+            isActive = true
+        ) to PublicProfile(
+            uid = "demo_student_uid",
+            displayName = "Demo Student",
+            schoolName = "Demo University",
+            program = "Undergraduate Program",
+            department = "Demo Department",
+            specialization = "General",
+            admissionYear = 2025,
+            currentSemester = 3,
+            section = "Demo-A",
+            bio = "Development Demo Student Profile"
+        )
+        UserRole.FACULTY -> User(
+            uid = "demo_faculty_uid",
+            email = "demo.faculty@projectx.demo",
+            rollNumber = "FAC001",
+            role = UserRole.FACULTY,
+            isActive = true
+        ) to PublicProfile(
+            uid = "demo_faculty_uid",
+            displayName = "Dr. Demo Professor",
+            schoolName = "Demo University",
+            program = "Computer Science Department",
+            department = "Computer Science",
+            specialization = "Artificial Intelligence",
+            admissionYear = 2020,
+            currentSemester = 1,
+            section = "Faculty-A",
+            bio = "Development Demo Faculty Profile"
+        )
+        UserRole.LOST_FOUND_STAFF -> User(
+            uid = "demo_lostfound_uid",
+            email = "demo.lostfound@projectx.demo",
+            rollNumber = "LF001",
+            role = UserRole.LOST_FOUND_STAFF,
+            isActive = true
+        ) to PublicProfile(
+            uid = "demo_lostfound_uid",
+            displayName = "Demo Lost & Found Staff",
+            schoolName = "Demo University",
+            program = "Campus Services",
+            department = "Lost & Found Desk",
+            specialization = "Student Services",
+            bio = "Development Demo Lost & Found Staff Profile"
+        )
+        UserRole.COLLEGE_ADMIN -> User(
+            uid = "demo_collegeadmin_uid",
+            email = "demo.collegeadmin@projectx.demo",
+            rollNumber = "CA001",
+            role = UserRole.COLLEGE_ADMIN,
+            isActive = true
+        ) to PublicProfile(
+            uid = "demo_collegeadmin_uid",
+            displayName = "Demo College Admin",
+            schoolName = "Demo University",
+            program = "Administration",
+            department = "College Office",
+            specialization = "Operations",
+            bio = "Development Demo College Admin Profile"
+        )
+        UserRole.SUPER_ADMIN -> User(
+            uid = "demo_superadmin_uid",
+            email = "demo.superadmin@projectx.demo",
+            rollNumber = "SA001",
+            role = UserRole.SUPER_ADMIN,
+            isActive = true
+        ) to PublicProfile(
+            uid = "demo_superadmin_uid",
+            displayName = "Demo Super Admin",
+            schoolName = "Demo University",
+            program = "Platform Administration",
+            department = "Super Admin Office",
+            specialization = "Platform-wide",
+            bio = "Development Demo Super Admin Profile"
+        )
     }
 
     suspend fun signInWithMicrosoft(activity: Activity): AuthSessionState = withContext(Dispatchers.IO) {
