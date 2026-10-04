@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
@@ -37,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentScreen(
+    onMenuClick: () -> Unit = {},
     facultyViewModel: FacultyViewModel = viewModel(),
     appointmentViewModel: AppointmentViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel(),
@@ -95,6 +97,14 @@ fun StudentScreen(
         topBar = {
             TopAppBar(
                 title = { Text("👨‍🎓 Student Desk Portal", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu"
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = { authViewModel.signOut() }) {
                         Icon(

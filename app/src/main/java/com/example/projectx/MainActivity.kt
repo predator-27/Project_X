@@ -31,8 +31,7 @@ import com.projectx.app.theme.CampusTheme
 import com.projectx.app.theme.CampusThemeState
 import com.projectx.app.theme.CampusTokens
 import com.projectx.app.ui.*
-import com.projectx.app.ui.academics.AcademicViewModel
-import com.projectx.app.ui.academics.CoursesScreen
+import com.projectx.app.ui.academics.*
 import com.projectx.app.ui.auth.*
 import com.projectx.app.ui.career.CareerPortfolioScreen
 import com.projectx.app.ui.career.CareerViewModel
@@ -359,6 +358,7 @@ fun StudentCampusShell(
                                 facultyViewModel = facultyViewModel,
                                 appointmentViewModel = appointmentViewModel,
                                 authViewModel = authViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 onLocateOnMap = { seatId ->
                                     targetMapSeatId = seatId
                                     selectedBottomTab = BottomTab.CAMPUS
@@ -478,6 +478,21 @@ fun StudentCampusShell(
                                     activeDrawerModule = "campus_map"
                                 }
                             )
+                        } else if (activeDrawerModule == "exam_schedules") {
+                            ExamScheduleScreen(
+                                academicViewModel = academicViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "results") {
+                            ResultsGradesScreen(
+                                academicViewModel = academicViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "reports") {
+                            AcademicReportsScreen(
+                                academicViewModel = academicViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
                         } else {
                             if (selectedAssignmentId != null) {
                                 AssignmentDetailScreen(
@@ -521,6 +536,7 @@ fun StudentCampusShell(
                                 facultyViewModel = facultyViewModel,
                                 appointmentViewModel = appointmentViewModel,
                                 authViewModel = authViewModel,
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 onLocateOnMap = { seatId ->
                                     targetMapSeatId = seatId
                                     selectedBottomTab = BottomTab.CAMPUS

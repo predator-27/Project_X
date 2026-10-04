@@ -2,7 +2,9 @@ package com.projectx.app.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,8 +21,12 @@ fun UnderlineTabRow(
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scrollState = rememberScrollState()
+
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.Start
     ) {
         tabs.forEachIndexed { index, tabName ->
@@ -28,7 +34,7 @@ fun UnderlineTabRow(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(end = 20.dp)
+                    .padding(end = 16.dp)
                     .clickable { onTabSelected(index) }
             ) {
                 Text(
@@ -36,6 +42,8 @@ fun UnderlineTabRow(
                     fontSize = 14.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                     color = if (isSelected) PrimaryIndigo else MutedText,
+                    maxLines = 1,
+                    softWrap = false,
                     modifier = Modifier.padding(bottom = 6.dp)
                 )
                 Box(
