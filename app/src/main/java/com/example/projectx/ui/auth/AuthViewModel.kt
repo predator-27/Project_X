@@ -102,6 +102,11 @@ class AuthViewModel(
         _errorMessage.value = null
     }
 
+    fun enterRoleDemoSession(role: UserRole) {
+        authRepository.enterRoleDemoSession(role)
+        _errorMessage.value = null
+    }
+
     fun signInWithMicrosoft(activity: Activity) {
         viewModelScope.launch {
             _isLoading.value = true

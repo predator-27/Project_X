@@ -10,6 +10,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -60,7 +61,8 @@ fun LoginScreen(
     val isLoading by authViewModel.isLoading.collectAsState()
     val errorMessage by authViewModel.errorMessage.collectAsState()
 
-    var selectedTabIndex by remember { mutableStateOf(0) } // 0 = Student Login, 1 = Faculty Login, 2 = Register Account
+    var selectedTabIndex by remember { mutableStateOf(0) } // 0 = Student Login, 1 = Faculty Login, 2 = Register Account (Hidden)
+    var showDemoRoleDialog by remember { mutableStateOf(false) }
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -142,7 +144,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 3-Way Top Action Switcher (Student Login | Faculty Login | Register Account)
+            // 2-Way Top Action Switcher (Student Login | Faculty Login)
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
@@ -164,16 +166,16 @@ fun LoginScreen(
                             containerColor = if (selectedTabIndex == 0) MaterialTheme.colorScheme.primary else Color.Transparent,
                             contentColor = if (selectedTabIndex == 0) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                         ),
-                        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp),
+                        contentPadding = PaddingValues(vertical = 10.dp, horizontal = 4.dp),
                         shape = RoundedCornerShape(12.dp),
                         elevation = if (selectedTabIndex == 0) ButtonDefaults.buttonElevation(defaultElevation = 2.dp) else null
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Icon(Icons.Default.School, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text("Student", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Text("Student Portal", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     }
 
@@ -188,40 +190,16 @@ fun LoginScreen(
                             containerColor = if (selectedTabIndex == 1) MaterialTheme.colorScheme.primary else Color.Transparent,
                             contentColor = if (selectedTabIndex == 1) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                         ),
-                        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp),
+                        contentPadding = PaddingValues(vertical = 10.dp, horizontal = 4.dp),
                         shape = RoundedCornerShape(12.dp),
                         elevation = if (selectedTabIndex == 1) ButtonDefaults.buttonElevation(defaultElevation = 2.dp) else null
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Icon(Icons.Default.Badge, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text("Faculty", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        }
-                    }
-
-                    // Register Tab
-                    Button(
-                        onClick = {
-                            selectedTabIndex = 2
-                            authViewModel.clearErrorMessage()
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (selectedTabIndex == 2) MaterialTheme.colorScheme.primary else Color.Transparent,
-                            contentColor = if (selectedTabIndex == 2) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = if (selectedTabIndex == 2) ButtonDefaults.buttonElevation(defaultElevation = 2.dp) else null
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text("Register", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Text("Faculty Portal", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     }
                 }
@@ -386,13 +364,6 @@ fun LoginScreen(
                                         Text("Sign In as Student", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
-
-                                TextButton(
-                                    onClick = { selectedTabIndex = 2 },
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                ) {
-                                    Text("New Student? Register Account", fontSize = 13.sp)
-                                }
                             }
 
                             1 -> {
@@ -526,7 +497,7 @@ fun LoginScreen(
                             }
 
                             2 -> {
-                                // REGISTER ACCOUNT FORM
+                                // REGISTER ACCOUNT FORM (Kept in codebase, hidden from starting login switcher)
                                 Text(
                                     text = "Self-Register Account",
                                     fontSize = 17.sp,
@@ -680,13 +651,113 @@ fun LoginScreen(
 
             if (BuildConfig.DEBUG) {
                 Spacer(modifier = Modifier.height(4.dp))
-                DemoUserTypePicker(
-                    onPick = { role -> authViewModel.enterDemoSession(role) }
-                )
+                OutlinedButton(
+                    onClick = { showDemoRoleDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.BugReport,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "⚡ Explore Demo Profiles (Debug Only)",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             // Bottom clearance spacer for soft keyboard scrolling
             Spacer(modifier = Modifier.height(120.dp))
+        }
+
+        // 5-Role Demo Profile Selection Dialog
+        if (showDemoRoleDialog) {
+            AlertDialog(
+                onDismissRequest = { showDemoRoleDialog = false },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.BugReport,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary
+                        )
+                        Text(
+                            text = "Select Demo Profile",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
+                text = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Preview role-specific dashboards with test data. No real data or authentication is modified.",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        val demoRoles = listOf(
+                            Triple(UserRole.STUDENT, "🎓 Student Demo", "Student Campus Shell, LMS & Attendance"),
+                            Triple(UserRole.FACULTY, "👨‍🏫 Faculty Demo", "Teacher Admin Portal & Desk Availability"),
+                            Triple(UserRole.COLLEGE_ADMIN, "🏢 College Admin Demo", "College Administration Shell"),
+                            Triple(UserRole.SUPER_ADMIN, "🛡️ Super Admin Demo", "System Super Admin Shell"),
+                            Triple(UserRole.LOST_FOUND_STAFF, "🔍 Lost & Found Staff Demo", "Lost & Found Operations Shell")
+                        )
+
+                        demoRoles.forEach { (role, title, desc) ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        showDemoRoleDialog = false
+                                        authViewModel.enterRoleDemoSession(role)
+                                    },
+                                shape = RoundedCornerShape(10.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(10.dp),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    Text(
+                                        text = title,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = desc,
+                                        fontSize = 10.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showDemoRoleDialog = false }) {
+                        Text("Close", fontWeight = FontWeight.Bold)
+                    }
+                }
+            )
         }
     }
 }

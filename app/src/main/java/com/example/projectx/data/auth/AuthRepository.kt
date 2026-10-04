@@ -1,6 +1,7 @@
 package com.projectx.app.data.auth
 
 import android.app.Activity
+import com.projectx.app.BuildConfig
 import com.projectx.app.data.firestore.PublicProfileRepository
 import com.projectx.app.data.firestore.UserRepository
 import com.projectx.app.model.AcademicProfile
@@ -9,7 +10,6 @@ import com.projectx.app.model.User
 import com.projectx.app.model.UserRole
 import com.projectx.app.ui.auth.AuthSessionState
 import com.google.firebase.auth.FirebaseUser
-import com.projectx.app.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -86,8 +86,6 @@ class AuthRepository(
             return@withContext errorState
         }
 
-        // Firebase Auth account created & verification email sent.
-        // Do NOT create /users/{uid} or /public_profiles/{uid} before verification!
         val state = AuthSessionState.EmailVerificationRequired(firebaseUser.email ?: email)
         _sessionState.value = state
         state
@@ -121,7 +119,6 @@ class AuthRepository(
             }
 
         // Step 1: Create private user account document (/users/{uid})
-        // Enforces role = STUDENT and isActive = true for self-registration
         val privateUser = User(
             uid = firebaseUser.uid,
             email = firebaseUser.email ?: "",
@@ -186,6 +183,14 @@ class AuthRepository(
     }
 
     fun enterDemoSession(role: UserRole = UserRole.STUDENT) {
+        enterRoleDemoSession(role)
+    }
+
+    fun enterFacultyDemoSession() {
+        enterRoleDemoSession(UserRole.FACULTY)
+    }
+
+    fun enterRoleDemoSession(role: UserRole) {
         if (!BuildConfig.DEBUG) return
 
         val (user, profile) = buildDemoIdentity(role)
