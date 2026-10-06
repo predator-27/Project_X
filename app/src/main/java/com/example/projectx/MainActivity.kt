@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.components.AmbientBackground
 import com.projectx.app.components.SideNavDrawerContent
+import com.projectx.app.feature.campusmap.CampusMapScreen
 import com.projectx.app.map.MapScreen
 import com.projectx.app.model.UserRole
 import com.projectx.app.theme.CampusTheme
@@ -247,7 +248,7 @@ fun StudentCampusShell(
                         when (moduleId) {
                             "home" -> selectedBottomTab = BottomTab.HOME
                             "courses", "attendance", "timetable", "assignments", "exam_schedules", "results", "reports" -> selectedBottomTab = BottomTab.ACADEMICS
-                            "teachers", "campus_map", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
+                            "teachers", "campus_map", "navigation", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
                             "messages", "announcements", "community" -> selectedBottomTab = BottomTab.MESSAGES
                             "profile", "settings", "career_portfolio", "cafeteria", "leave", "room_partner" -> selectedBottomTab = BottomTab.PROFILE
                             "ai_assistant" -> {
@@ -382,6 +383,8 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 targetSeatId = targetMapSeatId
                             )
+                        } else if (activeDrawerModule == "navigation") {
+                            CampusMapScreen()
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
@@ -538,6 +541,8 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 targetSeatId = targetMapSeatId
                             )
+                        } else if (activeDrawerModule == "navigation") {
+                            CampusMapScreen()
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
