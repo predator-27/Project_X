@@ -13,8 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.WbSunny
@@ -40,6 +40,7 @@ import com.projectx.app.components.StatusTone
 import com.projectx.app.theme.*
 import com.projectx.app.ui.TeacherManagementViewModel
 import com.projectx.app.ui.auth.AuthViewModel
+import com.projectx.app.update.UpdateInfo
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -58,6 +59,12 @@ fun SettingsScreen(
     val currentText by CampusThemeState.textSize.collectAsState()
     val customPrimary by CampusThemeState.customPrimary.collectAsState()
     val customSecondary by CampusThemeState.customSecondary.collectAsState()
+
+    val updateInfo by teacherViewModel.updateInfo.collectAsState()
+    val isCheckingUpdate by teacherViewModel.isCheckingUpdate.collectAsState()
+    val isDownloadingUpdate by teacherViewModel.isDownloadingUpdate.collectAsState()
+    val downloadProgress by teacherViewModel.downloadProgress.collectAsState()
+    val downloadError by teacherViewModel.downloadError.collectAsState()
 
     val activePrimary = customPrimary ?: c.primary
     val activeSecondary = customSecondary ?: c.secondary
@@ -103,10 +110,14 @@ fun SettingsScreen(
             item { TextSizeRow(current = currentText) }
             item { SectionHeader(icon = Icons.Default.CloudDownload, title = "Updates") }
             item {
-                SettingsRow(
-                    title = "Check for updates",
-                    subtitle = "Query GitHub for the latest release and show the banner.",
-                    onClick = { teacherViewModel.checkForAppUpdates(context) },
+                UpdateCheckSection(
+                    isChecking = isCheckingUpdate,
+                    updateInfo = updateInfo,
+                    isDownloading = isDownloadingUpdate,
+                    downloadProgress = downloadProgress,
+                    downloadError = downloadError,
+                    onCheck = { teacherViewModel.checkForAppUpdates(context) },
+                    onInstall = { teacherViewModel.downloadAndInstallAppUpdate(context) }
                 )
             }
             item {
@@ -311,6 +322,107 @@ private fun LiveThemePreviewCard() {
             ) {
                 Text("Sample Content Card", fontSize = 12.sp, color = c.bodyText, fontWeight = FontWeight.Medium)
                 StatusPill(text = "Active Token", tone = StatusTone.SUCCESS)
+            }
+        }
+    }
+}
+
+@Composable
+private fun UpdateCheckSection(
+    isChecking: Boolean,
+    updateInfo: UpdateInfo?,
+    isDownloading: Boolean,
+    downloadProgress: Float,
+    downloadError: String?,
+    onCheck: () -> Unit,
+    onInstall: () -> Unit
+) {
+    val c = CampusTokens.colors
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder)
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Check for updates", color = c.heading, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = when {
+                            isChecking -> "Querying GitHub Releases API..."
+                            updateInfo != null && updateInfo.isNewerVersion && !updateInfo.hasApkAsset ->
+                                "A newer release (${updateInfo.latestVersion}) is available, but it does not contain an APK for in-app installation."
+                            updateInfo != null && updateInfo.isUpdateAvailable ->
+                                "🎉 Update available: ${updateInfo.latestVersion}"
+                            updateInfo != null && !updateInfo.isNewerVersion ->
+                                "You're up to date. (${updateInfo.latestVersion})"
+                            else -> "Query GitHub repository for the latest app release."
+                        },
+                        color = c.mutedText,
+                        fontSize = 12.sp
+                    )
+                }
+
+                if (isChecking) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = c.primary, strokeWidth = 2.dp)
+                } else {
+                    OutlinedButton(
+                        onClick = onCheck,
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, c.surfaceBorder),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text("Check Now", fontSize = 12.sp, color = c.heading, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+
+            if (updateInfo?.isUpdateAvailable == true) {
+                HorizontalDivider(color = c.surfaceBorder)
+
+                Text(
+                    text = "Release Notes (${updateInfo.latestVersion}):\n${updateInfo.releaseNotes}",
+                    fontSize = 12.sp,
+                    color = c.bodyText
+                )
+
+                if (isDownloading) {
+                    val percent = (downloadProgress * 100).toInt()
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Downloading update from GitHub...", fontSize = 11.sp, color = c.mutedText)
+                            Text("$percent%", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = c.heading)
+                        }
+                        LinearProgressIndicator(
+                            progress = { downloadProgress },
+                            modifier = Modifier.fillMaxWidth(),
+                            color = c.primary
+                        )
+                    }
+                } else {
+                    Button(
+                        onClick = onInstall,
+                        modifier = Modifier.fillMaxWidth().height(42.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary)
+                    ) {
+                        Icon(Icons.Default.CloudDownload, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Install Update Now", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                }
+
+                downloadError?.let { err ->
+                    Text(err, fontSize = 11.sp, color = c.dangerRed, fontWeight = FontWeight.Medium)
+                }
             }
         }
     }
