@@ -6,8 +6,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,10 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.components.AmbientBackground
 import com.projectx.app.components.RoleShell
@@ -53,6 +58,7 @@ import com.projectx.app.ui.hostel.RoomPartnerScreen
 import com.projectx.app.ui.lms.AssignmentDetailScreen
 import com.projectx.app.ui.lms.CourseDetailScreen
 import kotlinx.coroutines.launch
+import kotlin.math.hypot
 
 enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {
     HOME("home", "Home", Icons.Default.Home),
@@ -246,6 +252,9 @@ fun StudentCampusShell(
     var selectedCourseName by remember { mutableStateOf<String?>(null) }
     var selectedAssignmentId by remember { mutableStateOf<String?>(null) }
 
+    var fabOffsetX by rememberSaveable { mutableFloatStateOf(0f) }
+    var fabOffsetY by rememberSaveable { mutableFloatStateOf(0f) }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -293,7 +302,26 @@ fun StudentCampusShell(
                     icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "AI Tutor", tint = Color.White) },
                     onClick = { showAiAssistantSheet = true },
                     containerColor = CampusTokens.colors.primary,
-                    shape = RoundedCornerShape(999.dp)
+                    shape = RoundedCornerShape(999.dp),
+                    modifier = Modifier
+                        .offset { IntOffset(fabOffsetX.roundToInt(), fabOffsetY.roundToInt()) }
+                        .pointerInput(Unit) {
+                            var dragDist = 0f
+                            detectDragGestures(
+                                onDragStart = { dragDist = 0f },
+                                onDragEnd = {
+                                    if (dragDist < 10f) {
+                                        showAiAssistantSheet = true
+                                    }
+                                },
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    dragDist += hypot(dragAmount.x, dragAmount.y)
+                                    fabOffsetX += dragAmount.x
+                                    fabOffsetY += dragAmount.y
+                                }
+                            )
+                        }
                 )
             },
             bottomBar = {

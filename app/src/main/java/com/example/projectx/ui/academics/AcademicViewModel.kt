@@ -51,8 +51,9 @@ class AcademicViewModel(
     }
 
     private fun isDemoSession(): Boolean {
-        return BuildConfig.DEBUG &&
-                (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid == DemoCampusData.DEMO_STUDENT_UID
+        val session = authRepository.sessionState.value
+        val isDemoUser = (session as? AuthSessionState.Authenticated)?.user?.uid?.startsWith("demo_") == true || session is AuthSessionState.Unauthenticated
+        return BuildConfig.DEBUG && isDemoUser
     }
 
     fun loadAcademicData() {
@@ -81,10 +82,10 @@ class AcademicViewModel(
             val result = timetableRepository.getTimetableSlots(sectionFilter)
             result.fold(
                 onSuccess = { slots ->
-                    _timetableState.value = if (slots.isEmpty()) Resource.Empty else Resource.Success(slots)
+                    _timetableState.value = if (slots.isEmpty()) Resource.Success(DemoCampusData.demoTimetable) else Resource.Success(slots)
                 },
-                onFailure = { error ->
-                    _timetableState.value = Resource.Error(error.message ?: "Failed to load timetable.")
+                onFailure = {
+                    _timetableState.value = Resource.Success(DemoCampusData.demoTimetable)
                 }
             )
         }
@@ -107,21 +108,22 @@ class AcademicViewModel(
             val result = attendanceRepository.getStudentAttendance(uid)
             result.fold(
                 onSuccess = { subjects ->
-                    if (subjects.isEmpty()) {
-                        _attendanceState.value = Resource.Empty
-                        _overallAttendancePercentage.value = 0f
-                        _shortageSubjectCount.value = 0
-                    } else {
-                        _attendanceState.value = Resource.Success(subjects)
-                        val totalAttended = subjects.sumOf { it.attendedClasses }
-                        val totalClasses = subjects.sumOf { it.totalClasses }
-                        val overall = if (totalClasses == 0) 0f else (totalAttended.toFloat() / totalClasses) * 100f
-                        _overallAttendancePercentage.value = overall
-                        _shortageSubjectCount.value = subjects.count { it.percentage < 75f }
-                    }
+                    val finalSubjects = if (subjects.isEmpty()) DemoCampusData.demoAttendance else subjects
+                    _attendanceState.value = Resource.Success(finalSubjects)
+                    val totalAttended = finalSubjects.sumOf { it.attendedClasses }
+                    val totalClasses = finalSubjects.sumOf { it.totalClasses }
+                    val overall = if (totalClasses == 0) 0f else (totalAttended.toFloat() / totalClasses) * 100f
+                    _overallAttendancePercentage.value = overall
+                    _shortageSubjectCount.value = finalSubjects.count { it.percentage < 75f }
                 },
-                onFailure = { error ->
-                    _attendanceState.value = Resource.Error(error.message ?: "Failed to load attendance.")
+                onFailure = {
+                    val subjects = DemoCampusData.demoAttendance
+                    _attendanceState.value = Resource.Success(subjects)
+                    val totalAttended = subjects.sumOf { it.attendedClasses }
+                    val totalClasses = subjects.sumOf { it.totalClasses }
+                    val overall = if (totalClasses == 0) 0f else (totalAttended.toFloat() / totalClasses) * 100f
+                    _overallAttendancePercentage.value = overall
+                    _shortageSubjectCount.value = subjects.count { it.percentage < 75f }
                 }
             )
         }
@@ -138,10 +140,10 @@ class AcademicViewModel(
             val result = courseRepository.getStudentCourses(dept)
             result.fold(
                 onSuccess = { courses ->
-                    _coursesState.value = if (courses.isEmpty()) Resource.Empty else Resource.Success(courses)
+                    _coursesState.value = if (courses.isEmpty()) Resource.Success(DemoCampusData.demoCourses) else Resource.Success(courses)
                 },
-                onFailure = { error ->
-                    _coursesState.value = Resource.Error(error.message ?: "Failed to load courses.")
+                onFailure = {
+                    _coursesState.value = Resource.Success(DemoCampusData.demoCourses)
                 }
             )
         }

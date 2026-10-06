@@ -492,7 +492,25 @@ fun VaultFileRowCard(file: PortfolioFile, onDelete: () -> Unit) {
 }
 
 @Composable
+private fun dialogTextFieldColors(): TextFieldColors {
+    val c = CampusTokens.colors
+    return OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = c.surface,
+        unfocusedContainerColor = c.surface,
+        focusedTextColor = c.heading,
+        unfocusedTextColor = c.heading,
+        focusedLabelColor = c.primary,
+        unfocusedLabelColor = c.mutedText,
+        focusedBorderColor = c.primary,
+        unfocusedBorderColor = c.surfaceBorder,
+        cursorColor = c.primary
+    )
+}
+
+@Composable
 fun AddCertificationDialog(onDismiss: () -> Unit, onConfirm: (name: String, issuer: String, date: String, cat: String, desc: String) -> Unit) {
+    val c = CampusTokens.colors
+    val tfColors = dialogTextFieldColors()
     var name by remember { mutableStateOf("") }
     var issuer by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
@@ -501,7 +519,8 @@ fun AddCertificationDialog(onDismiss: () -> Unit, onConfirm: (name: String, issu
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Certification", fontWeight = FontWeight.Bold) },
+        containerColor = c.surface,
+        title = { Text("Add Certification", fontWeight = FontWeight.Bold, color = c.heading) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -509,31 +528,37 @@ fun AddCertificationDialog(onDismiss: () -> Unit, onConfirm: (name: String, issu
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Certification Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Issue Date (YYYY-MM-DD)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Certification Name", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Issue Date (YYYY-MM-DD)", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description", color = c.mutedText) }, colors = tfColors, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
-            Button(onClick = { if (name.isNotBlank() && issuer.isNotBlank()) onConfirm(name, issuer, date, cat, desc) }) {
-                Text("Add")
+            Button(
+                onClick = { if (name.isNotBlank() && issuer.isNotBlank()) onConfirm(name, issuer, date, cat, desc) },
+                colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary)
+            ) {
+                Text("Add", fontWeight = FontWeight.Bold)
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = c.heading, fontWeight = FontWeight.Bold) } }
     )
 }
 
 @Composable
 fun AddProjectDialog(onDismiss: () -> Unit, onConfirm: (name: String, desc: String, techs: List<String>) -> Unit) {
+    val c = CampusTokens.colors
+    val tfColors = dialogTextFieldColors()
     var name by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
     var techs by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Project", fontWeight = FontWeight.Bold) },
+        containerColor = c.surface,
+        title = { Text("Add Project", fontWeight = FontWeight.Bold, color = c.heading) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -541,34 +566,40 @@ fun AddProjectDialog(onDismiss: () -> Unit, onConfirm: (name: String, desc: Stri
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Project Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = techs, onValueChange = { techs = it }, label = { Text("Technologies (comma separated)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Project Name", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description", color = c.mutedText) }, colors = tfColors, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = techs, onValueChange = { techs = it }, label = { Text("Technologies (comma separated)", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
-            Button(onClick = {
-                if (name.isNotBlank() && desc.isNotBlank()) {
-                    val techList = techs.split(",").map { it.trim() }.filter { it.isNotBlank() }
-                    onConfirm(name, desc, techList)
-                }
-            }) {
-                Text("Add")
+            Button(
+                onClick = {
+                    if (name.isNotBlank() && desc.isNotBlank()) {
+                        val techList = techs.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                        onConfirm(name, desc, techList)
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary)
+            ) {
+                Text("Add", fontWeight = FontWeight.Bold)
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = c.heading, fontWeight = FontWeight.Bold) } }
     )
 }
 
 @Composable
 fun AddSkillDialog(onDismiss: () -> Unit, onConfirm: (name: String, cat: String, prof: String) -> Unit) {
+    val c = CampusTokens.colors
+    val tfColors = dialogTextFieldColors()
     var name by remember { mutableStateOf("") }
     var cat by remember { mutableStateOf("Programming") }
     var prof by remember { mutableStateOf("Advanced") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Technical Skill", fontWeight = FontWeight.Bold) },
+        containerColor = c.surface,
+        title = { Text("Add Technical Skill", fontWeight = FontWeight.Bold, color = c.heading) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -576,22 +607,27 @@ fun AddSkillDialog(onDismiss: () -> Unit, onConfirm: (name: String, cat: String,
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Skill Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = prof, onValueChange = { prof = it }, label = { Text("Proficiency Level") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Skill Name", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = prof, onValueChange = { prof = it }, label = { Text("Proficiency Level", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
-            Button(onClick = { if (name.isNotBlank()) onConfirm(name, cat, prof) }) {
-                Text("Add")
+            Button(
+                onClick = { if (name.isNotBlank()) onConfirm(name, cat, prof) },
+                colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary)
+            ) {
+                Text("Add", fontWeight = FontWeight.Bold)
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = c.heading, fontWeight = FontWeight.Bold) } }
     )
 }
 
 @Composable
 fun AddAchievementDialog(onDismiss: () -> Unit, onConfirm: (title: String, desc: String, date: String, issuer: String) -> Unit) {
+    val c = CampusTokens.colors
+    val tfColors = dialogTextFieldColors()
     var title by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
@@ -599,7 +635,8 @@ fun AddAchievementDialog(onDismiss: () -> Unit, onConfirm: (title: String, desc:
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Achievement", fontWeight = FontWeight.Bold) },
+        containerColor = c.surface,
+        title = { Text("Add Achievement", fontWeight = FontWeight.Bold, color = c.heading) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -607,17 +644,20 @@ fun AddAchievementDialog(onDismiss: () -> Unit, onConfirm: (title: String, desc:
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Date (YYYY-MM-DD)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Date (YYYY-MM-DD)", color = c.mutedText) }, colors = tfColors, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description", color = c.mutedText) }, colors = tfColors, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
-            Button(onClick = { if (title.isNotBlank() && desc.isNotBlank()) onConfirm(title, desc, date, issuer) }) {
-                Text("Add")
+            Button(
+                onClick = { if (title.isNotBlank() && desc.isNotBlank()) onConfirm(title, desc, date, issuer) },
+                colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary)
+            ) {
+                Text("Add", fontWeight = FontWeight.Bold)
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = c.heading, fontWeight = FontWeight.Bold) } }
     )
 }

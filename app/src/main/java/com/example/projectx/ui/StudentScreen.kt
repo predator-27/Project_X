@@ -26,8 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.projectx.app.components.StatusPill
 import com.projectx.app.components.StatusTone
+import com.projectx.app.theme.CampusTokens
 import com.projectx.app.map.MapViewModel
 import com.projectx.app.model.Appointment
 import com.projectx.app.model.AppointmentStatus
@@ -640,32 +643,49 @@ fun BookAppointmentDialog(
     onDismiss: () -> Unit,
     onConfirm: (date: String, timeSlot: String, purpose: String) -> Unit
 ) {
+    val c = CampusTokens.colors
     var selectedDate by remember { mutableStateOf("") }
     var selectedSlot by remember { mutableStateOf("") }
     var purpose by remember { mutableStateOf("") }
 
+    val tfColors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = c.surface,
+        unfocusedContainerColor = c.surface,
+        focusedTextColor = c.heading,
+        unfocusedTextColor = c.heading,
+        focusedLabelColor = c.primary,
+        unfocusedLabelColor = c.mutedText,
+        focusedBorderColor = c.primary,
+        unfocusedBorderColor = c.surfaceBorder,
+        cursorColor = c.primary
+    )
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Book Appointment with ${teacher.name}", fontWeight = FontWeight.Bold) },
+        containerColor = c.surface,
+        title = { Text("Book Appointment with ${teacher.name}", fontWeight = FontWeight.Bold, color = c.heading) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = "📍 Location: ${teacher.deskNumber.ifBlank { "Faculty Desk" }}",
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
+                    color = c.primary,
+                    fontWeight = FontWeight.Bold
                 )
 
                 OutlinedTextField(
                     value = studentDisplayName,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Student Name") },
-                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    label = { Text("Student Name", color = c.mutedText) },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = c.primary) },
                     singleLine = true,
+                    colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -674,9 +694,10 @@ fun BookAppointmentDialog(
                     value = studentEmailAddress,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Student Email") },
-                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                    label = { Text("Student Email", color = c.mutedText) },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = c.primary) },
                     singleLine = true,
+                    colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -684,10 +705,11 @@ fun BookAppointmentDialog(
                 OutlinedTextField(
                     value = selectedDate,
                     onValueChange = { selectedDate = it },
-                    label = { Text("Date (YYYY-MM-DD)") },
-                    placeholder = { Text("e.g. 2026-09-20") },
-                    leadingIcon = { Icon(Icons.Default.CalendarMonth, contentDescription = null) },
+                    label = { Text("Date (YYYY-MM-DD)", color = c.mutedText) },
+                    placeholder = { Text("e.g. 2026-09-20", color = c.mutedText) },
+                    leadingIcon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = c.primary) },
                     singleLine = true,
+                    colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -695,10 +717,11 @@ fun BookAppointmentDialog(
                 OutlinedTextField(
                     value = selectedSlot,
                     onValueChange = { selectedSlot = it },
-                    label = { Text("Preferred Time Slot") },
-                    placeholder = { Text("e.g. 11:00 AM - 11:30 AM") },
-                    leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
+                    label = { Text("Preferred Time Slot", color = c.mutedText) },
+                    placeholder = { Text("e.g. 11:00 AM - 11:30 AM", color = c.mutedText) },
+                    leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null, tint = c.primary) },
                     singleLine = true,
+                    colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -706,8 +729,9 @@ fun BookAppointmentDialog(
                 OutlinedTextField(
                     value = purpose,
                     onValueChange = { purpose = it },
-                    label = { Text("Discussion Topic / Purpose") },
-                    placeholder = { Text("e.g. Guidance on Internship or AI Project") },
+                    label = { Text("Discussion Topic / Purpose", color = c.mutedText) },
+                    placeholder = { Text("e.g. Guidance on Internship or AI Project", color = c.mutedText) },
+                    colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -721,14 +745,15 @@ fun BookAppointmentDialog(
                     }
                 },
                 enabled = selectedDate.isNotBlank() && selectedSlot.isNotBlank() && purpose.isNotBlank(),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary)
             ) {
-                Text("Confirm Request")
+                Text("Confirm Request", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Cancel", color = c.heading, fontWeight = FontWeight.Bold)
             }
         }
     )

@@ -103,11 +103,6 @@ object CampusThemeState {
     private const val KEY_THEME = "selected_theme"
     private const val KEY_MODE = "theme_mode"
     private const val KEY_TEXT = "text_size"
-    private const val KEY_CUSTOM_PRIMARY = "custom_primary_color"
-    private const val KEY_CUSTOM_SECONDARY = "custom_secondary_color"
-
-    val DEFAULT_PRIMARY = Color(0xFF4F46E5)
-    val DEFAULT_SECONDARY = Color(0xFF14B8A6)
 
     private val _currentTheme = MutableStateFlow(CampusThemePreset.AURA_INDIGO)
     val currentTheme: StateFlow<CampusThemePreset> = _currentTheme.asStateFlow()
@@ -117,12 +112,6 @@ object CampusThemeState {
 
     private val _textSize = MutableStateFlow(CampusTextSize.NORMAL)
     val textSize: StateFlow<CampusTextSize> = _textSize.asStateFlow()
-
-    private val _customPrimary = MutableStateFlow<Color?>(null)
-    val customPrimary: StateFlow<Color?> = _customPrimary.asStateFlow()
-
-    private val _customSecondary = MutableStateFlow<Color?>(null)
-    val customSecondary: StateFlow<Color?> = _customSecondary.asStateFlow()
 
     private var appContext: Context? = null
 
@@ -135,12 +124,6 @@ object CampusThemeState {
             ?: CampusThemeMode.SYSTEM
         _textSize.value = CampusTextSize.entries.find { it.name == prefs.getString(KEY_TEXT, null) }
             ?: CampusTextSize.NORMAL
-
-        val savedPrimaryHex = prefs.getString(KEY_CUSTOM_PRIMARY, null)
-        _customPrimary.value = savedPrimaryHex?.let { parseHexColor(it) }
-
-        val savedSecondaryHex = prefs.getString(KEY_CUSTOM_SECONDARY, null)
-        _customSecondary.value = savedSecondaryHex?.let { parseHexColor(it) }
     }
 
     fun setTheme(theme: CampusThemePreset) {
@@ -167,45 +150,8 @@ object CampusThemeState {
         }
     }
 
-    fun setCustomPrimary(color: Color) {
-        _customPrimary.value = color
-        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
-            ?.putString(KEY_CUSTOM_PRIMARY, colorToHex(color))?.apply()
-    }
-
-    fun setCustomSecondary(color: Color) {
-        _customSecondary.value = color
-        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
-            ?.putString(KEY_CUSTOM_SECONDARY, colorToHex(color))?.apply()
-    }
-
-    fun resetCustomColors() {
-        _customPrimary.value = null
-        _customSecondary.value = null
-        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
-            ?.remove(KEY_CUSTOM_PRIMARY)
-            ?.remove(KEY_CUSTOM_SECONDARY)?.apply()
-    }
-
     fun setTheme(context: Context, theme: CampusThemePreset) {
         appContext = context.applicationContext
         setTheme(theme)
-    }
-}
-
-fun colorToHex(color: Color): String {
-    val r = (color.red * 255).toInt().coerceIn(0, 255)
-    val g = (color.green * 255).toInt().coerceIn(0, 255)
-    val b = (color.blue * 255).toInt().coerceIn(0, 255)
-    return String.format("#%02X%02X%02X", r, g, b)
-}
-
-fun parseHexColor(hex: String): Color {
-    return try {
-        val cleanHex = hex.removePrefix("#")
-        val colorInt = android.graphics.Color.parseColor("#$cleanHex")
-        Color(colorInt)
-    } catch (e: Exception) {
-        CampusThemeState.DEFAULT_PRIMARY
     }
 }

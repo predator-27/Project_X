@@ -14,6 +14,19 @@ object DemoCampusData {
     private const val BASE_TIME = 1789900800000L // Sep 15, 2026
     private const val ONE_DAY = 86400000L
 
+    val demoStudents = mutableListOf(
+        User(uid = "demo_student_uid", email = "alex.rivera@bennett.edu.in", rollNumber = "E25CSEU1823", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_2", email = "rahul.verma@bennett.edu.in", rollNumber = "E25CSEU0192", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_3", email = "ananya.sharma@bennett.edu.in", rollNumber = "E25ECU0042", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_4", email = "priya.nair@bennett.edu.in", rollNumber = "E25LAW0015", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_5", email = "karan.mehta@bennett.edu.in", rollNumber = "E25MGT0088", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_6", email = "sneha.gupta@bennett.edu.in", rollNumber = "E24CSEU0310", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_7", email = "arjun.singh@bennett.edu.in", rollNumber = "E24MEC0051", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_8", email = "divya.patel@bennett.edu.in", rollNumber = "E25CSEU0512", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_9", email = "rohit.joshi@bennett.edu.in", rollNumber = "E23CSEU0101", role = UserRole.STUDENT, isActive = false),
+        User(uid = "student_10", email = "simran.kaur@bennett.edu.in", rollNumber = "E25ECU0112", role = UserRole.STUDENT, isActive = true)
+    )
+
     val demoCourses = listOf(
         Course(
             courseCode = "CS201",

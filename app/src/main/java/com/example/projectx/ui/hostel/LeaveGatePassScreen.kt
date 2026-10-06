@@ -21,6 +21,9 @@ import com.projectx.app.components.*
 import com.projectx.app.model.hostel.HostelLeavePass
 import com.projectx.app.theme.*
 import com.projectx.app.util.Resource
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,20 +32,29 @@ fun LeaveGatePassScreen(
     hostelViewModel: HostelViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    val c = CampusTokens.colors
     val passesState by hostelViewModel.leavePassesState.collectAsState()
     val actionState by hostelViewModel.actionState.collectAsState()
 
     var leaveType by remember { mutableStateOf("Home Leave") }
-    var startDate by remember { mutableStateOf("2026-09-28") }
-    var endDate by remember { mutableStateOf("2026-09-30") }
-    var reason by remember { mutableStateOf("Family function at hometown") }
+    var startDate by remember { mutableStateOf("2026-10-05") }
+    var endDate by remember { mutableStateOf("2026-10-07") }
+    var reason by remember { mutableStateOf("") }
 
-    var selectedPassForDetails by remember { mutableStateOf<HostelLeavePass?>(null) }
-
-    val leaveTypes = listOf("Home Leave", "Local Gate Pass", "Emergency Leave")
+    val tfColors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = c.surface,
+        unfocusedContainerColor = c.surface,
+        focusedTextColor = c.heading,
+        unfocusedTextColor = c.heading,
+        focusedLabelColor = c.primary,
+        unfocusedLabelColor = c.mutedText,
+        focusedBorderColor = c.primary,
+        unfocusedBorderColor = c.surfaceBorder,
+        cursorColor = c.primary
+    )
 
     AppScaffold(
-        title = "Apply Leave & Gate Pass",
+        title = "Leave & Gate Pass Application",
         onMenuClick = onMenuClick,
         modifier = modifier
     ) {
@@ -53,20 +65,20 @@ fun LeaveGatePassScreen(
                 .fillMaxSize()
                 .imePadding()
         ) {
-
-            // Application Form
+            // Apply Leave Pass Form
             item {
-                SectionFormCard(sectionTitle = "Apply Leave and Gate Pass") {
-                    Text("Select Leave / Pass Type", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+                SectionFormCard(sectionTitle = "Apply for Out-Campus Pass") {
+                    Text("Select Leave Type", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = c.heading)
+
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        leaveTypes.forEach { type ->
+                        listOf("Home Leave", "Local Outing", "Emergency").forEach { type ->
                             FilterChip(
                                 selected = leaveType == type,
                                 onClick = { leaveType = type },
-                                label = { Text(type, fontSize = 11.sp, fontWeight = FontWeight.SemiBold) }
+                                label = { Text(type, fontSize = 12.sp, fontWeight = FontWeight.Bold) }
                             )
                         }
                     }
@@ -80,9 +92,10 @@ fun LeaveGatePassScreen(
                         OutlinedTextField(
                             value = startDate,
                             onValueChange = { startDate = it },
-                            label = { Text("Start Date") },
-                            placeholder = { Text("YYYY-MM-DD") },
+                            label = { Text("Start Date", color = c.mutedText) },
+                            placeholder = { Text("YYYY-MM-DD", color = c.mutedText) },
                             singleLine = true,
+                            colors = tfColors,
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.weight(1f)
                         )
@@ -90,9 +103,10 @@ fun LeaveGatePassScreen(
                         OutlinedTextField(
                             value = endDate,
                             onValueChange = { endDate = it },
-                            label = { Text("End Date") },
-                            placeholder = { Text("YYYY-MM-DD") },
+                            label = { Text("End Date", color = c.mutedText) },
+                            placeholder = { Text("YYYY-MM-DD", color = c.mutedText) },
                             singleLine = true,
+                            colors = tfColors,
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.weight(1f)
                         )
@@ -103,8 +117,9 @@ fun LeaveGatePassScreen(
                     OutlinedTextField(
                         value = reason,
                         onValueChange = { reason = it },
-                        label = { Text("Reason for Leave") },
-                        placeholder = { Text("State purpose for leaving campus...") },
+                        label = { Text("Reason for Leave", color = c.mutedText) },
+                        placeholder = { Text("State purpose for leaving campus...", color = c.mutedText) },
+                        colors = tfColors,
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -121,7 +136,7 @@ fun LeaveGatePassScreen(
                             )
                         },
                         shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
+                        colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary),
                         modifier = Modifier.fillMaxWidth().height(44.dp)
                     ) {
                         Icon(Icons.Default.Send, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -160,14 +175,14 @@ fun LeaveGatePassScreen(
 
             // Application History Section
             item {
-                Text("Leave & Gate Pass History", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+                Text("Leave & Gate Pass History", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = c.heading)
             }
 
             when (val state = passesState) {
                 is Resource.Loading -> {
                     item {
                         Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = PrimaryIndigo)
+                            CircularProgressIndicator(color = c.primary)
                         }
                     }
                 }
@@ -179,69 +194,31 @@ fun LeaveGatePassScreen(
                         item { EmptyStateCard(title = "No previous leave applications found.") }
                     } else {
                         items(state.data, key = { it.leaveId }) { pass ->
-                            LeavePassRowCard(
-                                pass = pass,
-                                onMoreClick = { selectedPassForDetails = pass }
-                            )
+                            LeavePassCard(pass = pass)
                         }
                     }
                 }
                 else -> {
-                    item { EmptyStateCard(title = "No previous leave applications found.") }
+                    item { EmptyStateCard(title = "No leave history available.") }
                 }
             }
-        }
-
-        // Details / More Dialog
-        selectedPassForDetails?.let { pass ->
-            AlertDialog(
-                onDismissRequest = { selectedPassForDetails = null },
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(Icons.Default.FlightTakeoff, contentDescription = null, tint = PrimaryIndigo)
-                        Text(pass.leaveType, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    }
-                },
-                text = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Application ID: ${pass.leaveId}", fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.Bold)
-                        Text("Dates: ${pass.startDate} to ${pass.endDate}", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HeadingNavy)
-                        Text("Reason: ${pass.reason}", fontSize = 12.sp, color = BodyText)
-                        Text("Status: ${pass.status}", fontSize = 12.sp, color = PrimaryIndigo, fontWeight = FontWeight.Bold)
-                        pass.approvedBy?.let { warden ->
-                            Text("Reviewed By: $warden", fontSize = 11.sp, color = MutedText)
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { selectedPassForDetails = null }) {
-                        Text("Close", fontWeight = FontWeight.Bold)
-                    }
-                }
-            )
         }
     }
 }
 
 @Composable
-fun LeavePassRowCard(
-    pass: HostelLeavePass,
-    onMoreClick: () -> Unit
-) {
+fun LeavePassCard(pass: HostelLeavePass) {
+    val c = CampusTokens.colors
+    val sdf = remember { SimpleDateFormat("d MMM, h:mm a", Locale.ENGLISH) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = CardShape,
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        border = BorderStroke(1.dp, SurfaceBorder)
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder)
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
@@ -249,55 +226,45 @@ fun LeavePassRowCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = pass.leaveType,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = HeadingNavy
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(Icons.Default.FlightTakeoff, contentDescription = null, tint = c.primary, modifier = Modifier.size(18.dp))
+                    Text(pass.leaveType, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = c.heading)
+                }
 
                 StatusPill(
                     text = pass.status,
                     tone = when (pass.status) {
                         "APPROVED" -> StatusTone.SUCCESS
+                        "PENDING", "SUBMITTED" -> StatusTone.WARNING
                         "REJECTED" -> StatusTone.DANGER
-                        else -> StatusTone.WARNING
+                        else -> StatusTone.NEUTRAL
                     }
                 )
             }
 
             Text(
-                text = "📅 ${pass.startDate} ➔ ${pass.endDate}",
+                text = "📅 ${pass.startDate} to ${pass.endDate}",
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = BodyText
+                fontWeight = FontWeight.Bold,
+                color = c.heading
             )
 
             Text(
                 text = "Reason: ${pass.reason}",
-                fontSize = 11.sp,
-                color = MutedText,
-                maxLines = 2
+                fontSize = 12.sp,
+                color = c.bodyText
             )
 
-            HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
+            HorizontalDivider(color = c.divider, thickness = 1.dp)
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                pass.approvedBy?.let { warden ->
-                    Text(text = "Warden: $warden", fontSize = 10.sp, color = MutedText)
-                }
-
-                TextButton(
-                    onClick = onMoreClick,
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                ) {
-                    Text("Details / More ➔", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryIndigo)
-                }
-            }
+            Text(
+                text = "Applied: ${sdf.format(Date(pass.appliedAt))}",
+                fontSize = 11.sp,
+                color = c.mutedText
+            )
         }
     }
 }
