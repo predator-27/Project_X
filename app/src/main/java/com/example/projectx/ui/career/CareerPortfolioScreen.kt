@@ -5,6 +5,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -501,12 +503,17 @@ fun AddCertificationDialog(onDismiss: () -> Unit, onConfirm: (name: String, issu
         onDismissRequest = onDismiss,
         title = { Text("Add Certification", fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Certification Name") }, singleLine = true)
-                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization") }, singleLine = true)
-                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Issue Date (YYYY-MM-DD)") }, singleLine = true)
-                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category") }, singleLine = true)
-                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") })
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Certification Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Issue Date (YYYY-MM-DD)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
@@ -528,10 +535,15 @@ fun AddProjectDialog(onDismiss: () -> Unit, onConfirm: (name: String, desc: Stri
         onDismissRequest = onDismiss,
         title = { Text("Add Project", fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Project Name") }, singleLine = true)
-                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") })
-                OutlinedTextField(value = techs, onValueChange = { techs = it }, label = { Text("Technologies (comma separated)") }, singleLine = true)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Project Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = techs, onValueChange = { techs = it }, label = { Text("Technologies (comma separated)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
@@ -558,10 +570,15 @@ fun AddSkillDialog(onDismiss: () -> Unit, onConfirm: (name: String, cat: String,
         onDismissRequest = onDismiss,
         title = { Text("Add Technical Skill", fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Skill Name") }, singleLine = true)
-                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category") }, singleLine = true)
-                OutlinedTextField(value = prof, onValueChange = { prof = it }, label = { Text("Proficiency Level") }, singleLine = true)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Skill Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = cat, onValueChange = { cat = it }, label = { Text("Category") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = prof, onValueChange = { prof = it }, label = { Text("Proficiency Level") }, singleLine = true, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
@@ -584,11 +601,16 @@ fun AddAchievementDialog(onDismiss: () -> Unit, onConfirm: (title: String, desc:
         onDismissRequest = onDismiss,
         title = { Text("Add Achievement", fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") }, singleLine = true)
-                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization") }, singleLine = true)
-                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Date (YYYY-MM-DD)") }, singleLine = true)
-                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") })
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = issuer, onValueChange = { issuer = it }, label = { Text("Issuing Organization") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Date (YYYY-MM-DD)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
             }
         },
         confirmButton = {

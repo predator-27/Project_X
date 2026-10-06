@@ -1,21 +1,21 @@
 package com.projectx.app.ui.settings
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
@@ -23,7 +23,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,13 +35,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.BuildConfig
 import com.projectx.app.components.AppScaffold
-import com.projectx.app.theme.CampusTextSize
-import com.projectx.app.theme.CampusThemeMode
-import com.projectx.app.theme.CampusThemePreset
-import com.projectx.app.theme.CampusThemeState
-import com.projectx.app.theme.CampusTokens
+import com.projectx.app.components.StatusPill
+import com.projectx.app.components.StatusTone
+import com.projectx.app.theme.*
 import com.projectx.app.ui.TeacherManagementViewModel
 import com.projectx.app.ui.auth.AuthViewModel
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 @Composable
 fun SettingsScreen(
@@ -48,9 +54,13 @@ fun SettingsScreen(
 ) {
     val c = CampusTokens.colors
     val context = LocalContext.current
-    val currentTheme by CampusThemeState.currentTheme.collectAsState()
     val currentMode by CampusThemeState.mode.collectAsState()
     val currentText by CampusThemeState.textSize.collectAsState()
+    val customPrimary by CampusThemeState.customPrimary.collectAsState()
+    val customSecondary by CampusThemeState.customSecondary.collectAsState()
+
+    val activePrimary = customPrimary ?: c.primary
+    val activeSecondary = customSecondary ?: c.secondary
 
     AppScaffold(title = "Settings & Appearance", onMenuClick = onMenuClick, modifier = modifier) {
         LazyColumn(
@@ -58,11 +68,38 @@ fun SettingsScreen(
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.fillMaxSize(),
         ) {
-            item { SectionHeader(icon = Icons.Default.Palette, title = "Theme preset") }
-            item { ThemePresetGrid(current = currentTheme) }
-            item { SectionHeader(icon = Icons.Default.WbSunny, title = "Appearance mode") }
+            item { SectionHeader(icon = Icons.Default.Palette, title = "Custom Appearance Colors") }
+            item {
+                ColorWheelPicker(
+                    title = "Primary Color",
+                    selectedColor = activePrimary,
+                    onColorSelected = { CampusThemeState.setCustomPrimary(it) }
+                )
+            }
+            item {
+                ColorWheelPicker(
+                    title = "Secondary Color",
+                    selectedColor = activeSecondary,
+                    onColorSelected = { CampusThemeState.setCustomSecondary(it) }
+                )
+            }
+            item { LiveThemePreviewCard() }
+            item {
+                OutlinedButton(
+                    onClick = { CampusThemeState.resetCustomColors() },
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, c.surfaceBorder),
+                    modifier = Modifier.fillMaxWidth().height(44.dp)
+                ) {
+                    Icon(Icons.Default.Refresh, contentDescription = null, tint = c.primary, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Reset Custom Colors to Default", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = c.heading)
+                }
+            }
+
+            item { SectionHeader(icon = Icons.Default.WbSunny, title = "Appearance Mode") }
             item { ModeRow(current = currentMode) }
-            item { SectionHeader(icon = Icons.Default.TextFields, title = "Text size") }
+            item { SectionHeader(icon = Icons.Default.TextFields, title = "Text Size") }
             item { TextSizeRow(current = currentText) }
             item { SectionHeader(icon = Icons.Default.CloudDownload, title = "Updates") }
             item {
@@ -87,7 +124,7 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SectionHeader(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String) {
+private fun SectionHeader(icon: ImageVector, title: String) {
     val c = CampusTokens.colors
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(icon, contentDescription = null, tint = c.primary, modifier = Modifier.size(18.dp))
@@ -96,51 +133,184 @@ private fun SectionHeader(icon: androidx.compose.ui.graphics.vector.ImageVector,
 }
 
 @Composable
-private fun ThemePresetGrid(current: CampusThemePreset) {
+private fun ColorWheelPicker(
+    title: String,
+    selectedColor: Color,
+    onColorSelected: (Color) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val c = CampusTokens.colors
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.fillMaxWidth().heightIn(max = 460.dp),
+    var hue by remember(selectedColor) { mutableFloatStateOf(colorToHue(selectedColor)) }
+    var saturation by remember(selectedColor) { mutableFloatStateOf(colorToSaturation(selectedColor)) }
+    var brightness by remember(selectedColor) { mutableFloatStateOf(colorToValue(selectedColor)) }
+
+    fun updateColorFromOffset(offset: Offset, sizePx: Float) {
+        val centerX = sizePx / 2f
+        val centerY = sizePx / 2f
+        val dx = offset.x - centerX
+        val dy = offset.y - centerY
+        val dist = sqrt(dx * dx + dy * dy)
+        val maxRadius = sizePx / 2f
+
+        val angleRad = atan2(dy, dx)
+        var angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
+        if (angleDeg < 0) angleDeg += 360f
+
+        hue = angleDeg
+        saturation = (dist / maxRadius).coerceIn(0f, 1f)
+        val newColor = Color.hsv(hue, saturation, brightness)
+        onColorSelected(newColor)
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder)
     ) {
-        items(CampusThemePreset.ALL_THEMES, key = { it.name }) { preset ->
-            val isSelected = preset == current
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = preset.pageBackground,
-                border = BorderStroke(
-                    width = if (isSelected) 2.dp else 1.dp,
-                    color = if (isSelected) preset.primaryColor else c.surfaceBorder,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 88.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable { CampusThemeState.setTheme(preset) },
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                        Surface(shape = CircleShape, color = preset.primaryColor, modifier = Modifier.size(20.dp)) {
-                            if (isSelected) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
-                                }
-                            }
-                        }
-                        Surface(shape = CircleShape, color = preset.sidebarColor, modifier = Modifier.size(16.dp)) {}
+                Text(title, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = c.heading)
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = selectedColor,
+                    border = BorderStroke(1.dp, c.surfaceBorder),
+                    modifier = Modifier.size(width = 76.dp, height = 28.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = colorToHex(selectedColor),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = calculateOnColor(selectedColor)
+                        )
                     }
-                    Text(
-                        text = preset.themeName,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = when (preset) {
-                            CampusThemePreset.CYBER_MIDNIGHT,
-                            CampusThemePreset.FROSTED_MIDNIGHT -> Color.White
-                            else -> Color(0xFF0F172A)
-                        },
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragStart = { offset -> updateColorFromOffset(offset, size.width.toFloat()) },
+                            onDrag = { change, _ ->
+                                updateColorFromOffset(change.position, size.width.toFloat())
+                                change.consume()
+                            }
+                        )
+                    }
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+                            updateColorFromOffset(offset, size.width.toFloat())
+                        }
+                    }
+            ) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val center = Offset(size.width / 2f, size.height / 2f)
+                    val radius = size.width / 2f
+
+                    val colors = (0..360 step 15).map { Color.hsv(it.toFloat(), 1f, brightness) }
+                    drawCircle(
+                        brush = Brush.sweepGradient(colors = colors, center = center),
+                        radius = radius,
+                        center = center
+                    )
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color.White.copy(alpha = brightness), Color.Transparent),
+                            center = center,
+                            radius = radius
+                        ),
+                        radius = radius,
+                        center = center
+                    )
+
+                    val selRad = Math.toRadians(hue.toDouble())
+                    val handleDist = saturation * radius
+                    val handleX = center.x + (handleDist * cos(selRad)).toFloat()
+                    val handleY = center.y + (handleDist * sin(selRad)).toFloat()
+
+                    drawCircle(
+                        color = Color.White,
+                        radius = 12.dp.toPx(),
+                        center = Offset(handleX, handleY)
+                    )
+                    drawCircle(
+                        color = selectedColor,
+                        radius = 9.dp.toPx(),
+                        center = Offset(handleX, handleY)
                     )
                 }
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Brightness", fontSize = 11.sp, color = c.mutedText)
+                Slider(
+                    value = brightness,
+                    onValueChange = { b ->
+                        brightness = b
+                        onColorSelected(Color.hsv(hue, saturation, brightness))
+                    },
+                    valueRange = 0.2f..1f,
+                    colors = SliderDefaults.colors(thumbColor = selectedColor, activeTrackColor = selectedColor),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LiveThemePreviewCard() {
+    val c = CampusTokens.colors
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder)
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("Live Theme Preview", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = c.heading)
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {},
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Primary Action", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+
+                Button(
+                    onClick = {},
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = c.secondary, contentColor = c.onSecondary),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Secondary", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Sample Content Card", fontSize = 12.sp, color = c.bodyText, fontWeight = FontWeight.Medium)
+                StatusPill(text = "Active Token", tone = StatusTone.SUCCESS)
             }
         }
     }
@@ -248,4 +418,37 @@ private fun SignOutRow(onClick: () -> Unit) {
         Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, tint = c.dangerRed)
         Text("Sign out", color = c.dangerRed, fontWeight = FontWeight.Bold, fontSize = 14.sp)
     }
+}
+
+private fun colorToHue(color: Color): Float {
+    val hsv = FloatArray(3)
+    android.graphics.Color.RGBToHSV(
+        (color.red * 255).toInt(),
+        (color.green * 255).toInt(),
+        (color.blue * 255).toInt(),
+        hsv
+    )
+    return hsv[0]
+}
+
+private fun colorToSaturation(color: Color): Float {
+    val hsv = FloatArray(3)
+    android.graphics.Color.RGBToHSV(
+        (color.red * 255).toInt(),
+        (color.green * 255).toInt(),
+        (color.blue * 255).toInt(),
+        hsv
+    )
+    return hsv[1]
+}
+
+private fun colorToValue(color: Color): Float {
+    val hsv = FloatArray(3)
+    android.graphics.Color.RGBToHSV(
+        (color.red * 255).toInt(),
+        (color.green * 255).toInt(),
+        (color.blue * 255).toInt(),
+        hsv
+    )
+    return hsv[2]
 }

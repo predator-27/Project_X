@@ -2,6 +2,7 @@ package com.projectx.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -115,7 +116,7 @@ fun CampusAppShell(
     }
 
     if (isWebViewActive) {
-        WebViewScreen(viewModel = teacherViewModel)
+        WebViewScreen(viewModel = teacherViewModel, onExit = { isWebViewActive = false })
     } else {
         when (val session = sessionState) {
             is AuthSessionState.Loading -> {
@@ -232,6 +233,10 @@ fun StudentCampusShell(
     var activeDrawerModule by remember { mutableStateOf("home") }
     var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
     var showAiAssistantSheet by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = drawerState.isOpen) {
+        coroutineScope.launch { drawerState.close() }
+    }
 
     // Map Target Seat Handoff State
     var targetMapSeatId by remember { mutableStateOf<String?>(null) }
@@ -567,12 +572,7 @@ fun StudentCampusShell(
                         }
                     }
                     BottomTab.CAMPUS -> {
-                        if (activeDrawerModule == "campus_map") {
-                            MapScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                                targetSeatId = targetMapSeatId
-                            )
-                        } else if (activeDrawerModule == "navigation") {
+                        if (activeDrawerModule == "campus_map" || activeDrawerModule == "navigation") {
                             CampusMapScreen()
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
@@ -588,7 +588,7 @@ fun StudentCampusShell(
                                 onLocateOnMap = { seatId ->
                                     targetMapSeatId = seatId
                                     selectedBottomTab = BottomTab.CAMPUS
-                                    activeDrawerModule = "campus_map"
+                                    activeDrawerModule = "navigation"
                                 }
                             )
                         }
@@ -663,6 +663,7 @@ fun StudentCampusShell(
                 if (showAiAssistantSheet) {
                     CampusAiAssistantSheet(
                         aiViewModel = aiViewModel,
+                        displayName = studentDisplayName,
                         onDismiss = { showAiAssistantSheet = false }
                     )
                 }

@@ -123,7 +123,7 @@ fun ThemeSelectorDialog(
                                     text = preset.themeName,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (preset == CampusThemePreset.CYBER_MIDNIGHT) Color.White else Color(0xFF0F172A)
+                                    color = if (preset == CampusThemePreset.CYBER_MIDNIGHT) Color.White else CampusTokens.colors.heading
                                 )
                             }
                         }

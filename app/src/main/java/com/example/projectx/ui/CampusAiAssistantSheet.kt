@@ -28,11 +28,16 @@ import com.projectx.app.theme.*
 @Composable
 fun CampusAiAssistantSheet(
     aiViewModel: CampusAiViewModel,
+    displayName: String? = null,
     onDismiss: () -> Unit
 ) {
     val messages by aiViewModel.messages.collectAsState()
     val isLoading by aiViewModel.isLoading.collectAsState()
     var inputText by remember { mutableStateOf("") }
+
+    LaunchedEffect(displayName) {
+        aiViewModel.setUserNameGreeting(displayName)
+    }
 
     val promptChips = listOf(
         "📚 Explain Trees vs Graphs in Data Structures",

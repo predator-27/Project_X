@@ -31,7 +31,7 @@ class CampusAiViewModel : ViewModel() {
         listOf(
             ChatMessage(
                 sender = MessageSender.AI,
-                text = "Hello Alex! I am your Campus Gemini AI Tutor & Study Buddy 🎓. Ask me anything about your courses, exam preparation, study schedules, or campus life!"
+                text = "Hello! I am your Campus Gemini AI Tutor & Study Buddy 🎓. Ask me anything about your courses, exam preparation, study schedules, or campus life!"
             )
         )
     )
@@ -39,6 +39,17 @@ class CampusAiViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    fun setUserNameGreeting(displayName: String?) {
+        val greeting = if (!displayName.isNullOrBlank()) "Hello, $displayName!" else "Hello!"
+        val updatedMessage = ChatMessage(
+            sender = MessageSender.AI,
+            text = "$greeting I am your Campus Gemini AI Tutor & Study Buddy 🎓. Ask me anything about your courses, exam preparation, study schedules, or campus life!"
+        )
+        if (_messages.value.size == 1 && _messages.value.first().sender == MessageSender.AI) {
+            _messages.value = listOf(updatedMessage)
+        }
+    }
 
     fun sendMessage(userPrompt: String) {
         if (userPrompt.isBlank()) return

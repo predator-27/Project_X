@@ -47,7 +47,6 @@ class LostFoundRepository(
 
     suspend fun getStaffQueue(): List<LostItem> {
         val querySnapshot = firestore.collection("lost_found")
-            .whereEqualTo("status", LostItemStatus.CLAIM_SUBMITTED.name)
             .get()
             .await()
 
@@ -150,6 +149,43 @@ class LostFoundRepository(
             "status" to LostItemStatus.CANCELLED.name
         )
 
+        firestore.collection("lost_found").document(itemId).update(updates).await()
+    }
+
+    suspend fun updateItemListing(
+        itemId: String,
+        title: String,
+        locationFound: String,
+        description: String
+    ) {
+        val updates = mapOf(
+            "title" to title,
+            "locationFound" to locationFound,
+            "description" to description
+        )
+        firestore.collection("lost_found").document(itemId).update(updates).await()
+    }
+
+    suspend fun addStaffNote(
+        itemId: String,
+        note: String
+    ) {
+        val updates = mapOf(
+            "staffNotes" to note
+        )
+        firestore.collection("lost_found").document(itemId).update(updates).await()
+    }
+
+    suspend fun updateItemStatus(
+        itemId: String,
+        status: LostItemStatus
+    ) {
+        val updates = mutableMapOf<String, Any?>(
+            "status" to status.name
+        )
+        if (status == LostItemStatus.HANDOVER_COMPLETE) {
+            updates["handoverTimestamp"] = FieldValue.serverTimestamp()
+        }
         firestore.collection("lost_found").document(itemId).update(updates).await()
     }
 

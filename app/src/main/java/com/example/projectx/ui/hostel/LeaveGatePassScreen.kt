@@ -53,22 +53,6 @@ fun LeaveGatePassScreen(
                 .fillMaxSize()
                 .imePadding()
         ) {
-            // Demo Label Banner
-            item {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.tertiaryContainer,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "⚡ DEMO LEAVE & GATE PASS PORTAL — FOR DEVELOPMENT PREVIEW ONLY",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                    )
-                }
-            }
 
             // Application Form
             item {

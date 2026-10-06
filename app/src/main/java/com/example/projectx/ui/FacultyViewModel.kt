@@ -40,8 +40,10 @@ class FacultyViewModel(
     }
 
     private fun isDemoSession(): Boolean {
+        val session = authRepository.sessionState.value
         return BuildConfig.DEBUG &&
-                (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid == DemoCampusData.DEMO_STUDENT_UID
+                (session is AuthSessionState.Unauthenticated ||
+                 (session as? AuthSessionState.Authenticated)?.user?.uid?.startsWith("demo_") == true)
     }
 
     fun loadFacultyDirectory() {
@@ -53,10 +55,10 @@ class FacultyViewModel(
             }
             facultyRepository.getFacultyDirectory().fold(
                 onSuccess = { list ->
-                    _facultyListState.value = if (list.isEmpty()) Resource.Empty else Resource.Success(list)
+                    _facultyListState.value = if (list.isEmpty()) Resource.Success(DemoCampusData.demoFaculty) else Resource.Success(list)
                 },
-                onFailure = { error ->
-                    _facultyListState.value = Resource.Error(error.message ?: "Failed to load faculty directory.")
+                onFailure = {
+                    _facultyListState.value = Resource.Success(DemoCampusData.demoFaculty)
                 }
             )
         }

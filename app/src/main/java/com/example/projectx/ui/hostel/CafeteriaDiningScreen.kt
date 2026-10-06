@@ -5,7 +5,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Restaurant
@@ -32,6 +34,7 @@ fun CafeteriaDiningScreen(
     hostelViewModel: HostelViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    val c = CampusTokens.colors
     val mealsState by hostelViewModel.mealsState.collectAsState()
     val selectedDate by hostelViewModel.selectedDateState.collectAsState()
 
@@ -46,101 +49,97 @@ fun CafeteriaDiningScreen(
         onMenuClick = onMenuClick,
         modifier = modifier
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 8.dp),
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Demo Label Banner
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = MaterialTheme.colorScheme.tertiaryContainer,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "⚡ DEMO DINING PASSPORT — FOR DEVELOPMENT PREVIEW ONLY",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                )
-            }
-
             // Header Context Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                border = BorderStroke(1.dp, SurfaceBorder)
-            ) {
-                Column(
-                    modifier = Modifier.padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = c.surface),
+                    border = BorderStroke(1.dp, c.surfaceBorder)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Restaurant, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(22.dp))
-                            Text("Central Mess — Ground Floor", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(Icons.Default.Restaurant, contentDescription = null, tint = c.primary, modifier = Modifier.size(22.dp))
+                                Text("Central Mess — Ground Floor", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = c.heading)
+                            }
+
+                            StatusPill(text = "Daily Meal QRs", tone = StatusTone.NEUTRAL)
                         }
 
-                        StatusPill(text = "Daily Meal QRs", tone = StatusTone.NEUTRAL)
+                        Text(
+                            text = "Each meal generates its own unique QR pass for the selected date. Click on any meal to display its specific entrance QR code.",
+                            fontSize = 12.sp,
+                            color = c.bodyText
+                        )
                     }
-
-                    Text(
-                        text = "Each meal generates its own unique QR pass for the selected date. Click on any meal to display its specific entrance QR code.",
-                        fontSize = 12.sp,
-                        color = BodyText
-                    )
                 }
             }
 
             // Date Selector Chips
-            Text("Select Dining Date", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                dateOptions.forEach { (dateVal, dateLabel) ->
-                    FilterChip(
-                        selected = selectedDate == dateVal,
-                        onClick = { hostelViewModel.setSelectedDate(dateVal) },
-                        label = { Text(dateLabel, fontSize = 12.sp, fontWeight = FontWeight.Bold) }
-                    )
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Select Dining Date", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = c.heading)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        dateOptions.forEach { (dateVal, dateLabel) ->
+                            FilterChip(
+                                selected = selectedDate == dateVal,
+                                onClick = { hostelViewModel.setSelectedDate(dateVal) },
+                                label = { Text(dateLabel, fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                            )
+                        }
+                    }
                 }
             }
 
             // Meal Filter Selector
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                filterOptions.forEach { filter ->
-                    FilterChip(
-                        selected = selectedMealFilter == filter,
-                        onClick = { selectedMealFilter = filter },
-                        label = { Text(filter, fontSize = 11.sp, fontWeight = FontWeight.SemiBold) }
-                    )
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    filterOptions.forEach { filter ->
+                        FilterChip(
+                            selected = selectedMealFilter == filter,
+                            onClick = { selectedMealFilter = filter },
+                            label = { Text(filter, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) }
+                        )
+                    }
                 }
             }
 
-            Text("Dining Schedule & Menu ($selectedDate)", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+            item {
+                Text("Dining Schedule & Menu ($selectedDate)", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = c.heading)
+            }
 
             when (val resource = mealsState) {
                 is Resource.Loading -> {
-                    Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = PrimaryIndigo)
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = c.primary)
+                        }
                     }
                 }
                 is Resource.Error -> {
-                    EmptyStateCard(title = resource.message)
+                    item { EmptyStateCard(title = resource.message) }
                 }
                 is Resource.Success -> {
                     val filteredMeals = resource.data.filter {
@@ -148,23 +147,19 @@ fun CafeteriaDiningScreen(
                     }
 
                     if (filteredMeals.isEmpty()) {
-                        EmptyStateCard(title = "No menu available for $selectedMealFilter on $selectedDate.")
+                        item { EmptyStateCard(title = "No menu available for $selectedMealFilter on $selectedDate.") }
                     } else {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                            contentPadding = PaddingValues(bottom = 32.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(filteredMeals, key = { it.mealId }) { meal ->
-                                MealCard(
-                                    meal = meal,
-                                    onShowQrClick = { selectedMealForQr = meal }
-                                )
-                            }
+                        items(filteredMeals, key = { it.mealId }) { meal ->
+                            MealCard(
+                                meal = meal,
+                                onShowQrClick = { selectedMealForQr = meal }
+                            )
                         }
                     }
                 }
-                else -> EmptyStateCard(title = "No dining menu available today.")
+                else -> {
+                    item { EmptyStateCard(title = "No dining menu available today.") }
+                }
             }
         }
 
@@ -177,21 +172,23 @@ fun CafeteriaDiningScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.QrCode2, contentDescription = null, tint = PrimaryIndigo)
-                        Text("${meal.mealType} QR Pass (${meal.date})", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.QrCode2, contentDescription = null, tint = c.primary)
+                        Text("${meal.mealType} QR Pass (${meal.date})", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = c.heading)
                     }
                 },
                 text = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
                     ) {
                         // Vector Canvas QR Representation
                         Surface(
                             shape = RoundedCornerShape(16.dp),
                             color = Color.White,
-                            border = BorderStroke(2.dp, PrimaryIndigo),
+                            border = BorderStroke(2.dp, c.primary),
                             modifier = Modifier.size(200.dp)
                         ) {
                             Box(
@@ -228,21 +225,21 @@ fun CafeteriaDiningScreen(
 
                         Text(
                             text = "Token: ${meal.qrToken}",
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryIndigo
+                            color = c.primary
                         )
 
                         Text(
                             text = "Scan this specific ${meal.mealType} QR pass at the mess scanner counter during ${meal.timeRange} on ${meal.date}.",
-                            fontSize = 11.sp,
-                            color = MutedText
+                            fontSize = 12.sp,
+                            color = c.mutedText
                         )
                     }
                 },
                 confirmButton = {
                     TextButton(onClick = { selectedMealForQr = null }) {
-                        Text("Close", fontWeight = FontWeight.Bold)
+                        Text("Close", fontWeight = FontWeight.Bold, color = c.primary)
                     }
                 }
             )
@@ -255,11 +252,12 @@ fun MealCard(
     meal: DiningMeal,
     onShowQrClick: () -> Unit = {}
 ) {
+    val c = CampusTokens.colors
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = CardShape,
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        border = BorderStroke(1.dp, SurfaceBorder)
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder)
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -274,19 +272,19 @@ fun MealCard(
                     text = meal.mealType,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = HeadingNavy
+                    color = c.heading
                 )
 
                 meal.calories?.let { cal ->
                     Surface(
                         shape = PillShape,
-                        color = SecondaryEmeraldBg
+                        color = c.successGreenBg
                     ) {
                         Text(
                             text = cal,
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = SecondaryEmerald,
+                            color = c.successGreen,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                         )
                     }
@@ -295,17 +293,17 @@ fun MealCard(
 
             Text(
                 text = "⏰ ${meal.timeRange} • ${meal.location}",
-                fontSize = 11.sp,
-                color = MutedText,
+                fontSize = 12.sp,
+                color = c.mutedText,
                 fontWeight = FontWeight.Medium
             )
 
-            HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
+            HorizontalDivider(color = c.divider, thickness = 1.dp)
 
             Text(
                 text = "Menu: ${meal.menuItems.joinToString(", ")}",
                 fontSize = 12.sp,
-                color = BodyText
+                color = c.bodyText
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -313,8 +311,8 @@ fun MealCard(
             Button(
                 onClick = onShowQrClick,
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                modifier = Modifier.fillMaxWidth().height(40.dp)
+                colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary),
+                modifier = Modifier.fillMaxWidth().height(42.dp)
             ) {
                 Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))

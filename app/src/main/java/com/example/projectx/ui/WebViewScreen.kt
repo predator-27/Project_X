@@ -1,15 +1,21 @@
 package com.projectx.app.ui
 
+import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -17,13 +23,20 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
+
+class WebAppInterface(private val onExit: () -> Unit) {
+    @JavascriptInterface
+    fun closeWebUpdate() {
+        onExit()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebViewScreen(
     viewModel: TeacherManagementViewModel,
+    onExit: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -32,7 +45,16 @@ fun WebViewScreen(
             webViewClient = WebViewClient()
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
+            addJavascriptInterface(WebAppInterface(onExit), "Android")
             loadUrl("file:///android_asset/web/index.html")
+        }
+    }
+
+    BackHandler {
+        if (webView.canGoBack()) {
+            webView.goBack()
+        } else {
+            onExit()
         }
     }
 
@@ -48,9 +70,16 @@ fun WebViewScreen(
         topBar = {
             TopAppBar(
                 title = { Text("🌐 Web Portal View") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (webView.canGoBack()) webView.goBack() else onExit()
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
                 actions = {
-                    TextButton(onClick = { viewModel.logout(context) }) {
-                        Text("Exit Web View", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = onExit) {
+                        Icon(Icons.Default.Close, contentDescription = "Close Web View")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

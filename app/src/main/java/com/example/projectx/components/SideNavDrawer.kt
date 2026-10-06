@@ -94,7 +94,7 @@ fun drawerFor(role: UserRole): List<NavDrawerCategory> = when (role) {
             DrawerItems.Assignments, DrawerItems.Exams, DrawerItems.Results, DrawerItems.Reports,
         )),
         NavDrawerCategory("CAMPUS", listOf(
-            DrawerItems.Teachers, DrawerItems.CampusMap, DrawerItems.Navigation,
+            DrawerItems.Teachers, DrawerItems.Navigation,
             DrawerItems.Appointments, DrawerItems.LostFound,
         )),
         NavDrawerCategory("COMMUNICATION", listOf(
@@ -111,7 +111,7 @@ fun drawerFor(role: UserRole): List<NavDrawerCategory> = when (role) {
         NavDrawerCategory("HOME", listOf(DrawerItems.Home)),
         NavDrawerCategory("CAMPUS", listOf(
             DrawerItems.Teachers, DrawerItems.Appointments,
-            DrawerItems.CampusMap, DrawerItems.Navigation,
+            DrawerItems.Navigation,
         )),
         NavDrawerCategory("COMMUNICATION", listOf(
             DrawerItems.Announce, DrawerItems.Messages,
@@ -123,14 +123,14 @@ fun drawerFor(role: UserRole): List<NavDrawerCategory> = when (role) {
     UserRole.LOST_FOUND_STAFF -> listOf(
         NavDrawerCategory("HOME", listOf(DrawerItems.Home)),
         NavDrawerCategory("DESK", listOf(DrawerItems.LostFound)),
-        NavDrawerCategory("CAMPUS", listOf(DrawerItems.CampusMap, DrawerItems.Navigation)),
+        NavDrawerCategory("CAMPUS", listOf(DrawerItems.Navigation)),
         NavDrawerCategory("SERVICES", listOf(DrawerItems.Holidays, DrawerItems.Feedback)),
         NavDrawerCategory("SETTINGS", listOf(DrawerItems.Settings)),
     )
     UserRole.COLLEGE_ADMIN -> listOf(
         NavDrawerCategory("HOME", listOf(DrawerItems.Home)),
         NavDrawerCategory("CAMPUS", listOf(
-            DrawerItems.Teachers, DrawerItems.CampusMap, DrawerItems.Navigation,
+            DrawerItems.Teachers, DrawerItems.Navigation,
         )),
         NavDrawerCategory("COMMUNICATION", listOf(DrawerItems.Announce, DrawerItems.Messages)),
         NavDrawerCategory("SERVICES", listOf(DrawerItems.Holidays, DrawerItems.Feedback)),
