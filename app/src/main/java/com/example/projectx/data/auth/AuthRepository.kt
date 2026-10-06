@@ -35,14 +35,23 @@ class AuthRepository(
             return@withContext state
         }
 
-        // Reload user and force-refresh token claim (getIdToken(true))
         val verifyResult = firebaseAuthRepo.verifyAndRefreshUser()
         if (verifyResult.isFailure) {
-            val reloadedUser = firebaseAuthRepo.currentUser.value ?: currentFirebaseUser
-            val state = if (!reloadedUser.isEmailVerified) {
-                AuthSessionState.EmailVerificationRequired(reloadedUser.email ?: "")
-            } else {
-                AuthSessionState.Error(verifyResult.exceptionOrNull()?.message ?: "Session restoration failed.")
+            val errMessage = verifyResult.exceptionOrNull()?.message
+            val state = when (errMessage) {
+                "NETWORK_TIMEOUT" -> {
+                    AuthSessionState.Unauthenticated
+                }
+                "EMAIL_NOT_VERIFIED" -> {
+                    AuthSessionState.EmailVerificationRequired(currentFirebaseUser.email ?: "")
+                }
+                else -> {
+                    if (currentFirebaseUser.isEmailVerified) {
+                        loadSessionForFirebaseUser(currentFirebaseUser)
+                    } else {
+                        AuthSessionState.Unauthenticated
+                    }
+                }
             }
             _sessionState.value = state
             return@withContext state
@@ -299,9 +308,13 @@ class AuthRepository(
         state
     }
 
+    private fun isMicrosoftOAuthUser(user: FirebaseUser): Boolean {
+        return user.providerData.any { it.providerId == "microsoft.com" }
+    }
+
     private suspend fun loadSessionForFirebaseUser(firebaseUser: FirebaseUser): AuthSessionState {
-        // Check email verification status
-        if (!firebaseUser.isEmailVerified) {
+        // Check email verification status for password accounts (Microsoft M365 accounts are pre-verified)
+        if (!firebaseUser.isEmailVerified && !isMicrosoftOAuthUser(firebaseUser)) {
             return AuthSessionState.EmailVerificationRequired(firebaseUser.email ?: "")
         }
 

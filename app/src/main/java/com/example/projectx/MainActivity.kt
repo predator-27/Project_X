@@ -1,9 +1,7 @@
 package com.projectx.app
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -28,14 +26,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.components.AmbientBackground
 import com.projectx.app.components.SideNavDrawerContent
-import com.projectx.app.feature.campusmap.CampusMapScreen
 import com.projectx.app.map.MapScreen
 import com.projectx.app.model.UserRole
 import com.projectx.app.theme.CampusTheme
+import com.projectx.app.theme.CampusThemePreset
 import com.projectx.app.theme.CampusThemeState
 import com.projectx.app.theme.CampusTokens
 import com.projectx.app.ui.*
 import com.projectx.app.ui.academics.*
+import com.projectx.app.ui.admin.CollegeAdminDashboard
+import com.projectx.app.ui.admin.LostFoundStaffDashboard
+import com.projectx.app.ui.admin.SuperAdminDashboard
 import com.projectx.app.ui.auth.*
 import com.projectx.app.ui.career.CareerPortfolioScreen
 import com.projectx.app.ui.career.CareerViewModel
@@ -101,42 +102,14 @@ fun CampusAppShell(
 ) {
     val sessionState by authViewModel.sessionState.collectAsState()
     val context = LocalContext.current
-    var showSplash by rememberSaveable { mutableStateOf(true) }
+    val coroutineScope = rememberCoroutineScope()
     var isWebViewActive by rememberSaveable { mutableStateOf(false) }
-
-    var showExitDialog by rememberSaveable { mutableStateOf(false) }
-    var lastBackPressTime by rememberSaveable { mutableLongStateOf(0L) }
 
     LaunchedEffect(Unit) {
         teacherViewModel.checkForAppUpdates(context)
     }
 
-    // Intercept system back button for double back press to exit
-    BackHandler(enabled = !showSplash) {
-        val currentTime = System.currentTimeMillis()
-        if (showExitDialog || (currentTime - lastBackPressTime < 2000L)) {
-            (context as? Activity)?.finish()
-        } else {
-            lastBackPressTime = currentTime
-            showExitDialog = true
-        }
-    }
-
-    if (showExitDialog) {
-        ExitAppDialog(
-            onDismiss = { showExitDialog = false },
-            onConfirmExit = {
-                showExitDialog = false
-                (context as? Activity)?.finish()
-            }
-        )
-    }
-
-    if (showSplash) {
-        SplashScreen(
-            onFinished = { showSplash = false }
-        )
-    } else if (isWebViewActive) {
+    if (isWebViewActive) {
         WebViewScreen(viewModel = teacherViewModel)
     } else {
         when (val session = sessionState) {
@@ -198,14 +171,19 @@ fun CampusAppShell(
                             authViewModel = authViewModel
                         )
                     }
-                    UserRole.LOST_FOUND_STAFF,
-                    UserRole.COLLEGE_ADMIN,
+                    UserRole.COLLEGE_ADMIN -> {
+                        CollegeAdminDashboard(
+                            onMenuClick = { }
+                        )
+                    }
                     UserRole.SUPER_ADMIN -> {
-                        RolePlaceholderScreen(
-                            role = session.role,
-                            userEmail = session.user.email,
-                            displayName = session.publicProfile?.displayName,
-                            authViewModel = authViewModel
+                        SuperAdminDashboard(
+                            onMenuClick = { }
+                        )
+                    }
+                    UserRole.LOST_FOUND_STAFF -> {
+                        LostFoundStaffDashboard(
+                            onMenuClick = { }
                         )
                     }
                 }
@@ -269,7 +247,7 @@ fun StudentCampusShell(
                         when (moduleId) {
                             "home" -> selectedBottomTab = BottomTab.HOME
                             "courses", "attendance", "timetable", "assignments", "exam_schedules", "results", "reports" -> selectedBottomTab = BottomTab.ACADEMICS
-                            "teachers", "campus_map", "navigation", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
+                            "teachers", "campus_map", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
                             "messages", "announcements", "community" -> selectedBottomTab = BottomTab.MESSAGES
                             "profile", "settings", "career_portfolio", "cafeteria", "leave", "room_partner" -> selectedBottomTab = BottomTab.PROFILE
                             "ai_assistant" -> {
@@ -404,8 +382,6 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 targetSeatId = targetMapSeatId
                             )
-                        } else if (activeDrawerModule == "navigation") {
-                            CampusMapScreen()
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
@@ -562,8 +538,6 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 targetSeatId = targetMapSeatId
                             )
-                        } else if (activeDrawerModule == "navigation") {
-                            CampusMapScreen()
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },

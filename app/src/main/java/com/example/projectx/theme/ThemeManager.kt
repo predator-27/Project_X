@@ -17,9 +17,9 @@ enum class CampusThemePreset(
     FROSTED_MIDNIGHT(
         themeName = "Pixel Glass Green",
         primaryColor    = Color(0xFFA8B840),   // mosaic green from LO.png
-        pageBackground  = Color(0xFF0A100A),   // near-black, olive undertone
-        surfaceColor    = Color(0xFF101812),   // 1st glass tier
-        sidebarColor    = Color(0xFF050805),   // darkest anchor
+        pageBackground  = Color(0xFF0F1812),   // deep glass olive
+        surfaceColor    = Color(0xFF1B281E),   // elevated glass card surface
+        sidebarColor    = Color(0xFF080D08),   // darkest anchor
         fieldLabelColor = Color(0xFFC8A840)    // warm gold pops on olive
     ),
     AURA_INDIGO(
@@ -93,15 +93,15 @@ enum class CampusThemePreset(
 }
 
 object CampusThemeState {
-    private val _currentTheme = MutableStateFlow(CampusThemePreset.FROSTED_MIDNIGHT)
+    private val _currentTheme = MutableStateFlow(CampusThemePreset.AURA_INDIGO)
     val currentTheme: StateFlow<CampusThemePreset> = _currentTheme.asStateFlow()
     private var appContext: Context? = null
 
     fun init(context: Context) {
         appContext = context.applicationContext
         val prefs = context.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
-        val savedName = prefs.getString("selected_theme", CampusThemePreset.FROSTED_MIDNIGHT.name)
-        val theme = CampusThemePreset.entries.find { it.name == savedName } ?: CampusThemePreset.FROSTED_MIDNIGHT
+        val savedName = prefs.getString("selected_theme", CampusThemePreset.AURA_INDIGO.name)
+        val theme = CampusThemePreset.entries.find { it.name == savedName } ?: CampusThemePreset.AURA_INDIGO
         _currentTheme.value = theme
     }
 

@@ -23,11 +23,17 @@ fun StatusPill(
     tone: StatusTone = StatusTone.SUCCESS,
     modifier: Modifier = Modifier
 ) {
-    val (bgColor, textColor) = when (tone) {
-        StatusTone.SUCCESS -> SecondaryEmeraldBg to SecondaryEmerald
-        StatusTone.WARNING -> WarningAmberBg to WarningAmber
-        StatusTone.DANGER -> AccentCoralBg to AccentCoral
-        StatusTone.NEUTRAL -> NavySidebarActive to HeadingNavy
+    val bgColor = when (tone) {
+        StatusTone.SUCCESS -> SecondaryEmeraldBg
+        StatusTone.WARNING -> WarningAmberBg
+        StatusTone.DANGER -> AccentCoralBg
+        StatusTone.NEUTRAL -> InfoBannerBg
+    }
+    val textColor = when (tone) {
+        StatusTone.SUCCESS -> SecondaryEmerald
+        StatusTone.WARNING -> WarningAmber
+        StatusTone.DANGER -> AccentCoral
+        StatusTone.NEUTRAL -> HeadingNavy
     }
 
     Surface(
@@ -38,9 +44,9 @@ fun StatusPill(
         Text(
             text = text,
             color = textColor,
-            fontSize = 12.sp,
+            fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
         )
     }
 }

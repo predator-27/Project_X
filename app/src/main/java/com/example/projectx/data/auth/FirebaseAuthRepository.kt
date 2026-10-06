@@ -9,11 +9,13 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.OAuthProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 
 import com.projectx.app.util.AuthValidation
 
@@ -103,7 +105,9 @@ class FirebaseAuthRepository(
     suspend fun signInWithMicrosoft(activity: Activity): Result<FirebaseUser> = withContext(Dispatchers.IO) {
         try {
             val provider = OAuthProvider.newBuilder("microsoft.com")
-                .addCustomParameter("tenant", "<TENANT_ID>")
+                .setScopes(listOf("openid", "profile", "email"))
+                .addCustomParameter("prompt", "select_account")
+                .addCustomParameter("tenant", "2c5bdaf4-8ff2-4bd9-bd54-7c50ab219590")
                 .build()
 
             val pendingResult = firebaseAuth.pendingAuthResult
@@ -131,16 +135,22 @@ class FirebaseAuthRepository(
             ?: return@withContext Result.failure(IllegalStateException("No active user session found."))
 
         try {
-            user.reload().await()
+            withTimeout(5000L) {
+                user.reload().await()
+                if (user.isEmailVerified) {
+                    // Force token refresh to ensure email_verified claim updates in Firebase JWT token for Firestore Rules
+                    user.getIdToken(true).await()
+                }
+            }
             if (user.isEmailVerified) {
-                // Force token refresh to ensure email_verified claim updates in Firebase JWT token for Firestore Rules
-                user.getIdToken(true).await()
                 Result.success(true)
             } else {
-                Result.failure(Exception("Email not verified yet. Please click the link sent to your @bennett.edu.in inbox."))
+                Result.failure(Exception("EMAIL_NOT_VERIFIED"))
             }
+        } catch (e: TimeoutCancellationException) {
+            Result.failure(Exception("NETWORK_TIMEOUT"))
         } catch (e: Exception) {
-            Result.failure(Exception("Verification check failed: ${e.localizedMessage}"))
+            Result.failure(Exception(e.localizedMessage ?: "Verification check failed."))
         }
     }
 
