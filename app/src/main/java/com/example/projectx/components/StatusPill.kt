@@ -5,10 +5,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.projectx.app.theme.*
+import com.projectx.app.theme.CampusTokens
+import com.projectx.app.theme.Danger700
+import com.projectx.app.theme.PillShape
+import com.projectx.app.theme.Success700
+import com.projectx.app.theme.Warning700
 
 enum class StatusTone {
     SUCCESS,
@@ -17,23 +22,29 @@ enum class StatusTone {
     NEUTRAL
 }
 
+/**
+ * Small coloured chip. Text/background pairs are chosen so each label stays WCAG-AA
+ * readable on its own tint in every preset (dark text on light bg for light presets,
+ * light text on dark bg for frosted/dark presets). Minimum 12sp per accessibility rules.
+ */
 @Composable
 fun StatusPill(
     text: String,
     tone: StatusTone = StatusTone.SUCCESS,
     modifier: Modifier = Modifier
 ) {
-    val bgColor = when (tone) {
-        StatusTone.SUCCESS -> SecondaryEmeraldBg
-        StatusTone.WARNING -> WarningAmberBg
-        StatusTone.DANGER -> AccentCoralBg
-        StatusTone.NEUTRAL -> InfoBannerBg
+    val c = CampusTokens.colors
+    val bgColor: Color = when (tone) {
+        StatusTone.SUCCESS -> c.successGreenBg
+        StatusTone.WARNING -> c.warningAmberBg
+        StatusTone.DANGER  -> c.dangerRedBg
+        StatusTone.NEUTRAL -> c.infoBanner
     }
-    val textColor = when (tone) {
-        StatusTone.SUCCESS -> SecondaryEmerald
-        StatusTone.WARNING -> WarningAmber
-        StatusTone.DANGER -> AccentCoral
-        StatusTone.NEUTRAL -> HeadingNavy
+    val textColor: Color = when (tone) {
+        StatusTone.SUCCESS -> if (c.isDark) c.successGreen else Success700
+        StatusTone.WARNING -> if (c.isDark) c.warningAmber else Warning700
+        StatusTone.DANGER  -> if (c.isDark) c.dangerRed else Danger700
+        StatusTone.NEUTRAL -> c.heading
     }
 
     Surface(
@@ -44,7 +55,7 @@ fun StatusPill(
         Text(
             text = text,
             color = textColor,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
         )

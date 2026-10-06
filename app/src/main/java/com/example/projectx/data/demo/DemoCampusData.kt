@@ -1,6 +1,8 @@
 package com.projectx.app.data.demo
 
 import com.projectx.app.model.*
+import com.projectx.app.model.HolidayEvent
+import com.projectx.app.model.HolidayKind
 import com.projectx.app.model.career.*
 import com.projectx.app.model.hostel.*
 import com.projectx.app.model.lms.*
@@ -746,5 +748,20 @@ object DemoCampusData {
             approvedBy = "Warden Office",
             appliedAt = BASE_TIME - ONE_DAY * 15
         )
+    )
+
+    // --- DEMO ACADEMIC CALENDAR (sample data, not labelled on-screen) ---
+    val demoHolidays: List<HolidayEvent> = listOf(
+        HolidayEvent("hol_1", "Gandhi Jayanti",              "2026-10-02", HolidayKind.HOLIDAY,  "National holiday — campus closed."),
+        HolidayEvent("hol_2", "Mid-Semester Examinations",   "2026-10-14", HolidayKind.EXAM,     "CS201 Data Structures mid-term, 09:00 AM, Block N1."),
+        HolidayEvent("hol_3", "Mid-Semester Examinations",   "2026-10-16", HolidayKind.EXAM,     "CS202 DBMS mid-term, 02:00 PM, Block N1."),
+        HolidayEvent("hol_4", "Diwali Vacation Begins",      "2026-10-20", HolidayKind.HOLIDAY,  "Campus closed for Diwali break."),
+        HolidayEvent("hol_5", "Diwali Vacation Ends",        "2026-10-27", HolidayKind.HOLIDAY,  "Resume classes from the next working day."),
+        HolidayEvent("hol_6", "Innovation & Tech Summit",    "2026-11-08", HolidayKind.EVENT,    "Hackathon + AI Project Exhibition — N1 Grounds."),
+        HolidayEvent("hol_7", "Project Submission Deadline", "2026-11-15", HolidayKind.DEADLINE, "Final capstone PR for the Project X semester review."),
+        HolidayEvent("hol_8", "Guru Nanak Jayanti",          "2026-11-24", HolidayKind.HOLIDAY,  "Campus closed."),
+        HolidayEvent("hol_9", "End-Semester Examinations",   "2026-12-01", HolidayKind.EXAM,     "ESE schedule published on Student Portal."),
+        HolidayEvent("hol_10", "Semester Ends",              "2026-12-15", HolidayKind.EVENT,    "Last day of regular classes for Semester 5."),
+        HolidayEvent("hol_11", "Winter Vacation Begins",     "2026-12-16", HolidayKind.HOLIDAY,  "Campus-wide winter break."),
     )
 }

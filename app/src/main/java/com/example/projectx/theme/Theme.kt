@@ -9,57 +9,45 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 
 /**
- * Applies the currently-selected [CampusThemePreset].
- *
- * FROSTED_MIDNIGHT gets its own hand-tuned dark scheme so the whole app
- * flows visually from the splash straight into the UI. Every other preset
- * keeps the classic light / cyber-dark behavior from the prior iteration.
+ * Applies the currently-selected [CampusThemePreset]. The M3 [ColorScheme]
+ * is derived from the preset's [CampusColors] so switching preset instantly
+ * retints every screen (buttons, text fields, chips, dialogs …).
  */
 @Composable
 fun CampusTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
     val preset by CampusThemeState.currentTheme.collectAsState()
-    val tokens = campusColorsFor(preset)
+    val mode by CampusThemeState.mode.collectAsState()
+    val textSize by CampusThemeState.textSize.collectAsState()
+    val systemDark = isSystemInDarkTheme()
 
-    val colorScheme = when {
-        preset == CampusThemePreset.FROSTED_MIDNIGHT -> frostedScheme(tokens)
-        preset == CampusThemePreset.CYBER_MIDNIGHT || darkTheme -> darkColorScheme(
-            primary = preset.primaryColor,
-            onPrimary = Color.White,
-            primaryContainer = preset.primaryColor.copy(alpha = 0.30f),
-            onPrimaryContainer = Color.White,
-            surface = preset.surfaceColor,
-            onSurface = Color(0xFFF8FAFC),
-            surfaceVariant = preset.surfaceColor,
-            onSurfaceVariant = Color(0xFF94A3B8),
-            background = preset.pageBackground,
-            onBackground = Color(0xFFF8FAFC),
-            outline = Color(0xFF334155),
-            error = Color(0xFFF43F5E),
-            onError = Color.White,
-        )
-        else -> lightColorScheme(
-            primary = preset.primaryColor,
-            onPrimary = Color.White,
-            primaryContainer = preset.primaryColor.copy(alpha = 0.15f),
-            onPrimaryContainer = Color(0xFF0F172A),
-            surface = preset.surfaceColor,
-            onSurface = Color(0xFF0F172A),
-            surfaceVariant = preset.primaryColor.copy(alpha = 0.12f),
-            onSurfaceVariant = Color(0xFF64748B),
-            background = preset.pageBackground,
-            onBackground = Color(0xFF0F172A),
-            outline = Color(0xFFE2E8F0),
-            error = Color(0xFFE11D48),
-            onError = Color.White,
-        )
+    // Resolve dark/light: preset's own dark bit wins if it is natively dark; otherwise the
+    // user's manual mode trumps system — SYSTEM falls back to the device setting.
+    val wantDark = when {
+        preset == CampusThemePreset.FROSTED_MIDNIGHT ||
+            preset == CampusThemePreset.CYBER_MIDNIGHT -> true
+        mode == CampusThemeMode.LIGHT -> false
+        mode == CampusThemeMode.DARK -> true
+        else -> systemDark
     }
+    val tokens = campusColorsFor(preset).copy(isDark = wantDark)
+    val colorScheme = tokens.toColorScheme()
 
-    CompositionLocalProvider(LocalCampusColors provides tokens) {
+    val baseDensity = LocalDensity.current
+    val scaledDensity = Density(
+        density = baseDensity.density,
+        fontScale = baseDensity.fontScale * textSize.scale,
+    )
+
+    CompositionLocalProvider(
+        LocalCampusColors provides tokens,
+        LocalDensity provides scaledDensity,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
@@ -69,32 +57,63 @@ fun CampusTheme(
     }
 }
 
-// Hand-crafted Material3 scheme for Frosted Midnight — every slot maps to
-// a token that reads correctly against the deep navy base.
-private fun frostedScheme(c: CampusColors) = darkColorScheme(
-    primary            = FrostPrimary,
-    onPrimary          = FrostOnPrimary,
-    primaryContainer   = FrostPrimaryContainer,
-    onPrimaryContainer = FrostOnPrimaryContainer,
-    secondary          = FrostSecondary,
-    onSecondary        = FrostOnPrimary,
-    secondaryContainer = FrostSecondaryContainer,
-    onSecondaryContainer = FrostOnPrimaryContainer,
-    tertiary           = FrostSecondary,
-    background         = c.pageBackground,
-    onBackground       = c.heading,
-    surface            = c.surface,
-    onSurface          = c.bodyText,
-    surfaceVariant     = c.surfaceElevated,
-    onSurfaceVariant   = c.mutedText,
-    surfaceTint        = FrostPrimary,
-    inverseSurface     = c.heading,
-    inverseOnSurface   = c.pageBackground,
-    outline            = c.surfaceBorder,
-    outlineVariant     = c.divider,
-    error              = c.dangerRed,
-    onError            = FrostOnPrimary,
-    errorContainer     = c.dangerRedBg,
-    onErrorContainer   = c.dangerRed,
-    scrim              = Color(0xCC000000),
-)
+/** Build a Material-3 [ColorScheme] directly from the preset's tokens. */
+internal fun CampusColors.toColorScheme() = if (isDark) {
+    darkColorScheme(
+        primary              = primary,
+        onPrimary            = onPrimary,
+        primaryContainer     = primaryContainer,
+        onPrimaryContainer   = heading,
+        secondary            = secondary,
+        onSecondary          = onSecondary,
+        secondaryContainer   = secondaryContainer,
+        onSecondaryContainer = heading,
+        tertiary             = secondary,
+        onTertiary           = onSecondary,
+        background           = pageBackground,
+        onBackground         = heading,
+        surface              = surface,
+        onSurface            = bodyText,
+        surfaceVariant       = surfaceElevated,
+        onSurfaceVariant     = mutedText,
+        surfaceTint          = primary,
+        inverseSurface       = heading,
+        inverseOnSurface     = pageBackground,
+        outline              = surfaceBorder,
+        outlineVariant       = divider,
+        error                = dangerRed,
+        onError              = Color.White,
+        errorContainer       = dangerRedBg,
+        onErrorContainer     = dangerRed,
+        scrim                = Color(0xCC000000),
+    )
+} else {
+    lightColorScheme(
+        primary              = primary,
+        onPrimary            = onPrimary,
+        primaryContainer     = primaryContainer,
+        onPrimaryContainer   = heading,
+        secondary            = secondary,
+        onSecondary          = onSecondary,
+        secondaryContainer   = secondaryContainer,
+        onSecondaryContainer = heading,
+        tertiary             = secondary,
+        onTertiary           = onSecondary,
+        background           = pageBackground,
+        onBackground         = heading,
+        surface              = surface,
+        onSurface            = bodyText,
+        surfaceVariant       = surfaceElevated,
+        onSurfaceVariant     = mutedText,
+        surfaceTint          = primary,
+        inverseSurface       = heading,
+        inverseOnSurface     = pageBackground,
+        outline              = surfaceBorder,
+        outlineVariant       = divider,
+        error                = dangerRed,
+        onError              = Color.White,
+        errorContainer       = dangerRedBg,
+        onErrorContainer     = dangerRed,
+        scrim                = Color(0x66000000),
+    )
+}

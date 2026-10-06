@@ -2,6 +2,7 @@ package com.projectx.app.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +14,12 @@ import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projectx.app.R
-import com.projectx.app.theme.*
+import com.projectx.app.model.UserRole
+import com.projectx.app.theme.CampusTokens
 
 data class NavDrawerCategory(
     val categoryTitle: String,
@@ -40,67 +47,97 @@ data class NavDrawerItem(
     val badgeTone: StatusTone = StatusTone.NEUTRAL
 )
 
-val CATEGORIZED_DRAWER_ITEMS = listOf(
-    NavDrawerCategory(
-        categoryTitle = "HOME",
-        items = listOf(
-            NavDrawerItem("home", "Dashboard", Icons.Default.Dashboard)
-        )
-    ),
-    NavDrawerCategory(
-        categoryTitle = "ACADEMICS",
-        items = listOf(
-            NavDrawerItem("courses", "Courses & Syllabus", Icons.Default.Book),
-            NavDrawerItem("attendance", "Attendance Tracker", Icons.Default.CheckCircle),
-            NavDrawerItem("timetable", "Class Timetable", Icons.Default.Schedule),
-            NavDrawerItem("assignments", "Assignments & Submissions", Icons.Default.Assignment),
-            NavDrawerItem("exam_schedules", "Exam Schedule", Icons.AutoMirrored.Filled.EventNote),
-            NavDrawerItem("results", "Results & Grades", Icons.Default.Grade),
-            NavDrawerItem("reports", "Academic Reports", Icons.AutoMirrored.Filled.TrendingUp)
-        )
-    ),
-    NavDrawerCategory(
-        categoryTitle = "CAMPUS",
-        items = listOf(
-            NavDrawerItem("teachers", "Faculty Directory", Icons.Default.PersonSearch),
-            NavDrawerItem("campus_map", "Campus Map & Indoor Nav", Icons.Default.Map),
-            NavDrawerItem("navigation", "Navigation (N1 live)", Icons.Default.Explore),
-            NavDrawerItem("appointments", "Faculty Appointments", Icons.Default.CalendarMonth),
-            NavDrawerItem("lost_found", "Lost & Found Portal", Icons.Default.FindInPage)
-        )
-    ),
-    NavDrawerCategory(
-        categoryTitle = "COMMUNICATION",
-        items = listOf(
-            NavDrawerItem("announcements", "Announcements", Icons.Default.Campaign),
-            NavDrawerItem("messages", "Messages", Icons.Default.Email),
-            NavDrawerItem("community", "Community & Mentorship", Icons.Default.Groups)
-        )
-    ),
-    NavDrawerCategory(
-        categoryTitle = "SERVICES",
-        items = listOf(
-            NavDrawerItem("career_portfolio", "Career & Portfolio", Icons.Default.Work),
-            NavDrawerItem("cafeteria", "Cafeteria & Dining", Icons.Default.Restaurant),
-            NavDrawerItem("leave", "Leave Application", Icons.Default.FlightTakeoff),
-            NavDrawerItem("room_partner", "Room Partner Selection", Icons.Default.GroupAdd),
-            NavDrawerItem("holidays", "Holidays & Calendar", Icons.Default.DateRange),
-            NavDrawerItem("feedback", "Institutional Feedback", Icons.Default.Feedback)
-        )
-    ),
-    NavDrawerCategory(
-        categoryTitle = "AI ASSISTANT",
-        items = listOf(
-            NavDrawerItem("ai_assistant", "Ask AI Campus Tutor", Icons.Default.AutoAwesome, badgeText = "Gemini", badgeTone = StatusTone.SUCCESS)
-        )
-    ),
-    NavDrawerCategory(
-        categoryTitle = "SETTINGS",
-        items = listOf(
-            NavDrawerItem("settings", "Settings & Appearance", Icons.Default.Settings)
-        )
+// ─────────────────────────────────────────────────────────────────────
+// Master menu — every drawer item lives here.
+// Per-role menus are a filtered subset of this list.
+// ─────────────────────────────────────────────────────────────────────
+private object DrawerItems {
+    val Home        = NavDrawerItem("home",            "Dashboard",                 Icons.Default.Dashboard)
+    val Courses     = NavDrawerItem("courses",         "Courses & Syllabus",        Icons.Default.Book)
+    val Attendance  = NavDrawerItem("attendance",      "Attendance Tracker",        Icons.Default.CheckCircle)
+    val Timetable   = NavDrawerItem("timetable",       "Class Timetable",           Icons.Default.Schedule)
+    val Assignments = NavDrawerItem("assignments",     "Assignments",               Icons.Default.Assignment)
+    val Exams       = NavDrawerItem("exam_schedules",  "Exam Schedule",             Icons.AutoMirrored.Filled.EventNote)
+    val Results     = NavDrawerItem("results",         "Results & Grades",          Icons.Default.Grade)
+    val Reports     = NavDrawerItem("reports",         "Academic Reports",          Icons.AutoMirrored.Filled.TrendingUp)
+    val Teachers    = NavDrawerItem("teachers",        "Faculty Directory",         Icons.Default.PersonSearch)
+    val CampusMap   = NavDrawerItem("campus_map",      "Campus Map & Indoor Nav",   Icons.Default.Map)
+    val Navigation  = NavDrawerItem("navigation",      "Navigation (N1 live)",      Icons.Default.Explore)
+    val Appointments= NavDrawerItem("appointments",    "Faculty Appointments",      Icons.Default.CalendarMonth)
+    val LostFound   = NavDrawerItem("lost_found",      "Lost & Found Portal",       Icons.Default.FindInPage)
+    val Announce    = NavDrawerItem("announcements",   "Announcements",             Icons.Default.Campaign)
+    val Messages    = NavDrawerItem("messages",        "Messages",                  Icons.Default.Email)
+    val Community   = NavDrawerItem("community",       "Community & Mentorship",    Icons.Default.Groups)
+    val Career      = NavDrawerItem("career_portfolio","Career & Portfolio",        Icons.Default.Work)
+    val Cafeteria   = NavDrawerItem("cafeteria",       "Cafeteria & Dining",        Icons.Default.Restaurant)
+    val Leave       = NavDrawerItem("leave",           "Leave Application",         Icons.Default.FlightTakeoff)
+    val RoomPartner = NavDrawerItem("room_partner",    "Room Partner Selection",    Icons.Default.GroupAdd)
+    val Holidays    = NavDrawerItem("holidays",        "Holidays & Calendar",       Icons.Default.DateRange)
+    val Feedback    = NavDrawerItem("feedback",        "Institutional Feedback",    Icons.Default.Feedback)
+    val Ai          = NavDrawerItem("ai_assistant",    "Ask AI Campus Tutor",       Icons.Default.AutoAwesome, badgeText = "Gemini", badgeTone = StatusTone.SUCCESS)
+    val Settings    = NavDrawerItem("settings",        "Settings & Appearance",     Icons.Default.Settings)
+}
+
+/** The classic student / super-admin menu — everything the drawer can show. */
+val CATEGORIZED_DRAWER_ITEMS: List<NavDrawerCategory> = drawerFor(UserRole.STUDENT)
+
+/**
+ * Build a role-specific menu. Every role gets Settings + Sign Out (Sign Out lives
+ * in the drawer chrome, not the menu). Keep the categories familiar between roles so
+ * users switching accounts see the same structure.
+ */
+fun drawerFor(role: UserRole): List<NavDrawerCategory> = when (role) {
+    UserRole.STUDENT -> listOf(
+        NavDrawerCategory("HOME", listOf(DrawerItems.Home)),
+        NavDrawerCategory("ACADEMICS", listOf(
+            DrawerItems.Courses, DrawerItems.Attendance, DrawerItems.Timetable,
+            DrawerItems.Assignments, DrawerItems.Exams, DrawerItems.Results, DrawerItems.Reports,
+        )),
+        NavDrawerCategory("CAMPUS", listOf(
+            DrawerItems.Teachers, DrawerItems.CampusMap, DrawerItems.Navigation,
+            DrawerItems.Appointments, DrawerItems.LostFound,
+        )),
+        NavDrawerCategory("COMMUNICATION", listOf(
+            DrawerItems.Announce, DrawerItems.Messages, DrawerItems.Community,
+        )),
+        NavDrawerCategory("SERVICES", listOf(
+            DrawerItems.Career, DrawerItems.Cafeteria, DrawerItems.Leave,
+            DrawerItems.RoomPartner, DrawerItems.Holidays, DrawerItems.Feedback,
+        )),
+        NavDrawerCategory("AI ASSISTANT", listOf(DrawerItems.Ai)),
+        NavDrawerCategory("SETTINGS", listOf(DrawerItems.Settings)),
     )
-)
+    UserRole.FACULTY -> listOf(
+        NavDrawerCategory("HOME", listOf(DrawerItems.Home)),
+        NavDrawerCategory("CAMPUS", listOf(
+            DrawerItems.Teachers, DrawerItems.Appointments,
+            DrawerItems.CampusMap, DrawerItems.Navigation,
+        )),
+        NavDrawerCategory("COMMUNICATION", listOf(
+            DrawerItems.Announce, DrawerItems.Messages,
+        )),
+        NavDrawerCategory("SERVICES", listOf(DrawerItems.Holidays, DrawerItems.Feedback)),
+        NavDrawerCategory("AI ASSISTANT", listOf(DrawerItems.Ai)),
+        NavDrawerCategory("SETTINGS", listOf(DrawerItems.Settings)),
+    )
+    UserRole.LOST_FOUND_STAFF -> listOf(
+        NavDrawerCategory("HOME", listOf(DrawerItems.Home)),
+        NavDrawerCategory("DESK", listOf(DrawerItems.LostFound)),
+        NavDrawerCategory("CAMPUS", listOf(DrawerItems.CampusMap, DrawerItems.Navigation)),
+        NavDrawerCategory("SERVICES", listOf(DrawerItems.Holidays, DrawerItems.Feedback)),
+        NavDrawerCategory("SETTINGS", listOf(DrawerItems.Settings)),
+    )
+    UserRole.COLLEGE_ADMIN -> listOf(
+        NavDrawerCategory("HOME", listOf(DrawerItems.Home)),
+        NavDrawerCategory("CAMPUS", listOf(
+            DrawerItems.Teachers, DrawerItems.CampusMap, DrawerItems.Navigation,
+        )),
+        NavDrawerCategory("COMMUNICATION", listOf(DrawerItems.Announce, DrawerItems.Messages)),
+        NavDrawerCategory("SERVICES", listOf(DrawerItems.Holidays, DrawerItems.Feedback)),
+        NavDrawerCategory("SETTINGS", listOf(DrawerItems.Settings)),
+    )
+    UserRole.SUPER_ADMIN -> drawerFor(UserRole.STUDENT)
+}
 
 @Composable
 fun SideNavDrawerContent(
@@ -110,14 +147,17 @@ fun SideNavDrawerContent(
     displayName: String? = null,
     rollNumber: String? = null,
     email: String? = null,
+    role: UserRole = UserRole.STUDENT,
     modifier: Modifier = Modifier
 ) {
+    val c = CampusTokens.colors
     var searchQuery by remember { mutableStateOf("") }
+    val menu = remember(role) { drawerFor(role) }
 
     val resolvedName = remember(displayName, email) {
         displayName?.ifBlank { null }
             ?: email?.substringBefore("@")
-            ?: "Project X Student"
+            ?: "Project X"
     }
 
     val resolvedSubtext = remember(rollNumber, email) {
@@ -130,21 +170,20 @@ fun SideNavDrawerContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(NavySidebar)
+            .background(c.sidebar)
             .padding(18.dp)
     ) {
-        // Project X Student Header Card (NO ROLE SWITCHING)
+        // Header card
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = NavySidebarActive,
+            color = c.sidebarActive,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 14.dp)
+                .border(1.dp, c.glassBorderGlow, RoundedCornerShape(16.dp))
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(14.dp),
+                modifier = Modifier.fillMaxWidth().padding(14.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(
@@ -169,156 +208,176 @@ fun SideNavDrawerContent(
                             text = resolvedName,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = HeadingNavy
+                            color = c.heading
                         )
                         Text(
                             text = resolvedSubtext,
-                            fontSize = 11.sp,
-                            color = MutedText
+                            fontSize = 12.sp,
+                            color = c.mutedText
                         )
                     }
                 }
 
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = PrimaryIndigo.copy(alpha = 0.15f)
+                    color = c.primary.copy(alpha = 0.18f)
                 ) {
                     Text(
-                        text = "Project X • Student Portal",
-                        fontSize = 10.sp,
+                        text = "Project X • ${roleLabel(role)}",
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryIndigo,
+                        color = if (c.isDark) c.primary else c.heading,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
         }
 
-        // Search Field inside Drawer
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search modules...", fontSize = 13.sp, color = MutedText) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MutedText) },
+            placeholder = { Text("Search modules...", fontSize = 13.sp, color = c.mutedText) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = c.mutedText) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = SurfaceCard,
-                unfocusedContainerColor = SurfaceCard,
-                focusedBorderColor = PrimaryIndigo,
-                unfocusedBorderColor = SurfaceBorder
+                focusedContainerColor = c.surface,
+                unfocusedContainerColor = c.surface,
+                focusedTextColor = c.heading,
+                unfocusedTextColor = c.heading,
+                focusedBorderColor = c.primary,
+                unfocusedBorderColor = c.surfaceBorder,
             ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp)
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
         )
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.12f), thickness = 1.dp)
+        HorizontalDivider(color = c.divider.copy(alpha = 0.4f), thickness = 1.dp)
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Module Categories List
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.weight(1f)
         ) {
-            CATEGORIZED_DRAWER_ITEMS.forEach { category ->
-                val matchingItems = if (searchQuery.isBlank()) category.items
+            menu.forEach { category ->
+                val matching = if (searchQuery.isBlank()) category.items
                 else category.items.filter { it.label.contains(searchQuery, ignoreCase = true) }
 
-                if (matchingItems.isNotEmpty()) {
-                    item {
+                if (matching.isNotEmpty()) {
+                    item(key = "cat-${category.categoryTitle}") {
                         Text(
                             text = category.categoryTitle,
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryIndigoLight,
+                            color = c.primary,
                             letterSpacing = 0.8.sp,
-                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
                         )
                     }
 
-                    items(matchingItems, key = { it.id }) { item ->
-                        val isActive = item.id == activeItemId
-
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = if (isActive) NavySidebarActive else Color.Transparent,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { onItemClick(item.id) }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        contentDescription = item.label,
-                                        tint = if (isActive) PrimaryIndigo else NavySidebarText,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Text(
-                                        text = item.label,
-                                        fontSize = 13.sp,
-                                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
-                                        color = if (isActive) HeadingNavy else NavySidebarText
-                                    )
-                                }
-
-                                item.badgeText?.let { badge ->
-                                    StatusPill(text = badge, tone = item.badgeTone)
-                                }
-                            }
-                        }
+                    items(matching, key = { it.id }) { item ->
+                        DrawerRow(
+                            item = item,
+                            isActive = item.id == activeItemId,
+                            onClick = { onItemClick(item.id) },
+                        )
                     }
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(color = c.divider.copy(alpha = 0.4f), thickness = 1.dp)
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.12f), thickness = 1.dp)
-
-        // Logout Button
         Surface(
             shape = RoundedCornerShape(12.dp),
             color = Color.Transparent,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp)
+                .heightIn(min = 48.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .clickable { onLogoutClick() }
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                    contentDescription = "Logout",
-                    tint = AccentCoral,
-                    modifier = Modifier.size(20.dp)
+                    contentDescription = "Sign Out",
+                    tint = c.dangerRed,
+                    modifier = Modifier.size(22.dp)
                 )
                 Text(
                     text = "Sign Out",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AccentCoral
+                    color = c.dangerRed
                 )
             }
         }
     }
+}
+
+@Composable
+private fun DrawerRow(
+    item: NavDrawerItem,
+    isActive: Boolean,
+    onClick: () -> Unit,
+) {
+    val c = CampusTokens.colors
+    val bg = if (isActive) c.sidebarActive else Color.Transparent
+    val iconTint = if (isActive) c.primary else c.sidebarText
+    val labelColor = if (isActive) c.heading else c.sidebarText
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = bg,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    imageVector = item.icon,
+                    contentDescription = item.label,
+                    tint = iconTint,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = item.label,
+                    fontSize = 14.sp,
+                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
+                    color = labelColor
+                )
+            }
+            if (isActive) {
+                Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(c.primary))
+            }
+            item.badgeText?.let { badge ->
+                Spacer(modifier = Modifier.width(6.dp))
+                StatusPill(text = badge, tone = item.badgeTone)
+            }
+        }
+    }
+}
+
+private fun roleLabel(role: UserRole): String = when (role) {
+    UserRole.STUDENT -> "Student Portal"
+    UserRole.FACULTY -> "Faculty Portal"
+    UserRole.LOST_FOUND_STAFF -> "Lost & Found Desk"
+    UserRole.COLLEGE_ADMIN -> "College Admin"
+    UserRole.SUPER_ADMIN -> "Super Admin"
 }

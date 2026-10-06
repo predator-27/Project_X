@@ -25,9 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.components.AmbientBackground
+import com.projectx.app.components.RoleShell
 import com.projectx.app.components.SideNavDrawerContent
 import com.projectx.app.feature.campusmap.CampusMapScreen
 import com.projectx.app.map.MapScreen
+import com.projectx.app.ui.calendar.HolidayCalendarScreen
+import com.projectx.app.ui.feedback.FeedbackScreen
+import com.projectx.app.ui.settings.SettingsScreen
 import com.projectx.app.model.UserRole
 import com.projectx.app.theme.CampusTheme
 import com.projectx.app.theme.CampusThemePreset
@@ -166,26 +170,38 @@ fun CampusAppShell(
                         )
                     }
                     UserRole.FACULTY -> {
-                        AdminTeacherScreen(
-                            facultyViewModel = facultyViewModel,
-                            appointmentViewModel = appointmentViewModel,
-                            authViewModel = authViewModel
-                        )
+                        RoleShell(
+                            role = UserRole.FACULTY,
+                            displayName = session.publicProfile?.displayName,
+                            rollNumber = session.user.rollNumber,
+                            email = session.user.email,
+                            onSignOut = { authViewModel.signOut() }
+                        ) { _, onMenuClick, _ ->
+                            AdminTeacherScreen(
+                                onMenuClick = onMenuClick,
+                                facultyViewModel = facultyViewModel,
+                                appointmentViewModel = appointmentViewModel,
+                                authViewModel = authViewModel
+                            )
+                        }
                     }
-                    UserRole.COLLEGE_ADMIN -> {
-                        CollegeAdminDashboard(
-                            onMenuClick = { }
-                        )
-                    }
+                    UserRole.LOST_FOUND_STAFF,
+                    UserRole.COLLEGE_ADMIN,
                     UserRole.SUPER_ADMIN -> {
-                        SuperAdminDashboard(
-                            onMenuClick = { }
-                        )
-                    }
-                    UserRole.LOST_FOUND_STAFF -> {
-                        LostFoundStaffDashboard(
-                            onMenuClick = { }
-                        )
+                        RoleShell(
+                            role = session.role,
+                            displayName = session.publicProfile?.displayName,
+                            rollNumber = session.user.rollNumber,
+                            email = session.user.email,
+                            onSignOut = { authViewModel.signOut() }
+                        ) { _, onMenuClick, _ ->
+                            AdminTeacherScreen(
+                                onMenuClick = onMenuClick,
+                                facultyViewModel = facultyViewModel,
+                                appointmentViewModel = appointmentViewModel,
+                                authViewModel = authViewModel
+                            )
+                        }
                     }
                 }
             }
@@ -250,7 +266,7 @@ fun StudentCampusShell(
                             "courses", "attendance", "timetable", "assignments", "exam_schedules", "results", "reports" -> selectedBottomTab = BottomTab.ACADEMICS
                             "teachers", "campus_map", "navigation", "appointments", "lost_found" -> selectedBottomTab = BottomTab.CAMPUS
                             "messages", "announcements", "community" -> selectedBottomTab = BottomTab.MESSAGES
-                            "profile", "settings", "career_portfolio", "cafeteria", "leave", "room_partner" -> selectedBottomTab = BottomTab.PROFILE
+                            "profile", "settings", "career_portfolio", "cafeteria", "leave", "room_partner", "holidays", "feedback" -> selectedBottomTab = BottomTab.PROFILE
                             "ai_assistant" -> {
                                 showAiAssistantSheet = true
                             }
@@ -416,6 +432,21 @@ fun StudentCampusShell(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 announcementViewModel = announcementViewModel,
                                 authViewModel = authViewModel
+                            )
+                        } else if (activeDrawerModule == "holidays") {
+                            HolidayCalendarScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "feedback") {
+                            FeedbackScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                authViewModel = authViewModel,
+                            )
+                        } else if (activeDrawerModule == "settings") {
+                            SettingsScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                authViewModel = authViewModel,
+                                teacherViewModel = teacherViewModel,
                             )
                         } else if (activeDrawerModule == "profile") {
                             ProfileScreen(
@@ -596,6 +627,21 @@ fun StudentCampusShell(
                             RoomPartnerScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                                 hostelViewModel = hostelViewModel
+                            )
+                        } else if (activeDrawerModule == "holidays") {
+                            HolidayCalendarScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+                            )
+                        } else if (activeDrawerModule == "feedback") {
+                            FeedbackScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                authViewModel = authViewModel,
+                            )
+                        } else if (activeDrawerModule == "settings") {
+                            SettingsScreen(
+                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                                authViewModel = authViewModel,
+                                teacherViewModel = teacherViewModel,
                             )
                         } else {
                             ProfileScreen(

@@ -92,24 +92,61 @@ enum class CampusThemePreset(
     }
 }
 
+enum class CampusThemeMode { SYSTEM, LIGHT, DARK }
+enum class CampusTextSize(val scale: Float, val label: String) {
+    NORMAL(1.0f, "Normal"),
+    LARGE(1.18f, "Large"),
+}
+
 object CampusThemeState {
+    private const val PREFS = "projectx_theme_prefs"
+    private const val KEY_THEME = "selected_theme"
+    private const val KEY_MODE = "theme_mode"
+    private const val KEY_TEXT = "text_size"
+
     private val _currentTheme = MutableStateFlow(CampusThemePreset.AURA_INDIGO)
     val currentTheme: StateFlow<CampusThemePreset> = _currentTheme.asStateFlow()
+
+    private val _mode = MutableStateFlow(CampusThemeMode.SYSTEM)
+    val mode: StateFlow<CampusThemeMode> = _mode.asStateFlow()
+
+    private val _textSize = MutableStateFlow(CampusTextSize.NORMAL)
+    val textSize: StateFlow<CampusTextSize> = _textSize.asStateFlow()
+
     private var appContext: Context? = null
 
     fun init(context: Context) {
         appContext = context.applicationContext
-        val prefs = context.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
-        val savedName = prefs.getString("selected_theme", CampusThemePreset.AURA_INDIGO.name)
-        val theme = CampusThemePreset.entries.find { it.name == savedName } ?: CampusThemePreset.AURA_INDIGO
-        _currentTheme.value = theme
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        _currentTheme.value = CampusThemePreset.entries.find { it.name == prefs.getString(KEY_THEME, null) }
+            ?: CampusThemePreset.AURA_INDIGO
+        _mode.value = CampusThemeMode.entries.find { it.name == prefs.getString(KEY_MODE, null) }
+            ?: CampusThemeMode.SYSTEM
+        _textSize.value = CampusTextSize.entries.find { it.name == prefs.getString(KEY_TEXT, null) }
+            ?: CampusTextSize.NORMAL
     }
 
     fun setTheme(theme: CampusThemePreset) {
         _currentTheme.value = theme
         appContext?.let { ctx ->
-            val prefs = ctx.getSharedPreferences("projectx_theme_prefs", Context.MODE_PRIVATE)
-            prefs.edit().putString("selected_theme", theme.name).apply()
+            ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putString(KEY_THEME, theme.name).apply()
+        }
+    }
+
+    fun setMode(mode: CampusThemeMode) {
+        _mode.value = mode
+        appContext?.let { ctx ->
+            ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putString(KEY_MODE, mode.name).apply()
+        }
+    }
+
+    fun setTextSize(size: CampusTextSize) {
+        _textSize.value = size
+        appContext?.let { ctx ->
+            ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putString(KEY_TEXT, size.name).apply()
         }
     }
 
