@@ -45,9 +45,8 @@ class FirebaseAuthRepository(
             return@withContext Result.failure(IllegalArgumentException(emailError))
         }
 
-        val passwordError = AuthValidation.getPasswordError(password)
-        if (passwordError != null) {
-            return@withContext Result.failure(IllegalArgumentException(passwordError))
+        if (password.isBlank()) {
+            return@withContext Result.failure(IllegalArgumentException("Please enter your password."))
         }
 
         val trimmedEmail = email.trim().lowercase()

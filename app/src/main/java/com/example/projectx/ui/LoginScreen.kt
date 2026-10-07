@@ -69,12 +69,27 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
 
-    val isEmailValid = remember(email) { AuthValidation.isValidEmail(email) }
-    val isPasswordValid = remember(password) { AuthValidation.isValidPassword(password) }
+    val isRegistering = selectedTabIndex == 2
+    val isDemoCredentials = remember(email, password) {
+        val trimmed = email.trim()
+        (trimmed.equals("S25CSEU1823", ignoreCase = true) || trimmed.equals("s25cseu1823@bennett.edu.in", ignoreCase = true)) && password == "12345678"
+    }
+    val isEmailValid = remember(email, isDemoCredentials) {
+        isDemoCredentials || AuthValidation.isValidEmail(email)
+    }
+    val isPasswordValid = remember(password, isRegistering) {
+        if (isRegistering) AuthValidation.isValidPassword(password) else password.isNotBlank()
+    }
     val isPhoneValid = remember(phone) { AuthValidation.isValidPhoneNumber(phone) }
 
-    val emailError = remember(email) { if (email.isNotBlank() && !isEmailValid) AuthValidation.getEmailError(email) else null }
-    val passwordError = remember(password) { if (password.isNotBlank() && !isPasswordValid) AuthValidation.getPasswordError(password) else null }
+    val emailError = remember(email, isDemoCredentials) {
+        if (email.isNotBlank() && !isEmailValid && !isDemoCredentials) AuthValidation.getEmailError(email) else null
+    }
+    val passwordError = remember(password, isRegistering) {
+        if (isRegistering && password.isNotBlank() && !AuthValidation.isValidPassword(password)) {
+            AuthValidation.getPasswordError(password)
+        } else null
+    }
     val phoneError = remember(phone) { if (phone.isNotBlank() && !isPhoneValid) AuthValidation.getPhoneNumberError(phone) else null }
 
     val gradientBrush = Brush.linearGradient(
@@ -307,9 +322,9 @@ fun LoginScreen(
                                 OutlinedTextField(
                                     value = email,
                                     onValueChange = { email = it },
-                                    label = { Text("Student Email (@bennett.edu.in)") },
+                                    label = { Text("Student ID / Email (@bennett.edu.in)") },
                                     leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                                    placeholder = { Text("student@bennett.edu.in") },
+                                    placeholder = { Text("e.g. S25CSEU1823 or student@bennett.edu.in") },
                                     singleLine = true,
                                     isError = emailError != null,
                                     supportingText = emailError?.let { err -> { Text(err, color = MaterialTheme.colorScheme.error) } },
@@ -347,9 +362,13 @@ fun LoginScreen(
 
                                 Button(
                                     onClick = {
-                                        authViewModel.signIn(email, password)
+                                        if (isDemoCredentials) {
+                                            authViewModel.enterRoleDemoSession(UserRole.STUDENT)
+                                        } else {
+                                            authViewModel.signIn(email, password)
+                                        }
                                     },
-                                    enabled = isEmailValid && isPasswordValid && !isLoading,
+                                    enabled = (isEmailValid || isDemoCredentials) && isPasswordValid && !isLoading,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(48.dp),
@@ -365,6 +384,14 @@ fun LoginScreen(
                                         Text("Sign In as Student", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
+
+                                Text(
+                                    text = "⚡ Demo credentials: S25CSEU1823 / 12345678",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
                             }
 
                             1 -> {
