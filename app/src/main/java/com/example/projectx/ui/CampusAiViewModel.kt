@@ -52,22 +52,30 @@ class CampusAiViewModel : ViewModel() {
     }
 
     fun sendMessage(userPrompt: String) {
-        if (userPrompt.isBlank()) return
+        if (userPrompt.isBlank() || _isLoading.value) return
 
-        val userMessage = ChatMessage(sender = MessageSender.USER, text = userPrompt)
+        val userMessage = ChatMessage(sender = MessageSender.USER, text = userPrompt.trim())
         _messages.value = _messages.value + userMessage
         _isLoading.value = true
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val generativeModel = Firebase.ai.generativeModel(modelName = "gemini-flash-latest")
-                val response = generativeModel.generateContent(userPrompt)
+                val systemContextPrompt = """
+                    You are Project X Campus AI Tutor for Bennett University.
+                    You assist students with campus information, academics, attendance, timetable, faculty directory, appointments, indoor navigation, lost & found, announcements, and student services.
+                    Be helpful, clear, concise, and polite. If live data is unavailable, state what is known without hallucinating.
+
+                    Student Question: ${userPrompt.trim()}
+                """.trimIndent()
+
+                val response = generativeModel.generateContent(systemContextPrompt)
                 val responseText = response.text
 
                 if (!responseText.isNullOrBlank()) {
                     _messages.value = _messages.value + ChatMessage(
                         sender = MessageSender.AI,
-                        text = responseText
+                        text = responseText.trim()
                     )
                 } else {
                     _messages.value = _messages.value + ChatMessage(

@@ -1,5 +1,6 @@
 package com.projectx.app.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -27,7 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.input.ImeAction
 import com.projectx.app.components.StatusPill
 import com.projectx.app.components.StatusTone
 import com.projectx.app.theme.CampusTokens
@@ -397,6 +400,7 @@ fun TeacherCard(
     onBookClick: () -> Unit,
     onLocateOnMap: ((seatId: String) -> Unit)? = null
 ) {
+    val c = CampusTokens.colors
     val resolvedSeatId = remember(teacher.deskNumber, availableSeatIds) {
         val trimmed = teacher.deskNumber.trim()
         if (trimmed.isNotBlank() && availableSeatIds.contains(trimmed)) {
@@ -410,7 +414,8 @@ fun TeacherCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder)
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -431,7 +436,7 @@ fun TeacherCard(
                     }
                     Surface(
                         shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        color = c.primaryContainer,
                         modifier = Modifier.size(38.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
@@ -439,7 +444,7 @@ fun TeacherCard(
                                 text = initials,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = c.heading
                             )
                         }
                     }
@@ -448,12 +453,13 @@ fun TeacherCard(
                         Text(
                             text = teacher.name,
                             fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = c.heading
                         )
                         Text(
                             text = "${teacher.title} • ${teacher.department}",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            fontSize = 12.sp,
+                            color = c.mutedText
                         )
                     }
                 }
@@ -469,7 +475,7 @@ fun TeacherCard(
                 )
             }
 
-            HorizontalDivider()
+            HorizontalDivider(color = c.divider, thickness = 1.dp)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -478,20 +484,21 @@ fun TeacherCard(
                 Icon(
                     Icons.Default.LocationOn,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = c.primary,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Desk:",
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = c.heading
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = teacher.deskNumber.ifBlank { "Unassigned" },
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = c.primary,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -503,28 +510,29 @@ fun TeacherCard(
                 Icon(
                     Icons.Default.Schedule,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = c.mutedText,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Office Hours:",
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = c.heading
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = teacher.timings.ifBlank { "Not specified" },
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = c.mutedText
                 )
             }
 
             if (teacher.bio.isNotBlank()) {
                 Text(
                     text = teacher.bio,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontSize = 12.sp,
+                    color = c.bodyText
                 )
             }
 
@@ -537,21 +545,22 @@ fun TeacherCard(
                     OutlinedButton(
                         onClick = { onLocateOnMap(resolvedSeatId) },
                         shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, c.surfaceBorder),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                     ) {
-                        Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.Map, contentDescription = null, tint = c.primary, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Locate on Map", fontSize = 11.sp)
+                        Text("Locate on Map", fontSize = 11.sp, color = c.heading, fontWeight = FontWeight.Bold)
                     }
                 } else {
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        color = c.surfaceElevated
                     ) {
                         Text(
                             text = "Map location unavailable",
                             fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = c.mutedText,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
@@ -561,11 +570,12 @@ fun TeacherCard(
                     onClick = onBookClick,
                     enabled = teacher.isAvailableForAppointments,
                     shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                 ) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Book Appointment", fontSize = 11.sp)
+                    Text("Book Appointment", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -577,10 +587,11 @@ fun StudentAppointmentCard(
     appointment: Appointment,
     onCancelClick: () -> Unit
 ) {
+    val c = CampusTokens.colors
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder),
         shape = RoundedCornerShape(14.dp)
     ) {
         Column(
@@ -595,7 +606,8 @@ fun StudentAppointmentCard(
                 Text(
                     text = appointment.teacherName,
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = c.heading
                 )
                 StatusPill(
                     text = appointment.status.name,
@@ -611,24 +623,25 @@ fun StudentAppointmentCard(
             Text(
                 text = "📅 ${appointment.date} @ ${appointment.timeSlot}",
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Bold,
+                color = c.heading
             )
 
             Text(
                 text = "Topic: ${appointment.purpose}",
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontSize = 12.sp,
+                color = c.bodyText
             )
 
             if (appointment.status == AppointmentStatus.PENDING || appointment.status == AppointmentStatus.CONFIRMED) {
                 OutlinedButton(
                     onClick = onCancelClick,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = BorderStroke(1.dp, c.dangerRed),
                     modifier = Modifier.align(Alignment.End),
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text("Cancel Request", fontSize = 11.sp)
+                    Text("Cancel Request", fontSize = 11.sp, color = c.dangerRed, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -709,6 +722,7 @@ fun BookAppointmentDialog(
                     placeholder = { Text("e.g. 2026-09-20", color = c.mutedText) },
                     leadingIcon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = c.primary) },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -721,6 +735,7 @@ fun BookAppointmentDialog(
                     placeholder = { Text("e.g. 11:00 AM - 11:30 AM", color = c.mutedText) },
                     leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null, tint = c.primary) },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Next),
                     colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -731,6 +746,7 @@ fun BookAppointmentDialog(
                     onValueChange = { purpose = it },
                     label = { Text("Discussion Topic / Purpose", color = c.mutedText) },
                     placeholder = { Text("e.g. Guidance on Internship or AI Project", color = c.mutedText) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     colors = tfColors,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()

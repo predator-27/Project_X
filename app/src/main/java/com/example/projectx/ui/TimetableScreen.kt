@@ -10,7 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,8 +31,9 @@ fun TimetableScreen(
     onNavigateToRoom: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val c = CampusTokens.colors
     var currentDateText by remember { mutableStateOf("Today") }
-    var selectedSemester by remember { mutableStateOf("Semester - 3") }
+    var selectedSemester by remember { mutableStateOf("Semester - 5") }
     val timetableState by academicViewModel.timetableState.collectAsState()
 
     AppScaffold(
@@ -57,7 +57,7 @@ fun TimetableScreen(
                         text = "Semester Schedule",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = HeadingNavy
+                        color = c.heading
                     )
                     SemesterSelector(
                         selectedOption = selectedSemester,
@@ -71,8 +71,8 @@ fun TimetableScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = CardShape,
-                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                    border = BorderStroke(1.dp, SurfaceBorder)
+                    colors = CardDefaults.cardColors(containerColor = c.surface),
+                    border = BorderStroke(1.dp, c.surfaceBorder)
                 ) {
                     Row(
                         modifier = Modifier
@@ -82,16 +82,16 @@ fun TimetableScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = {}) {
-                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Prev Day", tint = PrimaryIndigo)
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Prev Day", tint = c.primary)
                         }
                         Text(
                             text = currentDateText,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = HeadingNavy
+                            color = c.heading
                         )
                         IconButton(onClick = {}) {
-                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next Day", tint = PrimaryIndigo)
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next Day", tint = c.primary)
                         }
                     }
                 }
@@ -107,18 +107,18 @@ fun TimetableScreen(
                                 .padding(32.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(color = PrimaryIndigo)
+                            CircularProgressIndicator(color = c.primary)
                         }
                     }
                 }
                 is Resource.Error -> {
                     item {
                         SectionFormCard(sectionTitle = "Error Loading Timetable") {
-                            Text(text = state.message, fontSize = 13.sp, color = AccentCoral)
+                            Text(text = state.message, fontSize = 13.sp, color = c.dangerRed)
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = { academicViewModel.loadTimetable() },
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                                colors = ButtonDefaults.buttonColors(containerColor = c.primary)
                             ) {
                                 Text("Retry")
                             }
@@ -132,10 +132,7 @@ fun TimetableScreen(
                 }
                 is Resource.Success -> {
                     items(state.data, key = { it.id }) { slot ->
-                        TimetableClassCard(
-                            slot = slot,
-                            onNavigateClick = { onNavigateToRoom(slot.roomCode) }
-                        )
+                        TimetableClassCard(slot = slot)
                     }
                 }
             }
@@ -144,15 +141,13 @@ fun TimetableScreen(
 }
 
 @Composable
-fun TimetableClassCard(
-    slot: TimetableSlot,
-    onNavigateClick: () -> Unit
-) {
+fun TimetableClassCard(slot: TimetableSlot) {
+    val c = CampusTokens.colors
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = CardShape,
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        border = BorderStroke(1.dp, SurfaceBorder),
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -167,14 +162,14 @@ fun TimetableClassCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "${slot.courseName} (${slot.courseCode})",
-                        fontSize = 16.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = HeadingNavy
+                        color = c.heading
                     )
                     Text(
                         text = "Section: ${slot.section}",
                         fontSize = 12.sp,
-                        color = MutedText
+                        color = c.mutedText
                     )
                 }
                 StatusPill(
@@ -183,7 +178,7 @@ fun TimetableClassCard(
                 )
             }
 
-            HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
+            HorizontalDivider(color = c.divider, thickness = 1.dp)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -194,12 +189,12 @@ fun TimetableClassCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Icon(Icons.Default.Schedule, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Schedule, contentDescription = null, tint = c.primary, modifier = Modifier.size(16.dp))
                     Text(
                         text = "${slot.timeSlot} (${slot.durationMins} min)",
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = BodyText
+                        color = c.bodyText
                     )
                 }
 
@@ -207,43 +202,27 @@ fun TimetableClassCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Icon(Icons.Default.Person, contentDescription = null, tint = MutedText, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Person, contentDescription = null, tint = c.mutedText, modifier = Modifier.size(16.dp))
                     Text(
                         text = slot.facultyName,
-                        fontSize = 13.sp,
-                        color = MutedText
+                        fontSize = 12.sp,
+                        color = c.mutedText
                     )
                 }
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(Icons.Default.LocationOn, contentDescription = null, tint = SecondaryEmerald, modifier = Modifier.size(16.dp))
-                    Text(
-                        text = "Room: ${slot.roomCode}",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = SecondaryEmerald
-                    )
-                }
-
-                Button(
-                    onClick = onNavigateClick,
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(14.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Navigate", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                }
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = c.successGreen, modifier = Modifier.size(16.dp))
+                Text(
+                    text = "Location: ${slot.roomCode}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = c.successGreen
+                )
             }
         }
     }

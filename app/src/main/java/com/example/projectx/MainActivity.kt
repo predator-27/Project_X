@@ -317,8 +317,8 @@ fun StudentCampusShell(
                                 onDrag = { change, dragAmount ->
                                     change.consume()
                                     dragDist += hypot(dragAmount.x, dragAmount.y)
-                                    fabOffsetX += dragAmount.x
-                                    fabOffsetY += dragAmount.y
+                                    fabOffsetX = (fabOffsetX + dragAmount.x).coerceIn(-280f, 0f)
+                                    fabOffsetY = (fabOffsetY + dragAmount.y).coerceIn(-500f, 0f)
                                 }
                             )
                         }
@@ -427,13 +427,8 @@ fun StudentCampusShell(
                                     activeDrawerModule = "campus_map"
                                 }
                             )
-                        } else if (activeDrawerModule == "campus_map") {
-                            MapScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                                targetSeatId = targetMapSeatId
-                            )
-                        } else if (activeDrawerModule == "navigation") {
-                            CampusMapScreen()
+                        } else if (activeDrawerModule == "campus_map" || activeDrawerModule == "navigation") {
+                            CampusMapScreen(onMenuClick = { coroutineScope.launch { drawerState.open() } })
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
@@ -601,7 +596,7 @@ fun StudentCampusShell(
                     }
                     BottomTab.CAMPUS -> {
                         if (activeDrawerModule == "campus_map" || activeDrawerModule == "navigation") {
-                            CampusMapScreen()
+                            CampusMapScreen(onMenuClick = { coroutineScope.launch { drawerState.open() } })
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },

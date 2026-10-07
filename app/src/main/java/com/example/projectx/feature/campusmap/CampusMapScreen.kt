@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,6 +56,7 @@ fun CampusMapScreen(
     modifier: Modifier = Modifier,
     viewModel: CampusMapViewModel = viewModel(),
     onClose: (() -> Unit)? = null,
+    onMenuClick: (() -> Unit)? = null,
 ) {
     val state by viewModel.state.collectAsState()
     Box(modifier = modifier.fillMaxSize().background(MapTheme.Background)) {
@@ -80,6 +82,7 @@ fun CampusMapScreen(
                 onClearRoute = viewModel::clearRoute,
                 onExit = viewModel::routeToExit,
                 onClose = onClose,
+                onMenuClick = onMenuClick,
             )
         }
         if (state is CampusMapUiState.Loaded) {
@@ -102,6 +105,7 @@ private fun LoadedBody(
     onClearRoute: () -> Unit,
     onExit: () -> Unit,
     onClose: (() -> Unit)?,
+    onMenuClick: (() -> Unit)?,
 ) {
     val context = LocalContext.current
     var query by remember { mutableStateOf("") }
@@ -134,6 +138,12 @@ private fun LoadedBody(
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                if (onMenuClick != null) {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Color.White)
+                    }
+                    Spacer(Modifier.width(4.dp))
+                }
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it; onSearch(it) },
