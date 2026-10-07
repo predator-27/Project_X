@@ -186,31 +186,76 @@ fun CampusAppShell(
                             rollNumber = session.user.rollNumber,
                             email = session.user.email,
                             onSignOut = { authViewModel.signOut() }
-                        ) { _, onMenuClick, _ ->
-                            AdminTeacherScreen(
-                                onMenuClick = onMenuClick,
-                                facultyViewModel = facultyViewModel,
-                                appointmentViewModel = appointmentViewModel,
-                                authViewModel = authViewModel
-                            )
+                        ) { activeId, onMenuClick, _ ->
+                            when (activeId) {
+                                "navigation" -> CampusMapScreen(onMenuClick = onMenuClick)
+                                "holidays" -> HolidayCalendarScreen(onMenuClick = onMenuClick)
+                                "feedback" -> FeedbackScreen(onMenuClick = onMenuClick, authViewModel = authViewModel)
+                                "settings" -> SettingsScreen(onMenuClick = onMenuClick, authViewModel = authViewModel, teacherViewModel = teacherViewModel)
+                                else -> AdminTeacherScreen(
+                                    onMenuClick = onMenuClick,
+                                    facultyViewModel = facultyViewModel,
+                                    appointmentViewModel = appointmentViewModel,
+                                    authViewModel = authViewModel
+                                )
+                            }
                         }
                     }
-                    UserRole.LOST_FOUND_STAFF,
-                    UserRole.COLLEGE_ADMIN,
-                    UserRole.SUPER_ADMIN -> {
+                    UserRole.LOST_FOUND_STAFF -> {
                         RoleShell(
-                            role = session.role,
+                            role = UserRole.LOST_FOUND_STAFF,
                             displayName = session.publicProfile?.displayName,
                             rollNumber = session.user.rollNumber,
                             email = session.user.email,
                             onSignOut = { authViewModel.signOut() }
-                        ) { _, onMenuClick, _ ->
-                            AdminTeacherScreen(
-                                onMenuClick = onMenuClick,
-                                facultyViewModel = facultyViewModel,
-                                appointmentViewModel = appointmentViewModel,
-                                authViewModel = authViewModel
-                            )
+                        ) { activeId, onMenuClick, _ ->
+                            when (activeId) {
+                                "navigation" -> CampusMapScreen(onMenuClick = onMenuClick)
+                                "holidays" -> HolidayCalendarScreen(onMenuClick = onMenuClick)
+                                "feedback" -> FeedbackScreen(onMenuClick = onMenuClick, authViewModel = authViewModel)
+                                "settings" -> SettingsScreen(onMenuClick = onMenuClick, authViewModel = authViewModel, teacherViewModel = teacherViewModel)
+                                else -> LostFoundStaffDashboard(
+                                    onMenuClick = onMenuClick
+                                )
+                            }
+                        }
+                    }
+                    UserRole.COLLEGE_ADMIN -> {
+                        RoleShell(
+                            role = UserRole.COLLEGE_ADMIN,
+                            displayName = session.publicProfile?.displayName,
+                            rollNumber = session.user.rollNumber,
+                            email = session.user.email,
+                            onSignOut = { authViewModel.signOut() }
+                        ) { activeId, onMenuClick, _ ->
+                            when (activeId) {
+                                "navigation" -> CampusMapScreen(onMenuClick = onMenuClick)
+                                "holidays" -> HolidayCalendarScreen(onMenuClick = onMenuClick)
+                                "feedback" -> FeedbackScreen(onMenuClick = onMenuClick, authViewModel = authViewModel)
+                                "settings" -> SettingsScreen(onMenuClick = onMenuClick, authViewModel = authViewModel, teacherViewModel = teacherViewModel)
+                                else -> CollegeAdminDashboard(
+                                    onMenuClick = onMenuClick
+                                )
+                            }
+                        }
+                    }
+                    UserRole.SUPER_ADMIN -> {
+                        RoleShell(
+                            role = UserRole.SUPER_ADMIN,
+                            displayName = session.publicProfile?.displayName,
+                            rollNumber = session.user.rollNumber,
+                            email = session.user.email,
+                            onSignOut = { authViewModel.signOut() }
+                        ) { activeId, onMenuClick, _ ->
+                            when (activeId) {
+                                "navigation" -> CampusMapScreen(onMenuClick = onMenuClick)
+                                "holidays" -> HolidayCalendarScreen(onMenuClick = onMenuClick)
+                                "feedback" -> FeedbackScreen(onMenuClick = onMenuClick, authViewModel = authViewModel)
+                                "settings" -> SettingsScreen(onMenuClick = onMenuClick, authViewModel = authViewModel, teacherViewModel = teacherViewModel)
+                                else -> SuperAdminDashboard(
+                                    onMenuClick = onMenuClick
+                                )
+                            }
                         }
                     }
                 }
