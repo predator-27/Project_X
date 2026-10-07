@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,11 +28,18 @@ enum class MessageSender {
 
 class CampusAiViewModel : ViewModel() {
 
+    private fun welcomeMessage(): String {
+        val displayName = FirebaseAuth.getInstance().currentUser?.displayName?.trim()
+        val name = displayName.takeIf { !it.isNullOrBlank() }
+        val opening = if (name != null) "Hello $name!" else "Hello!"
+        return "$opening I am your Campus Gemini AI Tutor & Study Buddy 🎓. Ask me anything about your courses, exam preparation, study schedules, or campus life!"
+    }
+
     private val _messages = MutableStateFlow<List<ChatMessage>>(
         listOf(
             ChatMessage(
                 sender = MessageSender.AI,
-                text = "Hello Alex! I am your Campus Gemini AI Tutor & Study Buddy 🎓. Ask me anything about your courses, exam preparation, study schedules, or campus life!"
+                text = welcomeMessage()
             )
         )
     )

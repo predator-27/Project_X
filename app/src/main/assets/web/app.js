@@ -106,6 +106,15 @@ function closeWebUpdate() {
     if (banner) banner.style.display = 'none';
 }
 
+// Bridges the "Exit to app" control back to the Android host.
+function exitWebView() {
+    if (typeof Android !== 'undefined' && typeof Android.closeWebView === 'function') {
+        Android.closeWebView();
+    } else {
+        window.history.length > 1 ? window.history.back() : window.close();
+    }
+}
+
 function populateWebTeacherSelect() {
     const teachers = getTeachers();
     const select = document.getElementById('web-teacher-select');

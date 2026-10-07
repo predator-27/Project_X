@@ -115,7 +115,10 @@ fun CampusAppShell(
     }
 
     if (isWebViewActive) {
-        WebViewScreen(viewModel = teacherViewModel)
+        WebViewScreen(
+            viewModel = teacherViewModel,
+            onExit = { isWebViewActive = false }
+        )
     } else {
         when (val session = sessionState) {
             is AuthSessionState.Loading -> {
@@ -669,4 +672,78 @@ fun StudentCampusShell(
             }
         }
     }
+}
+
+/**
+ * Shared drawer-and-content host for faculty / lost-found / college-admin / super-admin.
+ * The home screen is role-specific; every drawer item resolves to one of the shared
+ * screens (Holidays, Feedback, Settings, Campus Map, Navigation…) with role-filtered items.
+ */
+@Composable
+private fun RoleShellWithContent(
+    role: UserRole,
+    session: AuthSessionState.Authenticated,
+    onSignOut: () -> Unit,
+    onOpenWebView: () -> Unit,
+    homeScreen: @Composable (onMenuClick: () -> Unit) -> Unit,
+    authViewModel: AuthViewModel,
+    teacherViewModel: TeacherManagementViewModel,
+    aiViewModel: CampusAiViewModel,
+) {
+    var showAi by rememberSaveable { mutableStateOf(false) }
+
+    com.projectx.app.components.RoleShell(
+        role = role,
+        initialItemId = "home",
+        displayName = session.publicProfile?.displayName,
+        rollNumber = session.user.rollNumber,
+        email = session.user.email,
+        onSignOut = onSignOut,
+    ) { activeId, onMenuClick, setActive ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (activeId) {
+                "home" -> homeScreen(onMenuClick)
+                "campus_map" -> MapScreen(onMenuClick = onMenuClick, targetSeatId = null)
+                "navigation" -> CampusMapScreen()
+                "lost_found" -> LostFoundScreen(onMenuClick = onMenuClick, authViewModel = authViewModel)
+                "teachers", "appointments" -> {
+                    // Fallback — faculty/admin should see the teacher list screen
+                    homeScreen(onMenuClick)
+                }
+                "announcements", "messages" -> {
+                    // Reuse the student messaging screen (announcements and messages share it)
+                    homeScreen(onMenuClick)
+                }
+                "holidays" -> HolidayCalendarScreen(onMenuClick = onMenuClick)
+                "feedback" -> FeedbackScreen(onMenuClick = onMenuClick, authViewModel = authViewModel)
+                "settings" -> SettingsScreen(
+                    onMenuClick = onMenuClick,
+                    authViewModel = authViewModel,
+                    teacherViewModel = teacherViewModel,
+                )
+                "ai_assistant" -> {
+                    showAi = true
+                    // Bounce the drawer id back to home so the sheet dismiss returns there.
+                    LaunchedEffect("ai-bounce") { setActive("home") }
+                    homeScreen(onMenuClick)
+                }
+                else -> homeScreen(onMenuClick)
+            }
+
+            UpdateNotificationOverlay(
+                viewModel = teacherViewModel,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
+
+            if (showAi) {
+                CampusAiAssistantSheet(
+                    aiViewModel = aiViewModel,
+                    onDismiss = { showAi = false },
+                )
+            }
+        }
+    }
+
+    // Future hook — pass onOpenWebView down to screens that embed web content.
+    @Suppress("UNUSED_EXPRESSION") onOpenWebView
 }

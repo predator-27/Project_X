@@ -138,23 +138,6 @@ fun AdminTeacherScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Demo Label Banner
-                item {
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "⚡ DEMO FACULTY PORTAL — FOR DEVELOPMENT PREVIEW ONLY",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                        )
-                    }
-                }
-
                 // Faculty Header Card
                 item {
                     val teacher = (activeFacultyResource as? Resource.Success)?.data

@@ -36,23 +36,6 @@ fun LostFoundStaffDashboard(
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            // Demo Label Banner
-            item {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.tertiaryContainer,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "⚡ DEMO LOST & FOUND STAFF PORTAL — FOR DEVELOPMENT PREVIEW ONLY",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                    )
-                }
-            }
-
             // Header Overview Card
             item {
                 Card(

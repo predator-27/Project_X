@@ -22,7 +22,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
@@ -657,19 +656,12 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .height(44.dp),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.BugReport,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "⚡ Explore Demo Profiles (Debug Only)",
+                        text = "Explore Demo Profiles",
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -684,21 +676,11 @@ fun LoginScreen(
             AlertDialog(
                 onDismissRequest = { showDemoRoleDialog = false },
                 title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.BugReport,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary
-                        )
-                        Text(
-                            text = "Select Demo Profile",
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = "Select Demo Profile",
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 text = {
                     Column(
@@ -758,70 +740,6 @@ fun LoginScreen(
                     }
                 }
             )
-        }
-    }
-}
-
-private data class DemoRoleOption(val role: UserRole, val label: String)
-
-private val DEMO_ROLE_OPTIONS = listOf(
-    DemoRoleOption(UserRole.STUDENT, "Student"),
-    DemoRoleOption(UserRole.FACULTY, "Faculty"),
-    DemoRoleOption(UserRole.LOST_FOUND_STAFF, "Lost & Found Staff"),
-    DemoRoleOption(UserRole.COLLEGE_ADMIN, "College Admin"),
-    DemoRoleOption(UserRole.SUPER_ADMIN, "Super Admin")
-)
-
-@Composable
-private fun DemoUserTypePicker(onPick: (UserRole) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf(DEMO_ROLE_OPTIONS.first()) }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedButton(
-            onClick = { expanded = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary)
-        ) {
-            Icon(
-                imageVector = Icons.Default.BugReport,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.tertiary,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = "⚡ Begin the demo as ${selected.label}",
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.tertiary,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.tertiary
-            )
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-            DEMO_ROLE_OPTIONS.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option.label) },
-                    onClick = {
-                        selected = option
-                        expanded = false
-                        onPick(option.role)
-                    }
-                )
-            }
         }
     }
 }
