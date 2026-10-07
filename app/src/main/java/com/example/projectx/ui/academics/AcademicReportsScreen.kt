@@ -34,6 +34,7 @@ fun AcademicReportsScreen(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val c = CampusTokens.colors
     val reportsList = remember {
         listOf(
             AcademicReportDoc("rep_1", "Official Grade Transcript - Semester 5", "Official Transcript", "2026-09-01", "1.4 MB"),
@@ -58,8 +59,8 @@ fun AcademicReportsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                    border = BorderStroke(1.dp, SurfaceBorder)
+                    colors = CardDefaults.cardColors(containerColor = c.surface),
+                    border = BorderStroke(1.dp, c.surfaceBorder)
                 ) {
                     Column(
                         modifier = Modifier.padding(14.dp),
@@ -72,33 +73,35 @@ fun AcademicReportsScreen(
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.weight(1f)
                             ) {
-                                Icon(Icons.Default.Description, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(22.dp))
-                                Text("University Records & Transcripts", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+                                Icon(Icons.Default.Description, contentDescription = null, tint = c.primary, modifier = Modifier.size(22.dp))
+                                Text("University Records & Transcripts", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = c.heading)
                             }
-                            StatusPill(text = "Official Documents", tone = StatusTone.SUCCESS)
+                            Spacer(Modifier.width(8.dp))
+                            StatusPill(text = "Official Pass", tone = StatusTone.SUCCESS)
                         }
 
                         Text(
                             text = "Download signed transcripts, attendance summaries, and bonafide certificates issued by Academic Affairs.",
                             fontSize = 12.sp,
-                            color = BodyText
+                            color = c.bodyText
                         )
                     }
                 }
             }
 
             item {
-                Text("Available Reports", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = HeadingNavy)
+                Text("Available Reports", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = c.heading)
             }
 
             items(reportsList, key = { it.reportId }) { doc ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = CardShape,
-                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                    border = BorderStroke(1.dp, SurfaceBorder)
+                    colors = CardDefaults.cardColors(containerColor = c.surface),
+                    border = BorderStroke(1.dp, c.surfaceBorder)
                 ) {
                     Column(
                         modifier = Modifier.padding(14.dp),
@@ -109,38 +112,21 @@ fun AcademicReportsScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = doc.title,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = HeadingNavy,
-                                modifier = Modifier.weight(1f)
-                            )
-                            StatusPill(text = "Verified", tone = StatusTone.SUCCESS)
+                            Text(doc.title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = c.heading, modifier = Modifier.weight(1f))
+                            StatusPill(text = doc.category, tone = StatusTone.NEUTRAL)
                         }
 
-                        Text(
-                            text = "${doc.category} • Issued: ${doc.issueDate} • ${doc.fileSize}",
-                            fontSize = 11.sp,
-                            color = MutedText
-                        )
+                        Text("Issued: ${doc.issueDate} • Size: ${doc.fileSize}", fontSize = 12.sp, color = c.mutedText)
 
-                        HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                        OutlinedButton(
+                            onClick = {},
+                            shape = RoundedCornerShape(10.dp),
+                            border = BorderStroke(1.dp, c.surfaceBorder),
+                            modifier = Modifier.fillMaxWidth().height(40.dp)
                         ) {
-                            Button(
-                                onClick = { /* View / Download handler */ },
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                            ) {
-                                Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(14.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("View Report", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                            }
+                            Icon(Icons.Default.Download, contentDescription = null, tint = c.primary, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Download Document", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = c.heading)
                         }
                     }
                 }

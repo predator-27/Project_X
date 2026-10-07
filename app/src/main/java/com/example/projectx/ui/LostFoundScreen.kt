@@ -410,8 +410,8 @@ fun LostFoundScreen(
                 onDismiss = { staffActionItem = null },
                 onConfirm = { notes ->
                     when (action) {
-                        "VERIFY" -> viewModel.verifyClaim(item.itemId, currentUid, notes)
-                        "REJECT" -> viewModel.rejectClaim(item.itemId, currentUid, notes)
+                        "VERIFY" -> viewModel.verifyClaim(item.itemId, notes)
+                        "REJECT" -> viewModel.rejectClaim(item.itemId, notes)
                         "HANDOVER" -> viewModel.completeHandover(item.itemId, notes)
                     }
                     staffActionItem = null

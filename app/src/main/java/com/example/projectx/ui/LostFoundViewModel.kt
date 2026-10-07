@@ -42,10 +42,21 @@ class LostFoundViewModel(
         loadBrowseableItems()
     }
 
+    private val knownDemoUids = setOf(
+        DemoCampusData.DEMO_STUDENT_UID,
+        "demo_faculty_uid",
+        "demo_staff_uid",
+        "demo_collegeadmin_uid",
+        "demo_superadmin_uid"
+    )
+
     private fun isDemoSession(uid: String? = null): Boolean {
         val sessionUid = (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid
-        val matchesDemoUid = sessionUid == DemoCampusData.DEMO_STUDENT_UID || uid == DemoCampusData.DEMO_STUDENT_UID
-        return BuildConfig.DEBUG && matchesDemoUid && sessionUid == DemoCampusData.DEMO_STUDENT_UID
+        return BuildConfig.DEBUG && (sessionUid in knownDemoUids || uid in knownDemoUids)
+    }
+
+    private fun getActiveUserUid(): String? {
+        return (authRepository.sessionState.value as? AuthSessionState.Authenticated)?.user?.uid
     }
 
     fun setSearchQuery(query: String) {
@@ -234,15 +245,45 @@ class LostFoundViewModel(
         }
     }
 
+    fun isTransitionAllowed(currentStatus: LostItemStatus, newStatus: LostItemStatus): Boolean {
+        if (currentStatus == newStatus) return true
+        return when (currentStatus) {
+            LostItemStatus.REPORTED -> newStatus == LostItemStatus.CANCELLED
+            LostItemStatus.CLAIM_SUBMITTED -> newStatus == LostItemStatus.VERIFIED || newStatus == LostItemStatus.CANCELLED
+            LostItemStatus.VERIFIED -> newStatus == LostItemStatus.HANDOVER_COMPLETE || newStatus == LostItemStatus.CANCELLED
+            LostItemStatus.HANDOVER_COMPLETE -> false
+            LostItemStatus.CANCELLED -> false
+        }
+    }
+
     fun rejectClaim(
         itemId: String,
-        staffUid: String,
         staffNotes: String?
     ) {
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            val staffUid = getActiveUserUid()
+            if (isDemoSession()) {
+                val idx = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (idx != -1) {
+                    DemoCampusData.demoLostItems[idx] = DemoCampusData.demoLostItems[idx].copy(
+                        status = LostItemStatus.REPORTED,
+                        reviewedByUid = staffUid,
+                        reviewTimestamp = System.currentTimeMillis(),
+                        staffNotes = staffNotes?.ifBlank { DemoCampusData.demoLostItems[idx].staffNotes }
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+                return@launch
+            }
+            val activeUid = staffUid ?: run {
+                _actionState.value = Resource.Error("Authentication required to perform staff action.")
+                return@launch
+            }
             try {
-                repository.rejectClaim(itemId, staffUid, staffNotes?.ifBlank { null })
+                repository.rejectClaim(itemId, activeUid, staffNotes?.ifBlank { null })
                 _actionState.value = Resource.Success(Unit)
                 loadStaffQueue()
                 loadBrowseableItems()
@@ -254,18 +295,85 @@ class LostFoundViewModel(
 
     fun verifyClaim(
         itemId: String,
-        staffUid: String,
         staffNotes: String?
     ) {
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            val staffUid = getActiveUserUid()
+            if (isDemoSession()) {
+                val idx = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (idx != -1) {
+                    DemoCampusData.demoLostItems[idx] = DemoCampusData.demoLostItems[idx].copy(
+                        status = LostItemStatus.VERIFIED,
+                        verifiedByUid = staffUid,
+                        verificationTimestamp = System.currentTimeMillis(),
+                        staffNotes = staffNotes?.ifBlank { DemoCampusData.demoLostItems[idx].staffNotes }
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+                return@launch
+            }
+            val activeUid = staffUid ?: run {
+                _actionState.value = Resource.Error("Authentication required to perform staff action.")
+                return@launch
+            }
             try {
-                repository.verifyClaim(itemId, staffUid, staffNotes?.ifBlank { null })
+                repository.verifyClaim(itemId, activeUid, staffNotes?.ifBlank { null })
                 _actionState.value = Resource.Success(Unit)
                 loadStaffQueue()
                 loadBrowseableItems()
             } catch (e: Exception) {
                 _actionState.value = Resource.Error(e.localizedMessage ?: "Failed to verify claim.")
+            }
+        }
+    }
+
+    fun updateItemStatus(
+        itemId: String,
+        newStatus: LostItemStatus
+    ) {
+        viewModelScope.launch {
+            _actionState.value = Resource.Loading
+            val currentItem = if (isDemoSession()) {
+                DemoCampusData.demoLostItems.find { it.itemId == itemId }
+            } else {
+                (_staffQueueState.value as? Resource.Success)?.data?.find { it.itemId == itemId }
+            }
+
+            if (currentItem != null && !isTransitionAllowed(currentItem.status, newStatus)) {
+                _actionState.value = Resource.Error("Invalid status transition from ${currentItem.status.label} to ${newStatus.label}.")
+                return@launch
+            }
+
+            if (isDemoSession()) {
+                val idx = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (idx != -1) {
+                    val isHandover = newStatus == LostItemStatus.HANDOVER_COMPLETE
+                    DemoCampusData.demoLostItems[idx] = DemoCampusData.demoLostItems[idx].copy(
+                        status = newStatus,
+                        handoverTimestamp = if (isHandover) System.currentTimeMillis() else DemoCampusData.demoLostItems[idx].handoverTimestamp
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+                return@launch
+            }
+
+            if (getActiveUserUid() == null) {
+                _actionState.value = Resource.Error("Authentication required to perform staff action.")
+                return@launch
+            }
+
+            try {
+                repository.updateItemStatus(itemId, newStatus)
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+            } catch (e: Exception) {
+                _actionState.value = Resource.Error(e.localizedMessage ?: "Failed to update item status.")
             }
         }
     }
@@ -276,6 +384,26 @@ class LostFoundViewModel(
     ) {
         viewModelScope.launch {
             _actionState.value = Resource.Loading
+            if (isDemoSession()) {
+                val idx = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (idx != -1) {
+                    DemoCampusData.demoLostItems[idx] = DemoCampusData.demoLostItems[idx].copy(
+                        status = LostItemStatus.HANDOVER_COMPLETE,
+                        handoverTimestamp = System.currentTimeMillis(),
+                        staffNotes = staffNotes?.ifBlank { DemoCampusData.demoLostItems[idx].staffNotes }
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+                return@launch
+            }
+
+            if (getActiveUserUid() == null) {
+                _actionState.value = Resource.Error("Authentication required to perform staff action.")
+                return@launch
+            }
+
             try {
                 repository.completeHandover(itemId, staffNotes?.ifBlank { null })
                 _actionState.value = Resource.Success(Unit)
@@ -283,6 +411,80 @@ class LostFoundViewModel(
                 loadBrowseableItems()
             } catch (e: Exception) {
                 _actionState.value = Resource.Error(e.localizedMessage ?: "Failed to complete handover.")
+            }
+        }
+    }
+
+    fun editItemListing(
+        itemId: String,
+        title: String,
+        locationFound: String,
+        description: String
+    ) {
+        viewModelScope.launch {
+            _actionState.value = Resource.Loading
+            if (isDemoSession()) {
+                val idx = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (idx != -1) {
+                    DemoCampusData.demoLostItems[idx] = DemoCampusData.demoLostItems[idx].copy(
+                        title = title.trim(),
+                        locationFound = locationFound.trim(),
+                        description = description.trim()
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+                return@launch
+            }
+
+            if (getActiveUserUid() == null) {
+                _actionState.value = Resource.Error("Authentication required to perform staff action.")
+                return@launch
+            }
+
+            try {
+                repository.updateItemListing(itemId, title.trim(), locationFound.trim(), description.trim())
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+            } catch (e: Exception) {
+                _actionState.value = Resource.Error(e.localizedMessage ?: "Failed to update item listing.")
+            }
+        }
+    }
+
+    fun addStaffNote(
+        itemId: String,
+        note: String
+    ) {
+        viewModelScope.launch {
+            _actionState.value = Resource.Loading
+            if (isDemoSession()) {
+                val idx = DemoCampusData.demoLostItems.indexOfFirst { it.itemId == itemId }
+                if (idx != -1) {
+                    DemoCampusData.demoLostItems[idx] = DemoCampusData.demoLostItems[idx].copy(
+                        staffNotes = note.trim()
+                    )
+                }
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+                return@launch
+            }
+
+            if (getActiveUserUid() == null) {
+                _actionState.value = Resource.Error("Authentication required to perform staff action.")
+                return@launch
+            }
+
+            try {
+                repository.addStaffNote(itemId, note.trim())
+                _actionState.value = Resource.Success(Unit)
+                loadStaffQueue()
+                loadBrowseableItems()
+            } catch (e: Exception) {
+                _actionState.value = Resource.Error(e.localizedMessage ?: "Failed to add staff note.")
             }
         }
     }

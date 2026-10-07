@@ -14,6 +14,19 @@ object DemoCampusData {
     private const val BASE_TIME = 1789900800000L // Sep 15, 2026
     private const val ONE_DAY = 86400000L
 
+    val demoStudents = mutableListOf(
+        User(uid = "demo_student_uid", email = "alex.rivera@bennett.edu.in", rollNumber = "E25CSEU1823", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_2", email = "rahul.verma@bennett.edu.in", rollNumber = "E25CSEU0192", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_3", email = "ananya.sharma@bennett.edu.in", rollNumber = "E25ECU0042", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_4", email = "priya.nair@bennett.edu.in", rollNumber = "E25LAW0015", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_5", email = "karan.mehta@bennett.edu.in", rollNumber = "E25MGT0088", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_6", email = "sneha.gupta@bennett.edu.in", rollNumber = "E24CSEU0310", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_7", email = "arjun.singh@bennett.edu.in", rollNumber = "E24MEC0051", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_8", email = "divya.patel@bennett.edu.in", rollNumber = "E25CSEU0512", role = UserRole.STUDENT, isActive = true),
+        User(uid = "student_9", email = "rohit.joshi@bennett.edu.in", rollNumber = "E23CSEU0101", role = UserRole.STUDENT, isActive = false),
+        User(uid = "student_10", email = "simran.kaur@bennett.edu.in", rollNumber = "E25ECU0112", role = UserRole.STUDENT, isActive = true)
+    )
+
     val demoCourses = listOf(
         Course(
             courseCode = "CS201",
@@ -312,11 +325,39 @@ object DemoCampusData {
             deskNumber = "Desk #401",
             timings = "Wed, Fri: 10:00 AM - 12:00 PM",
             email = "robert.vance@projectx.demo",
-            institution = "Demo University",
+            institution = "Bennett University",
             institutionDomain = "projectx.demo",
             status = TeacherStatus.AWAY,
             isAvailableForAppointments = false,
             bio = "Specializes in Discrete Mathematics, Graph Theory, and Combinatorics."
+        ),
+        Teacher(
+            id = "fac_kumar",
+            name = "Dr. Rajesh Kumar",
+            title = "Professor",
+            department = "Electronics & Communication",
+            deskNumber = "Desk #204",
+            timings = "Mon, Thu: 01:00 PM - 03:00 PM",
+            email = "rajesh.kumar@projectx.demo",
+            institution = "Bennett University",
+            institutionDomain = "projectx.demo",
+            status = TeacherStatus.AT_DESK,
+            isAvailableForAppointments = true,
+            bio = "Specializes in Signal Processing, Embedded Systems, and VLSI Design."
+        ),
+        Teacher(
+            id = "fac_sharma",
+            name = "Prof. Meera Sharma",
+            title = "Associate Professor",
+            department = "School of Law",
+            deskNumber = "Desk #108",
+            timings = "Tue, Fri: 10:00 AM - 12:00 PM",
+            email = "meera.sharma@projectx.demo",
+            institution = "Bennett University",
+            institutionDomain = "projectx.demo",
+            status = TeacherStatus.AT_DESK,
+            isAvailableForAppointments = true,
+            bio = "Specializes in Cyber Law, Intellectual Property Rights, and Corporate Governance."
         )
     )
 
@@ -412,6 +453,62 @@ object DemoCampusData {
             claimantPhone = "+91 9876543211",
             claimTimestamp = BASE_TIME - ONE_DAY * 6,
             handoverTimestamp = BASE_TIME - ONE_DAY * 2
+        ),
+        LostItem(
+            itemId = "lost_demo_5",
+            title = "Bennett Student ID Card (CSE Dept)",
+            description = "Belongs to Rahul Verma (Roll: E25CSEU0192). Found near elevator lobby.",
+            locationFound = "Block N1 1st Floor Lobby",
+            imageUrl = null,
+            reporterUid = "staff_reporter_1",
+            status = LostItemStatus.REPORTED,
+            createdAt = BASE_TIME - ONE_DAY * 1
+        ),
+        LostItem(
+            itemId = "lost_demo_6",
+            title = "Apple AirPods Pro (2nd Gen Case)",
+            description = "White charging case found on seat_c305 desk in Block N1.",
+            locationFound = "Block N1 Room 305",
+            imageUrl = null,
+            reporterUid = "staff_reporter_2",
+            status = LostItemStatus.CLAIM_SUBMITTED,
+            createdAt = BASE_TIME - ONE_DAY * 2,
+            claimantUid = DEMO_STUDENT_UID,
+            claimNotes = "Engraved with initials 'RV' on back of case.",
+            claimantPhone = "+91 9876543210",
+            claimTimestamp = BASE_TIME - ONE_DAY * 1
+        ),
+        LostItem(
+            itemId = "lost_demo_7",
+            title = "Blue Leather Wallet with Metro Card",
+            description = "Found under bench near Central Mess entrance.",
+            locationFound = "Ground Floor Mess Entrance",
+            imageUrl = null,
+            reporterUid = "staff_reporter_3",
+            status = LostItemStatus.VERIFIED,
+            createdAt = BASE_TIME - ONE_DAY * 4,
+            claimantUid = DEMO_STUDENT_UID,
+            claimNotes = "Contains Metro card and library card.",
+            claimantPhone = "+91 9876543210",
+            claimTimestamp = BASE_TIME - ONE_DAY * 3,
+            verifiedByUid = "staff_1",
+            verificationTimestamp = BASE_TIME - ONE_DAY * 1,
+            staffNotes = "Stored at Desk 1. Student notified via SMS."
+        ),
+        LostItem(
+            itemId = "lost_demo_8",
+            title = "DBMS Core TextBook (Korth 7th Ed)",
+            description = "Found in Central Library reading room.",
+            locationFound = "Central Library 3rd Floor",
+            imageUrl = null,
+            reporterUid = "staff_reporter_4",
+            status = LostItemStatus.HANDOVER_COMPLETE,
+            createdAt = BASE_TIME - ONE_DAY * 8,
+            claimantUid = "other_student_uid_2",
+            claimNotes = "ID verified and returned.",
+            claimantPhone = "+91 9876543212",
+            claimTimestamp = BASE_TIME - ONE_DAY * 7,
+            handoverTimestamp = BASE_TIME - ONE_DAY * 3
         )
     )
 

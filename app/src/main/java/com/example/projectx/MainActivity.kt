@@ -2,11 +2,14 @@ package com.projectx.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,10 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projectx.app.components.AmbientBackground
 import com.projectx.app.components.RoleShell
@@ -52,6 +58,7 @@ import com.projectx.app.ui.hostel.RoomPartnerScreen
 import com.projectx.app.ui.lms.AssignmentDetailScreen
 import com.projectx.app.ui.lms.CourseDetailScreen
 import kotlinx.coroutines.launch
+import kotlin.math.hypot
 
 enum class BottomTab(val id: String, val label: String, val icon: ImageVector) {
     HOME("home", "Home", Icons.Default.Home),
@@ -236,6 +243,10 @@ fun StudentCampusShell(
     var selectedBottomTab by remember { mutableStateOf(BottomTab.HOME) }
     var showAiAssistantSheet by remember { mutableStateOf(false) }
 
+    BackHandler(enabled = drawerState.isOpen) {
+        coroutineScope.launch { drawerState.close() }
+    }
+
     // Map Target Seat Handoff State
     var targetMapSeatId by remember { mutableStateOf<String?>(null) }
 
@@ -243,6 +254,9 @@ fun StudentCampusShell(
     var selectedCourseCode by remember { mutableStateOf<String?>(null) }
     var selectedCourseName by remember { mutableStateOf<String?>(null) }
     var selectedAssignmentId by remember { mutableStateOf<String?>(null) }
+
+    var fabOffsetX by rememberSaveable { mutableFloatStateOf(0f) }
+    var fabOffsetY by rememberSaveable { mutableFloatStateOf(0f) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -291,7 +305,26 @@ fun StudentCampusShell(
                     icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "AI Tutor", tint = Color.White) },
                     onClick = { showAiAssistantSheet = true },
                     containerColor = CampusTokens.colors.primary,
-                    shape = RoundedCornerShape(999.dp)
+                    shape = RoundedCornerShape(999.dp),
+                    modifier = Modifier
+                        .offset { IntOffset(fabOffsetX.roundToInt(), fabOffsetY.roundToInt()) }
+                        .pointerInput(Unit) {
+                            var dragDist = 0f
+                            detectDragGestures(
+                                onDragStart = { dragDist = 0f },
+                                onDragEnd = {
+                                    if (dragDist < 10f) {
+                                        showAiAssistantSheet = true
+                                    }
+                                },
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    dragDist += hypot(dragAmount.x, dragAmount.y)
+                                    fabOffsetX = (fabOffsetX + dragAmount.x).coerceIn(-280f, 0f)
+                                    fabOffsetY = (fabOffsetY + dragAmount.y).coerceIn(-500f, 0f)
+                                }
+                            )
+                        }
                 )
             },
             bottomBar = {
@@ -397,13 +430,8 @@ fun StudentCampusShell(
                                     activeDrawerModule = "campus_map"
                                 }
                             )
-                        } else if (activeDrawerModule == "campus_map") {
-                            MapScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                                targetSeatId = targetMapSeatId
-                            )
-                        } else if (activeDrawerModule == "navigation") {
-                            CampusMapScreen()
+                        } else if (activeDrawerModule == "campus_map" || activeDrawerModule == "navigation") {
+                            CampusMapScreen(onMenuClick = { coroutineScope.launch { drawerState.open() } })
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
@@ -570,13 +598,8 @@ fun StudentCampusShell(
                         }
                     }
                     BottomTab.CAMPUS -> {
-                        if (activeDrawerModule == "campus_map") {
-                            MapScreen(
-                                onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                                targetSeatId = targetMapSeatId
-                            )
-                        } else if (activeDrawerModule == "navigation") {
-                            CampusMapScreen()
+                        if (activeDrawerModule == "campus_map" || activeDrawerModule == "navigation") {
+                            CampusMapScreen(onMenuClick = { coroutineScope.launch { drawerState.open() } })
                         } else if (activeDrawerModule == "lost_found") {
                             LostFoundScreen(
                                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
@@ -591,7 +614,7 @@ fun StudentCampusShell(
                                 onLocateOnMap = { seatId ->
                                     targetMapSeatId = seatId
                                     selectedBottomTab = BottomTab.CAMPUS
-                                    activeDrawerModule = "campus_map"
+                                    activeDrawerModule = "navigation"
                                 }
                             )
                         }
@@ -666,6 +689,7 @@ fun StudentCampusShell(
                 if (showAiAssistantSheet) {
                     CampusAiAssistantSheet(
                         aiViewModel = aiViewModel,
+                        displayName = studentDisplayName,
                         onDismiss = { showAiAssistantSheet = false }
                     )
                 }

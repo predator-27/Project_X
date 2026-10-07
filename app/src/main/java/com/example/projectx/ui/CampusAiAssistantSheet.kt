@@ -1,21 +1,20 @@
 package com.projectx.app.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,11 +27,17 @@ import com.projectx.app.theme.*
 @Composable
 fun CampusAiAssistantSheet(
     aiViewModel: CampusAiViewModel,
+    displayName: String? = null,
     onDismiss: () -> Unit
 ) {
+    val c = CampusTokens.colors
     val messages by aiViewModel.messages.collectAsState()
     val isLoading by aiViewModel.isLoading.collectAsState()
     var inputText by remember { mutableStateOf("") }
+
+    LaunchedEffect(displayName) {
+        aiViewModel.setUserNameGreeting(displayName)
+    }
 
     val promptChips = listOf(
         "📚 Explain Trees vs Graphs in Data Structures",
@@ -44,7 +49,7 @@ fun CampusAiAssistantSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = SurfaceCard,
+        containerColor = c.surface,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(
@@ -53,7 +58,7 @@ fun CampusAiAssistantSheet(
                 .fillMaxHeight(0.85f)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            // Header
+            // Header Bar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -63,36 +68,33 @@ fun CampusAiAssistantSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = InfoBannerBg,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PrimaryIndigo, modifier = Modifier.size(22.dp))
-                        }
-                    }
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = c.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
                     Column {
                         Text(
                             text = "Campus Gemini AI Tutor",
-                            fontSize = 17.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = HeadingNavy
+                            color = c.heading
                         )
                         Text(
-                            text = "24/7 Educational & Academic Assistant",
-                            fontSize = 12.sp,
-                            color = MutedText
+                            text = "Bennett University Study Buddy",
+                            fontSize = 11.sp,
+                            color = c.mutedText
                         )
                     }
                 }
 
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = HeadingNavy)
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = c.heading)
                 }
             }
 
-            HorizontalDivider(color = SurfaceBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 12.dp))
+            HorizontalDivider(color = c.surfaceBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 12.dp))
 
             // Suggested Prompt Chips
             LazyRow(
@@ -102,16 +104,18 @@ fun CampusAiAssistantSheet(
                 items(promptChips) { chipText ->
                     Surface(
                         shape = PillShape,
-                        color = InfoBannerBg,
-                        modifier = Modifier.clickable {
-                            aiViewModel.sendMessage(chipText)
-                        }
+                        color = c.primary.copy(alpha = 0.12f),
+                        modifier = Modifier
+                            .clip(PillShape)
+                            .clickable(enabled = !isLoading) {
+                                aiViewModel.sendMessage(chipText)
+                            }
                     ) {
                         Text(
                             text = chipText,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
-                            color = PrimaryIndigo,
+                            color = c.primary,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                         )
                     }
@@ -137,8 +141,8 @@ fun CampusAiAssistantSheet(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.padding(vertical = 4.dp)
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.size(18.dp), color = PrimaryIndigo, strokeWidth = 2.dp)
-                            Text("Gemini AI is thinking...", fontSize = 12.sp, color = MutedText)
+                            CircularProgressIndicator(modifier = Modifier.size(18.dp), color = c.primary, strokeWidth = 2.dp)
+                            Text("Gemini AI is thinking...", fontSize = 12.sp, color = c.mutedText)
                         }
                     }
                 }
@@ -155,36 +159,32 @@ fun CampusAiAssistantSheet(
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    placeholder = { Text("Ask AI Tutor about courses, exams...", fontSize = 13.sp, color = MutedText) },
+                    placeholder = { Text("Ask AI Tutor about courses, exams...", fontSize = 13.sp, color = c.mutedText) },
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = SurfaceCard,
-                        unfocusedContainerColor = SurfaceCard,
-                        focusedBorderColor = PrimaryIndigo,
-                        unfocusedBorderColor = SurfaceBorder
+                        focusedContainerColor = c.surface,
+                        unfocusedContainerColor = c.surface,
+                        focusedTextColor = c.heading,
+                        unfocusedTextColor = c.heading,
+                        focusedBorderColor = c.primary,
+                        unfocusedBorderColor = c.surfaceBorder
                     ),
                     modifier = Modifier.weight(1f)
                 )
 
                 IconButton(
                     onClick = {
-                        if (inputText.isNotBlank()) {
+                        if (inputText.isNotBlank() && !isLoading) {
                             aiViewModel.sendMessage(inputText)
                             inputText = ""
                         }
                     },
-                    enabled = inputText.isNotBlank() && !isLoading,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(
-                            if (inputText.isNotBlank() && !isLoading) PrimaryIndigo else SurfaceBorder,
-                            shape = CircleShape
-                        )
+                    enabled = !isLoading && inputText.isNotBlank()
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        imageVector = Icons.Default.Send,
                         contentDescription = "Send",
-                        tint = Color.White
+                        tint = if (!isLoading && inputText.isNotBlank()) c.primary else c.mutedText
                     )
                 }
             }
@@ -193,12 +193,16 @@ fun CampusAiAssistantSheet(
 }
 
 @Composable
-fun ChatMessageBubble(message: ChatMessage) {
+private fun ChatMessageBubble(message: ChatMessage) {
+    val c = CampusTokens.colors
     val isUser = message.sender == MessageSender.USER
+    val alignment = if (isUser) Alignment.End else Alignment.Start
+    val bgColor = if (isUser) c.primary else c.surfaceElevated
+    val textColor = if (isUser) c.onPrimary else c.bodyText
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+    Column(
+        horizontalAlignment = alignment,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Surface(
             shape = RoundedCornerShape(
@@ -207,24 +211,21 @@ fun ChatMessageBubble(message: ChatMessage) {
                 bottomStart = if (isUser) 16.dp else 4.dp,
                 bottomEnd = if (isUser) 4.dp else 16.dp
             ),
-            color = if (isUser) PrimaryIndigo else InfoBannerBg,
+            color = bgColor,
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Text(
-                    text = if (isUser) "You" else "✨ Gemini AI Tutor",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isUser) Color.White.copy(alpha = 0.8f) else PrimaryIndigo
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = message.text,
-                    fontSize = 13.sp,
-                    color = if (isUser) Color.White else BodyText,
-                    lineHeight = 18.sp
-                )
-            }
+            Text(
+                text = message.text,
+                fontSize = 13.sp,
+                color = textColor,
+                modifier = Modifier.padding(12.dp)
+            )
         }
+        Text(
+            text = message.timestamp,
+            fontSize = 10.sp,
+            color = c.mutedText,
+            modifier = Modifier.padding(top = 2.dp, start = 4.dp, end = 4.dp)
+        )
     }
 }

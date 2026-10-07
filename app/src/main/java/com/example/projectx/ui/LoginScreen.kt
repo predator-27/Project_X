@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.sp
 import com.projectx.app.BuildConfig
 import com.projectx.app.R
 import com.projectx.app.model.UserRole
+import com.projectx.app.theme.CampusTokens
+import com.projectx.app.theme.MicrosoftBrandBlue
 import com.projectx.app.ui.auth.AuthViewModel
 import com.projectx.app.util.AuthValidation
 import kotlinx.coroutines.launch
@@ -269,7 +271,7 @@ fun LoginScreen(
                                         activity?.let { authViewModel.signInWithMicrosoft(it) }
                                     },
                                     enabled = !isLoading && activity != null,
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A4EF)),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MicrosoftBrandBlue),
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -380,7 +382,7 @@ fun LoginScreen(
                                         activity?.let { authViewModel.signInWithMicrosoft(it) }
                                     },
                                     enabled = !isLoading && activity != null,
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A4EF)),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MicrosoftBrandBlue),
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -752,13 +754,13 @@ private fun PasswordRequirementRule(label: String, isMet: Boolean) {
     ) {
         Text(
             text = if (isMet) "✓" else "•",
-            color = if (isMet) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (isMet) CampusTokens.colors.successGreen else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp
         )
         Text(
             text = label,
-            color = if (isMet) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (isMet) CampusTokens.colors.successGreen else MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 11.sp
         )
     }

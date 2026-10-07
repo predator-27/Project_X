@@ -145,3 +145,12 @@ val FrostSheenTop      = Color(0x18FFFFFF)
 val FrostBorderGlow    = Color(0x40A8B840)
 val FrostAmbientPrimary   = Color(0x26A8B840)
 val FrostAmbientSecondary = Color(0x18C8A840)
+
+// ─────────────────────────────────────────────────────────────────────
+// Fixed Splash & Brand Constants
+// ─────────────────────────────────────────────────────────────────────
+val SplashBackground     = Color(0xFF0A100A)
+val SplashBrandNameColor = Color(0xFFE8F0D8)
+val SplashTaglineColor   = Color(0xFF7A8870)
+
+val MicrosoftBrandBlue   = Color(0xFF00A4EF)

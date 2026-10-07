@@ -22,8 +22,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
+
+class WebAppInterface(private val onExit: () -> Unit) {
+    @JavascriptInterface
+    fun closeWebUpdate() {
+        onExit()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

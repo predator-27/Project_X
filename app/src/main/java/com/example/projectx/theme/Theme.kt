@@ -12,6 +12,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 
+fun calculateOnColor(color: Color): Color {
+    val luminance = (0.299f * color.red + 0.587f * color.green + 0.114f * color.blue)
+    return if (luminance > 0.6f) Color(0xFF0F172A) else Color.White
+}
+
 /**
  * Applies the currently-selected [CampusThemePreset]. The M3 [ColorScheme]
  * is derived from the preset's [CampusColors] so switching preset instantly
@@ -26,8 +31,6 @@ fun CampusTheme(
     val textSize by CampusThemeState.textSize.collectAsState()
     val systemDark = isSystemInDarkTheme()
 
-    // Resolve dark/light: preset's own dark bit wins if it is natively dark; otherwise the
-    // user's manual mode trumps system — SYSTEM falls back to the device setting.
     val wantDark = when {
         preset == CampusThemePreset.FROSTED_MIDNIGHT ||
             preset == CampusThemePreset.CYBER_MIDNIGHT -> true
@@ -35,6 +38,7 @@ fun CampusTheme(
         mode == CampusThemeMode.DARK -> true
         else -> systemDark
     }
+
     val tokens = campusColorsFor(preset).copy(isDark = wantDark)
     val colorScheme = tokens.toColorScheme()
 

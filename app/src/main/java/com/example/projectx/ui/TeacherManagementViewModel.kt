@@ -60,6 +60,7 @@ class TeacherManagementViewModel(
     val showUpdateBanner: StateFlow<Boolean> = _showUpdateBanner.asStateFlow()
 
     val updateInfo: StateFlow<UpdateInfo?> = updateManager.updateInfo
+    val isCheckingUpdate: StateFlow<Boolean> = updateManager.isChecking
     val isDownloadingUpdate: StateFlow<Boolean> = updateManager.isDownloading
     val downloadProgress: StateFlow<Float> = updateManager.downloadProgress
     val downloadError: StateFlow<String?> = updateManager.downloadError

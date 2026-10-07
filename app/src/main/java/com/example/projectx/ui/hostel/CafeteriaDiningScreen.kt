@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Restaurant
@@ -34,6 +35,7 @@ fun CafeteriaDiningScreen(
     hostelViewModel: HostelViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    val c = CampusTokens.colors
     val mealsState by hostelViewModel.mealsState.collectAsState()
     val selectedDate by hostelViewModel.selectedDateState.collectAsState()
 
@@ -163,8 +165,8 @@ fun CafeteriaDiningScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.QrCode2, contentDescription = null, tint = PrimaryIndigo)
-                        Text("${meal.mealType} QR Pass (${meal.date})", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.QrCode2, contentDescription = null, tint = c.primary)
+                        Text("${meal.mealType} QR Pass (${meal.date})", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = c.heading)
                     }
                 },
                 text = {
@@ -180,7 +182,7 @@ fun CafeteriaDiningScreen(
                         Surface(
                             shape = RoundedCornerShape(16.dp),
                             color = Color.White,
-                            border = BorderStroke(2.dp, PrimaryIndigo),
+                            border = BorderStroke(2.dp, c.primary),
                             modifier = Modifier.size(200.dp)
                         ) {
                             Box(
@@ -217,21 +219,21 @@ fun CafeteriaDiningScreen(
 
                         Text(
                             text = "Token: ${meal.qrToken}",
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryIndigo
+                            color = c.primary
                         )
 
                         Text(
                             text = "Scan this specific ${meal.mealType} QR pass at the mess scanner counter during ${meal.timeRange} on ${meal.date}.",
-                            fontSize = 11.sp,
-                            color = MutedText
+                            fontSize = 12.sp,
+                            color = c.mutedText
                         )
                     }
                 },
                 confirmButton = {
                     TextButton(onClick = { selectedMealForQr = null }) {
-                        Text("Close", fontWeight = FontWeight.Bold)
+                        Text("Close", fontWeight = FontWeight.Bold, color = c.primary)
                     }
                 }
             )
@@ -244,11 +246,12 @@ fun MealCard(
     meal: DiningMeal,
     onShowQrClick: () -> Unit = {}
 ) {
+    val c = CampusTokens.colors
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = CardShape,
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        border = BorderStroke(1.dp, SurfaceBorder)
+        colors = CardDefaults.cardColors(containerColor = c.surface),
+        border = BorderStroke(1.dp, c.surfaceBorder)
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -263,19 +266,19 @@ fun MealCard(
                     text = meal.mealType,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = HeadingNavy
+                    color = c.heading
                 )
 
                 meal.calories?.let { cal ->
                     Surface(
                         shape = PillShape,
-                        color = SecondaryEmeraldBg
+                        color = c.successGreenBg
                     ) {
                         Text(
                             text = cal,
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = SecondaryEmerald,
+                            color = c.successGreen,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                         )
                     }
@@ -284,17 +287,17 @@ fun MealCard(
 
             Text(
                 text = "⏰ ${meal.timeRange} • ${meal.location}",
-                fontSize = 11.sp,
-                color = MutedText,
+                fontSize = 12.sp,
+                color = c.mutedText,
                 fontWeight = FontWeight.Medium
             )
 
-            HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
+            HorizontalDivider(color = c.divider, thickness = 1.dp)
 
             Text(
                 text = "Menu: ${meal.menuItems.joinToString(", ")}",
                 fontSize = 12.sp,
-                color = BodyText
+                color = c.bodyText
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -302,8 +305,8 @@ fun MealCard(
             Button(
                 onClick = onShowQrClick,
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                modifier = Modifier.fillMaxWidth().height(40.dp)
+                colors = ButtonDefaults.buttonColors(containerColor = c.primary, contentColor = c.onPrimary),
+                modifier = Modifier.fillMaxWidth().height(42.dp)
             ) {
                 Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))

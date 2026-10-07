@@ -43,10 +43,14 @@ class AuthRepository(
                     AuthSessionState.Unauthenticated
                 }
                 "EMAIL_NOT_VERIFIED" -> {
-                    AuthSessionState.EmailVerificationRequired(currentFirebaseUser.email ?: "")
+                    if (isBypassVerificationUser(currentFirebaseUser)) {
+                        loadSessionForFirebaseUser(currentFirebaseUser)
+                    } else {
+                        AuthSessionState.EmailVerificationRequired(currentFirebaseUser.email ?: "")
+                    }
                 }
                 else -> {
-                    if (currentFirebaseUser.isEmailVerified) {
+                    if (currentFirebaseUser.isEmailVerified || isBypassVerificationUser(currentFirebaseUser)) {
                         loadSessionForFirebaseUser(currentFirebaseUser)
                     } else {
                         AuthSessionState.Unauthenticated
@@ -312,9 +316,15 @@ class AuthRepository(
         return user.providerData.any { it.providerId == "microsoft.com" }
     }
 
+    private fun isBypassVerificationUser(user: FirebaseUser): Boolean {
+        if (isMicrosoftOAuthUser(user)) return true
+        if (BuildConfig.DEBUG && user.email?.endsWith(".test@bennett.edu.in") == true) return true
+        return false
+    }
+
     private suspend fun loadSessionForFirebaseUser(firebaseUser: FirebaseUser): AuthSessionState {
-        // Check email verification status for password accounts (Microsoft M365 accounts are pre-verified)
-        if (!firebaseUser.isEmailVerified && !isMicrosoftOAuthUser(firebaseUser)) {
+        // Check email verification status for password accounts (Microsoft M365 accounts & DEBUG test accounts are pre-verified)
+        if (!firebaseUser.isEmailVerified && !isBypassVerificationUser(firebaseUser)) {
             return AuthSessionState.EmailVerificationRequired(firebaseUser.email ?: "")
         }
 

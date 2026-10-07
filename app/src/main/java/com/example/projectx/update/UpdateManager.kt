@@ -20,7 +20,9 @@ data class UpdateInfo(
     val latestVersion: String,
     val releaseNotes: String,
     val downloadUrl: String,
-    val isUpdateAvailable: Boolean
+    val isUpdateAvailable: Boolean,
+    val isNewerVersion: Boolean = false,
+    val hasApkAsset: Boolean = false
 )
 
 class UpdateManager private constructor() {
@@ -96,23 +98,27 @@ class UpdateManager private constructor() {
                         }
                     }
                 }
-                if (downloadUrl.isBlank()) {
-                    downloadUrl = "https://raw.githubusercontent.com/predator-27/Project_X/main/releases/app-debug.apk"
-                }
 
-                val isAvailable = isVersionHigher(normalizeVersion(tagName), normalizeVersion(installedVersion))
+                val versionHigher = isVersionHigher(normalizeVersion(tagName), normalizeVersion(installedVersion))
+                val hasApk = downloadUrl.isNotBlank()
+                val isAvailable = versionHigher && hasApk
+
+                if (versionHigher && !hasApk) {
+                    _downloadError.value = "The latest release ($tagName) does not contain an APK asset."
+                }
 
                 val info = UpdateInfo(
                     latestVersion = tagName,
                     releaseNotes = releaseNotes,
                     downloadUrl = downloadUrl,
-                    isUpdateAvailable = isAvailable
+                    isUpdateAvailable = isAvailable,
+                    isNewerVersion = versionHigher,
+                    hasApkAsset = hasApk
                 )
 
                 _updateInfo.value = info
                 return@withContext info
             } else {
-                // API unreachable / rate-limited — stay silent, don't nag.
                 _updateInfo.value = null
                 return@withContext null
             }
@@ -208,10 +214,12 @@ class UpdateManager private constructor() {
         context.startActivity(intent)
     }
 
-    private fun isVersionHigher(remote: String, current: String): Boolean {
+    fun isVersionHigher(remote: String, current: String): Boolean {
         try {
-            val remoteParts = remote.split(".").mapNotNull { it.toIntOrNull() }
-            val currentParts = current.split(".").mapNotNull { it.toIntOrNull() }
+            val rClean = normalizeVersion(remote)
+            val cClean = normalizeVersion(current)
+            val remoteParts = rClean.split(".").mapNotNull { it.toIntOrNull() }
+            val currentParts = cClean.split(".").mapNotNull { it.toIntOrNull() }
 
             if (remoteParts.isEmpty() || currentParts.isEmpty()) return false
 

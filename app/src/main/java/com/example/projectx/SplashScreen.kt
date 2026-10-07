@@ -21,10 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projectx.app.R
-
-private val SplashBackground = Color(0xFF0A100A)
-private val BrandNameColor   = Color(0xFFE8F0D8)
-private val TaglineColor     = Color(0xFF7A8870)
+import com.projectx.app.theme.SplashBackground
+import com.projectx.app.theme.SplashBrandNameColor
+import com.projectx.app.theme.SplashTaglineColor
 
 /**
  * Optional Project X Brand Pose Composable.
@@ -57,7 +56,7 @@ fun SplashScreen(
             Spacer(Modifier.height(16.dp))
             Text(
                 text = "Project X",
-                color = BrandNameColor,
+                color = SplashBrandNameColor,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center
@@ -65,7 +64,7 @@ fun SplashScreen(
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Digital Campus Platform",
-                color = TaglineColor,
+                color = SplashTaglineColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 1.2.sp,
