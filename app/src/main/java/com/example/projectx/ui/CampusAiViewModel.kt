@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
 @Immutable
@@ -18,7 +21,7 @@ data class ChatMessage(
     val id: String = UUID.randomUUID().toString(),
     val sender: MessageSender,
     val text: String,
-    val timestamp: String = "Just now"
+    val timestamp: String = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
 )
 
 enum class MessageSender {
@@ -60,9 +63,10 @@ class CampusAiViewModel : ViewModel() {
     }
 
     fun sendMessage(userPrompt: String) {
-        if (userPrompt.isBlank() || _isLoading.value) return
+        val cleanPrompt = userPrompt.trim()
+        if (cleanPrompt.isBlank() || _isLoading.value) return
 
-        val userMessage = ChatMessage(sender = MessageSender.USER, text = userPrompt.trim())
+        val userMessage = ChatMessage(sender = MessageSender.USER, text = cleanPrompt)
         _messages.value = _messages.value + userMessage
         _isLoading.value = true
 
@@ -74,7 +78,7 @@ class CampusAiViewModel : ViewModel() {
                     You assist students with campus information, academics, attendance, timetable, faculty directory, appointments, indoor navigation, lost & found, announcements, and student services.
                     Be helpful, clear, concise, and polite. If live data is unavailable, state what is known without hallucinating.
 
-                    Student Question: ${userPrompt.trim()}
+                    Student Question: $cleanPrompt
                 """.trimIndent()
 
                 val response = generativeModel.generateContent(systemContextPrompt)
@@ -88,13 +92,13 @@ class CampusAiViewModel : ViewModel() {
                 } else {
                     _messages.value = _messages.value + ChatMessage(
                         sender = MessageSender.AI,
-                        text = getSmartFallbackResponse(userPrompt)
+                        text = getSmartFallbackResponse(cleanPrompt)
                     )
                 }
             } catch (e: Exception) {
                 _messages.value = _messages.value + ChatMessage(
                     sender = MessageSender.AI,
-                    text = getSmartFallbackResponse(userPrompt)
+                    text = getSmartFallbackResponse(cleanPrompt)
                 )
             } finally {
                 _isLoading.value = false

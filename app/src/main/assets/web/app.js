@@ -91,14 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkWebUpdate() {
-    setTimeout(() => {
-        const banner = document.getElementById('web-update-banner');
-        if (banner) banner.style.display = 'block';
-    }, 1500);
+    // Disabled auto web update banner to prevent unexpected download redirects.
 }
 
 function triggerWebUpdate() {
-    window.location.href = "https://raw.githubusercontent.com/predator-27/Project_X/main/releases/app-debug.apk";
+    // Web update redirect disabled.
 }
 
 function closeWebUpdate() {
